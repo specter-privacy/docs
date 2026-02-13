@@ -1,0 +1,56 @@
+---
+title: "Verify integration"
+description: "A practical checklist to confirm your integration is working end-to-end"
+---
+
+<CardGroup cols={2}>
+  <Card title="Frontend experience" icon="rocket" href="https://specter-stealth.vercel.app/">
+    Compare user-facing behavior with local API outputs.
+  </Card>
+  <Card title="Detailed FAQ" icon="circle-question" href="/faq">
+    Use FAQ answers while validating.
+  </Card>
+</CardGroup>
+
+## Integration validation checklist
+
+<Steps>
+  <Step title="Backend health is stable">
+
+```bash
+curl -s http://localhost:3001/health | jq .
+```
+
+Confirm `status` is `ok` and version is present.
+
+  </Step>
+  <Step title="Core endpoints respond">
+
+```bash
+curl -s -X POST http://localhost:3001/api/v1/keys/generate | jq .
+curl -s http://localhost:3001/api/v1/registry/stats | jq .
+```
+
+  </Step>
+  <Step title="Create and scan round-trip works">
+    Re-run `/getting-started/quickstart` and confirm discovery output is non-empty.
+  </Step>
+  <Step title="CLI path is available">
+
+```bash
+cd SPECTER/specter
+cargo run --bin specter -- --help
+```
+
+Confirm commands include `generate`, `resolve`, `create`, `scan`, `serve`, and `bench`.
+
+  </Step>
+</Steps>
+
+## Integration-ready definition
+
+You are integration-ready when:
+- `/health` is stable
+- key generation and registry stats endpoints succeed
+- quickstart round-trip returns a discovery
+- your team can repeat the same results with CLI or API

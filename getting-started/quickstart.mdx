@@ -1,64 +1,63 @@
 ---
-title: "Quickstart"
-description: "Run a full keygen -> stealth create -> publish -> scan loop in minutes"
+title: "Integration Quickstart"
+description: "Integrate the full loop into your app: keygen → create → publish → scan"
 ---
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="Launch app" icon="rocket" href="https://specter-stealth.vercel.app/">
-    Try the same flow in the UI while running CLI/curl locally.
+    Mirror these steps visually in the frontend.
   </Card>
-  <Card title="API map" icon="sitemap" href="/api/introduction">
-    Keep route docs open while executing commands.
+  <Card title="API route map" icon="sitemap" href="/api/introduction">
+    Keep endpoint docs open while executing commands.
+  </Card>
+  <Card title="FAQ" icon="circle-question" href="/faq">
+    Use detailed answers if any response is unexpected.
   </Card>
 </CardGroup>
 
-This tutorial runs a full local stealth flow against the API.
-
 <Note>
-Start the backend first: `cargo run --bin specter -- serve --port 3001` from `SPECTER/specter`.
+Start backend first: `cargo run --bin specter -- serve --port 3001` from `SPECTER/specter`.
 </Note>
 
-## 1. Generate keys
+## Integration loop
+
+<Steps>
+  <Step title="Generate recipient keys">
 
 ```bash
 curl -s -X POST http://localhost:3001/api/v1/keys/generate | tee /tmp/specter-keys.json
-```
-
-Extract fields:
-
-```bash
 META_ADDRESS=$(jq -r '.meta_address' /tmp/specter-keys.json)
 VIEWING_SK=$(jq -r '.viewing_sk' /tmp/specter-keys.json)
 SPENDING_PK=$(jq -r '.spending_pk' /tmp/specter-keys.json)
 SPENDING_SK=$(jq -r '.spending_sk' /tmp/specter-keys.json)
 ```
 
-## 2. Create stealth payment data
+  </Step>
+  <Step title="Create stealth payload">
 
 ```bash
 curl -s -X POST http://localhost:3001/api/v1/stealth/create \
   -H 'Content-Type: application/json' \
   -d "{\"meta_address\":\"$META_ADDRESS\"}" | tee /tmp/specter-create.json
-```
 
-```bash
 EPHEMERAL_KEY=$(jq -r '.ephemeral_ciphertext' /tmp/specter-create.json)
 VIEW_TAG=$(jq -r '.view_tag' /tmp/specter-create.json)
 STEALTH_ADDRESS=$(jq -r '.stealth_address' /tmp/specter-create.json)
-echo "Send funds to: $STEALTH_ADDRESS"
+
+echo "Stealth destination: $STEALTH_ADDRESS"
 ```
 
-## 3. Publish the announcement
-
-`tx_hash` is required by the API. Use the real chain tx hash after sending funds.
+  </Step>
+  <Step title="Publish announcement">
 
 ```bash
 curl -s -X POST http://localhost:3001/api/v1/registry/announcements \
   -H 'Content-Type: application/json' \
-  -d "{\"ephemeral_key\":\"$EPHEMERAL_KEY\",\"view_tag\":$VIEW_TAG,\"tx_hash\":\"0x1111111111111111111111111111111111111111111111111111111111111111\",\"amount\":\"0.01\",\"chain\":\"ethereum\"}"
+  -d "{\"ephemeral_key\":\"$EPHEMERAL_KEY\",\"view_tag\":$VIEW_TAG,\"tx_hash\":\"0x1111111111111111111111111111111111111111111111111111111111111111\",\"amount\":\"0.01\",\"chain\":\"ethereum\"}" | jq .
 ```
 
-## 4. Scan for discoveries
+  </Step>
+  <Step title="Scan and discover">
 
 ```bash
 curl -s -X POST http://localhost:3001/api/v1/stealth/scan \
@@ -66,21 +65,16 @@ curl -s -X POST http://localhost:3001/api/v1/stealth/scan \
   -d "{\"viewing_sk\":\"$VIEWING_SK\",\"spending_pk\":\"$SPENDING_PK\",\"spending_sk\":\"$SPENDING_SK\"}" | jq .
 ```
 
-Expected: one discovery with `stealth_address` matching step 2.
+Expected result: one discovery with `stealth_address` matching the create step.
 
-<details>
-<summary><strong>UX tip for teams</strong></summary>
+  </Step>
+</Steps>
 
-Run this quickstart as a team checklist during onboarding and release validation.
-
-- One person runs sender steps.
-- One person runs recipient scan.
-- Compare output addresses together.
-
-</details>
-
-## Source references
-
-- `../SPECTER/specter/specter-api/src/routes.rs`
-- `../SPECTER/specter/specter-api/src/handlers.rs`
-- `../SPECTER/specter/specter-api/src/dto.rs`
+<AccordionGroup>
+  <Accordion title="What this proves">
+    You validated the core integration loop and payload contract: keygen → create → publish → scan. Your app can now use these exact calls.
+  </Accordion>
+  <Accordion title="Next step after quickstart">
+    Move to the [Integration playbook](/guides/integration-playbook) to fit this loop into your app architecture.
+  </Accordion>
+</AccordionGroup>

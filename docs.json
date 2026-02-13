@@ -22,10 +22,17 @@
             "group": "Getting started",
             "pages": [
               "index",
+              "getting-started/first-time-overview",
               "getting-started/choose-your-path",
               "getting-started/installation",
               "getting-started/quickstart",
-              "getting-started/verify-deployment"
+              "getting-started/verify-integration"
+            ]
+          },
+          {
+            "group": "Explore product",
+            "pages": [
+              "explore/frontend-experience"
             ]
           },
           {
@@ -39,8 +46,9 @@
             ]
           },
           {
-            "group": "Guides",
+            "group": "Integration guides",
             "pages": [
+              "guides/integration-playbook",
               "guides/ens-setup",
               "guides/suins-setup",
               "guides/private-payment-workflow",
@@ -56,45 +64,27 @@
             ]
           },
           {
-            "group": "Deployment",
-            "pages": [
-              "deployment/production-checklist",
-              "deployment/docker",
-              "deployment/kubernetes",
-              "deployment/cloud"
-            ]
-          },
-          {
-            "group": "Development",
-            "pages": [
-              "development/contributing",
-              "development/workspace",
-              "development/testing",
-              "development/release-process"
-            ]
-          },
-          {
             "group": "Roadmap",
             "pages": [
               "roadmap/yet-to-implement"
             ]
           },
           {
-            "group": "Troubleshooting",
+            "group": "Development",
             "pages": [
-              "troubleshooting/common-issues",
-              "troubleshooting/faq"
+              "development/index"
             ]
           },
           {
             "group": "Reference",
             "pages": [
-              "reference/cli",
-              "reference/crates",
-              "reference/glossary",
-              "reference/changelog",
-              "reference/license",
-              "reference/verification-matrix"
+              "reference/index"
+            ]
+          },
+          {
+            "group": "FAQ",
+            "pages": [
+              "faq"
             ]
           }
         ]

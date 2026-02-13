@@ -1,0 +1,187 @@
+---
+title: "FAQ"
+description: "Detailed answers for everyone — beginners, integrators, and product teams"
+---
+
+<CardGroup cols={3}>
+  <Card title="What is SPECTER?" icon="sparkles" href="/getting-started/first-time-overview">
+    Start here if you're completely new.
+  </Card>
+  <Card title="Integration Quickstart" icon="bolt" href="/getting-started/quickstart">
+    Validate the core loop with copy-paste commands.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api/introduction">
+    Use endpoint schemas for implementation details.
+  </Card>
+</CardGroup>
+
+---
+
+## Beginner Questions
+
+<AccordionGroup>
+  <Accordion title="What problem does SPECTER solve?">
+    Every blockchain transaction is public. If someone sends you crypto, anyone watching the chain can trace that payment back to you, see your balance, and track your activity.
+    
+    SPECTER solves this by creating **one-time stealth addresses** for every payment. The sender creates a fresh address that only the recipient can discover — observers see the transaction, but can't figure out who received the funds.
+  </Accordion>
+  <Accordion title="Do I need to understand cryptography to use SPECTER?">
+    **No.** You can use the frontend app and the API without any crypto knowledge. The cryptography runs in the background — you interact with simple API calls like "generate keys" and "create stealth address."
+    
+    If you're curious, the [What is SPECTER?](/getting-started/first-time-overview) page has expandable sections that explain the crypto in simple terms.
+  </Accordion>
+  <Accordion title="What should I open first if I'm completely new?">
+    Follow this path:
+    1. **[What is SPECTER?](/getting-started/first-time-overview)** — understand the concept in 5 minutes
+    2. **[Explore the product](/explore/frontend-experience)** — see it work in the live app
+    3. **[Integration quickstart](/getting-started/quickstart)** — run the API loop yourself
+  </Accordion>
+  <Accordion title="Is this a wallet? A token? A blockchain?">
+    None of those. SPECTER is a **privacy protocol** — a set of tools (API, frontend, CLI) that generate private receiving addresses. It works *on top of* existing blockchains (Ethereum, Sui). You use your own wallet to send and receive funds — SPECTER just makes the addresses private.
+  </Accordion>
+  <Accordion title="What does 'post-quantum' mean?">
+    Current encryption (like the kind used in Bitcoin and Ethereum) could be broken by future quantum computers. SPECTER uses **ML-KEM-768** (formerly called Kyber), a new encryption standard specifically designed to resist quantum attacks. This means your privacy stays safe even in a post-quantum world.
+  </Accordion>
+  <Accordion title="Can I try it without installing anything?">
+    Yes! Just click **[Launch app](https://specter-stealth.vercel.app/)** and explore the full flow in your browser. No local setup, no downloads, no wallet required for testing.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Integration Questions
+
+<AccordionGroup>
+  <Accordion title="Which API endpoints do I need at minimum?">
+    The core integration loop uses exactly 4 endpoints:
+    
+    | Step | Endpoint | Purpose |
+    | --- | --- | --- |
+    | 1 | `POST /api/v1/keys/generate` | Generate recipient keys |
+    | 2 | `POST /api/v1/stealth/create` | Create stealth payment |
+    | 3 | `POST /api/v1/registry/announcements` | Publish announcement |
+    | 4 | `POST /api/v1/stealth/scan` | Discover payments |
+    
+    That's it. Everything else (ENS, SuiNS, IPFS, Yellow) is optional and builds on this core.
+  </Accordion>
+  <Accordion title="Is authentication built into the API?">
+    No. The SPECTER API is stateless and does not include authentication. Add auth and rate limiting at your API gateway, reverse proxy, or application layer based on your security requirements.
+  </Accordion>
+  <Accordion title="Why does the publish endpoint require tx_hash?">
+    The `tx_hash` field serves as a unique identifier for duplicate protection in the registry. In production, this would be the actual on-chain transaction hash. For testing, you can use any unique hex string.
+  </Accordion>
+  <Accordion title="Why does scan return no discoveries sometimes?">
+    Common causes:
+    - **Wrong keys** — the viewing/spending keys don't match what was used during creation
+    - **Missing publish step** — the announcement was never published to the registry
+    - **Payload mismatch** — the fields sent to scan don't match what was published
+    - **Registry reset** — the in-memory registry resets when the server restarts
+    
+    **Fix**: Re-run the [Integration quickstart](/getting-started/quickstart) steps in exact order with fresh keys.
+  </Accordion>
+  <Accordion title="Can I use SPECTER with my existing backend?">
+    Yes. SPECTER's API is a standard REST API — call it from any language or framework. Common integration patterns:
+    - **Node.js/Python backend** → Call SPECTER API via HTTP from your server
+    - **Frontend dApp** → Call SPECTER API directly or through your backend proxy
+    - **Mobile app** → Same as frontend, use HTTP requests
+    
+    See the [Integration playbook](/guides/integration-playbook) for detailed patterns.
+  </Accordion>
+  <Accordion title="What's the difference between API and CLI integration?">
+    - **API**: Best for production apps. Your backend calls SPECTER endpoints programmatically.
+    - **CLI**: Best for local testing, demos, CI/CD pipelines, and support debugging.
+    
+    Most teams use the API for production and CLI for development/QA.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Product & Frontend Questions
+
+<AccordionGroup>
+  <Accordion title="Can I explore SPECTER without any local setup?">
+    Yes! Use the **[Launch app](https://specter-stealth.vercel.app/)** button and follow the [Explore product](/explore/frontend-experience) guide. The hosted frontend connects to the live backend — no installation required.
+  </Accordion>
+  <Accordion title="When should I use the CLI instead of the frontend?">
+    Use the CLI when you need:
+    - **Scripted automation** — reproducible test flows
+    - **CI/CD integration** — smoke tests in your pipeline
+    - **Support playbooks** — reproducing user issues locally
+    - **Benchmarking** — the CLI includes a `bench` command for performance testing
+  </Accordion>
+  <Accordion title="When should I use the API directly?">
+    Use the API when your backend needs to:
+    - Control payment workflows programmatically
+    - Handle multi-user scenarios (e.g., a wallet serving many recipients)
+    - Integrate with existing services deterministically
+    - Process payments without user interaction
+  </Accordion>
+  <Accordion title="Does the frontend work on mobile?">
+    The frontend is a standard web app and works in mobile browsers. It's optimized for desktop but functional on mobile screens.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Security & Privacy Questions
+
+<AccordionGroup>
+  <Accordion title="Is my spending key ever sent to the server?">
+    The spending *secret* key is used locally during the scan operation. The API does receive it for the scan endpoint in the current implementation — in a production deployment, you would perform scanning client-side or in a trusted enclave.
+  </Accordion>
+  <Accordion title="Can someone link my stealth addresses to my identity?">
+    Not without your viewing key. Each stealth address is cryptographically unique and unlinkable from the public meta-address. Only someone with your viewing secret key can determine which stealth addresses belong to you.
+  </Accordion>
+  <Accordion title="What happens if quantum computers arrive?">
+    SPECTER uses ML-KEM-768, a NIST-standardized post-quantum algorithm. Even with a quantum computer, an attacker cannot break the encryption to link payments to your identity. This is unlike classical stealth address protocols that rely on elliptic curves.
+  </Accordion>
+  <Accordion title="Is the registry stored on-chain?">
+    Currently, the registry supports two modes:
+    - **In-memory** — for development and testing (resets on server restart)
+    - **File-based** — for persistent local storage
+    
+    On-chain registry storage is a future enhancement on the roadmap.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Chain & Compatibility Questions
+
+<AccordionGroup>
+  <Accordion title="Which blockchains does SPECTER support?">
+    Currently: **Ethereum** and **Sui**. The core cryptography is chain-agnostic — only name resolution (ENS vs SuiNS) and on-chain settlement differ between chains.
+  </Accordion>
+  <Accordion title="Is Solana support available?">
+    Solana is on the roadmap but not yet implemented. Current backend flow focuses on Ethereum and Sui.
+  </Accordion>
+  <Accordion title="Can I use SPECTER with ENS names?">
+    Yes. SPECTER includes ENS resolution — senders can look up a recipient's meta-address using their `.eth` name instead of pasting a long key. See the [ENS setup guide](/guides/ens-setup).
+  </Accordion>
+  <Accordion title="Can I use SPECTER with Sui Name Service (SuiNS)?">
+    Yes. Sui name resolution works the same way as ENS — look up meta-addresses by `.sui` names. See the [SuiNS setup guide](/guides/suins-setup).
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Current Scope Questions
+
+<AccordionGroup>
+  <Accordion title="Are roadmap features already implemented?">
+    No. The following are **planned but not yet built**:
+    - OAPA (One Address Per Application)
+    - PQ account abstraction wallet
+    - Privacy keystore
+    - Migration contracts
+    
+    See the [Roadmap](/roadmap/yet-to-implement) for full details and priority.
+  </Accordion>
+  <Accordion title="Are Yellow channels fully settled on-chain?">
+    Not yet. The Yellow close flow currently returns placeholder transaction fields and depends on external Yellow Network processing. This is functional for testing the API contract.
+  </Accordion>
+  <Accordion title="Is the file-based registry production-ready?">
+    The file-based registry is suitable for local development and testing. For production use, you'd want a database-backed registry with proper replication and access controls.
+  </Accordion>
+</AccordionGroup>

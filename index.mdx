@@ -1,122 +1,77 @@
 ---
 title: "SPECTER"
-description: "Post-quantum stealth addresses for Ethereum and Sui"
+description: "Private payments, made simple — post-quantum stealth addresses for Ethereum and Sui"
 ---
-
 
 ![SPECTER logo](/images/specter/logo-tagline.png)
 
-## Launch app
+## Welcome to SPECTER
 
-<Info>
-Use the **Launch app** button in the top navigation to open the hosted SPECTER experience.
-</Info>
+SPECTER lets you receive funds at **private one-time addresses** so observers cannot link payments back to your identity. It uses **post-quantum cryptography** (ML-KEM-768) to future-proof your privacy against quantum attacks.
 
 <CardGroup cols={3}>
-  <Card title="Launch app now" icon="rocket" href="https://specter-stealth.vercel.app/">
-    Open the live app and test private flows immediately.
+  <Card title="Launch App" icon="rocket" href="https://specter-stealth.vercel.app/">
+    Try the full experience — no setup required.
   </Card>
-  <Card title="Choose your path" icon="map" href="/getting-started/choose-your-path">
-    Start from your role: integrator, operator, auditor, or builder.
-  </Card>
-  <Card title="Run local quickstart" icon="terminal" href="/getting-started/quickstart">
-    Use copy-paste commands to complete your first stealth flow.
-  </Card>
-</CardGroup>
-
-## Post-Quantum Privacy for Ethereum and Sui
-
-SPECTER is the first production-ready protocol for **quantum-resistant private payments**. It enables users to receive assets without revealing their primary address, protecting them from surveillance and future quantum threats.
-
-<CardGroup cols={2}>
-  <Card title="Launch Hosted App" icon="rocket" href="https://specter-stealth.vercel.app/">
-    Try the live demo on Sepolia and Sui Testnet.
-  </Card>
-  <Card title="Start by role" icon="map" href="/getting-started/choose-your-path">
-    Follow the best route for your use case.
-  </Card>
-  <Card title="Quickstart Guide" icon="bolt" href="/getting-started/quickstart">
-    Integrate privacy into your dApp in < 5 minutes.
-  </Card>
-  <Card title="API endpoint map" icon="sitemap" href="/api/introduction">
-    Jump directly into endpoint-level integration.
-  </Card>
-</CardGroup>
-
-## Core Capabilities
-
-![Quantum Security](/images/specter/quantum-shield.png)
-
-SPECTER is built for speed, security, and developer experience.
-
-<CardGroup cols={2}>
-  <Card title="Quantum Resistance" icon="shield-halved">
-    Secured by **ML-KEM-768** (Kyber), the NIST standard for post-quantum cryptography.
-  </Card>
-  <Card title="Multi-Chain Support" icon="link">
-    Native support for **Ethereum (EVM)** and **Sui**, with more chains coming soon.
-  </Card>
-  <Card title="Stealth Addressing" icon="user-secret">
-    Derive unique, unlinkable addresses for every transaction.
-  </Card>
-  <Card title="Decentralized Registry" icon="globe">
-    Announce payments via 1-byte view tags for efficient scanning.
-  </Card>
-</CardGroup>
-
-![Protocol Flow](/images/specter/protocol-flow-visual.png)
-
-## Application Status
-
-<Note>
-**Active Development**: SPECTER is currently in **Alpha**. The protocol is stable and reusable, but we are rapidly evolving the SDKs and adding new features.
-</Note>
-
-We are actively working on:
-- 🟡 **Yellow Network Integration**: High-speed, cross-chain state channels.
-- 🟡 **Mobile SDKs**: Native iOS and Android libraries.
-- 🟢 **Audits**: Preparing for comprehensive security reviews.
-
-## Yet to implement roadmap
-
-<CardGroup cols={2}>
-  <Card title="Roadmap: not yet implemented" icon="flag" href="/roadmap/yet-to-implement">
-    Track planned features that are intentionally not shipped yet.
-  </Card>
-  <Card title="Current planned items" icon="flag">
-    OAPA, PQ account abstraction wallet, privacy keystore, and migration contracts.
-  </Card>
-</CardGroup>
-
-## Explore the Docs
-
-<CardGroup cols={3}>
-  <Card title="Choose your path" icon="map" href="/getting-started/choose-your-path">
-    Start with the shortest path for your role.
-  </Card>
-  <Card title="Architecture" icon="sitemap" href="/core-concepts/architecture">
-    How it works under the hood.
+  <Card title="What is SPECTER?" icon="sparkles" href="/getting-started/first-time-overview">
+    Understand everything in plain language with diagrams.
   </Card>
   <Card title="API Reference" icon="code" href="/api/introduction">
-    Interact with the SPECTER Node.
-  </Card>
-  <Card title="Rust Crates" icon="box" href="https://crates.io/crates/specter-core">
-    Core cryptographic libraries.
+    Go endpoint-by-endpoint for integration.
   </Card>
 </CardGroup>
 
-<details>
-<summary><strong>Need a fast orientation?</strong></summary>
+---
 
-1. Open `/getting-started/choose-your-path`.
-2. Run `/getting-started/quickstart`.
-3. Read `/core-concepts/protocol-flow`.
-4. Integrate `/api/stealth` and `/api/registry`.
+## Get Started in 3 Steps
 
-</details>
+<Steps>
+  <Step title="Learn the Model" icon="lightbulb">
+    Open the **[What is SPECTER?](/getting-started/first-time-overview)** page for a beginner-friendly walkthrough with analogies, diagrams, and a technical deep-dive.
+  </Step>
+  <Step title="Explore the Product" icon="globe">
+    **[Launch the app](https://specter-stealth.vercel.app/)** and follow the **[product tour](/explore/frontend-experience)** to see the Setup → Send → Scan flow visually before writing code.
+  </Step>
+  <Step title="Integrate with Your App" icon="plug">
+    Use the **[API docs](/api/introduction)** for backend integrations, the **[CLI reference](/reference/cli)** for local workflows, or the **[integration playbook](/guides/integration-playbook)** for guided patterns.
+  </Step>
+</Steps>
 
-## Source references
+---
 
-- `../SPECTER/specter/Cargo.toml`
-- `../SPECTER/specter/specter-core/src/lib.rs`
-- `../SPECTER/specter/specter-api/src/routes.rs`
+## How It Works
+
+```mermaid
+flowchart LR
+    A["Recipient shares\none public profile"] --> B["Sender creates\none-time stealth address"]
+    B --> C["Announcement\npublished"]
+    C --> D["Recipient scans\nand discovers payment"]
+
+    style A fill:#0f766e,color:#fff
+    style B fill:#14b8a6,color:#fff
+    style C fill:#115e59,color:#fff
+    style D fill:#0f766e,color:#fff
+```
+
+---
+
+## Navigate the Docs
+
+<CardGroup cols={2}>
+  <Card title="Explore Product" icon="globe" href="/explore/frontend-experience">
+    Frontend-first product tour with screenshots and integration handoff.
+  </Card>
+  <Card title="Integration Playbook" icon="map" href="/guides/integration-playbook">
+    Pick a practical integration path by use case.
+  </Card>
+  <Card title="Roadmap" icon="flag" href="/roadmap/yet-to-implement">
+    Track planned features not yet implemented.
+  </Card>
+  <Card title="FAQ" icon="circle-question" href="/faq">
+    Detailed answers for beginners and integrators.
+  </Card>
+</CardGroup>
+
+<Info>
+New to privacy protocols? Start with **[What is SPECTER?](/getting-started/first-time-overview)** — no crypto knowledge required.
+</Info>
