@@ -1,0 +1,36 @@
+---
+title: "Yellow endpoints"
+description: "Private channel API endpoints and current implementation boundaries"
+---
+
+## Endpoints
+
+- `POST /api/v1/yellow/channel/create`
+- `POST /api/v1/yellow/channel/discover`
+- `POST /api/v1/yellow/channel/fund`
+- `POST /api/v1/yellow/channel/close`
+- `GET /api/v1/yellow/channel/:id/status`
+- `POST /api/v1/yellow/transfer`
+- `GET /api/v1/yellow/config`
+
+## What is implemented
+
+- Channel-create flow generates stealth payment + announcement data
+- Channel discovery scans announcement registry with provided keys
+- Config endpoint returns Yellow network + token metadata
+
+## Important limitations
+
+- Some responses are placeholders (`tx_hash` values in fund/close flows)
+- Close handler explicitly notes no L1 transaction submission by backend
+- `token` handling in discovery/status is simplified
+
+<Warning>
+Treat Yellow API behavior as integration scaffolding. Validate final settlement and balance behavior with the external Yellow stack before production rollout.
+</Warning>
+
+## Source references
+
+- `../SPECTER/specter/specter-api/src/handlers.rs`
+- `../SPECTER/specter/specter-yellow/src/client.rs`
+- `../SPECTER/specter/specter-yellow/src/channel.rs`

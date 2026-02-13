@@ -1,0 +1,33 @@
+---
+title: "Auth and errors"
+description: "Current auth model and API error contract"
+---
+
+## Auth model
+
+Current server code does not enforce API keys, JWT auth, or wallet signatures at the HTTP layer.
+
+## Error payload shape
+
+```json
+{
+  "error": {
+    "code": "BAD_REQUEST",
+    "message": "..."
+  }
+}
+```
+
+## Common HTTP mappings
+
+| Condition | HTTP status | Example code |
+| --- | --- | --- |
+| Validation / malformed input | `422` or `400` | `VALIDATION_ERROR`, `BAD_REQUEST` |
+| Missing ENS/SuiNS records | `404` | `ENS_NAME_NOT_FOUND`, `NO_SPECTER_RECORD` |
+| IPFS download failure | `502` | `IPFS_ERROR` |
+| Internal failure | `500` | `INTERNAL_ERROR` |
+
+## Source references
+
+- `../SPECTER/specter/specter-api/src/error.rs`
+- `../SPECTER/specter/specter-core/src/error.rs`

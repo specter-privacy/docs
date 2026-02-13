@@ -1,0 +1,40 @@
+---
+title: "Registry endpoints"
+description: "Publish, list, and inspect announcement records"
+---
+
+## POST `/api/v1/registry/announcements`
+
+Publish an announcement.
+
+### Required fields
+
+- `ephemeral_key` (hex)
+- `view_tag` (u8)
+- `tx_hash` (non-empty string)
+
+### Optional fields
+
+- `channel_id` (32-byte hex)
+- `amount`
+- `chain`
+
+## GET `/api/v1/registry/announcements`
+
+List announcements with optional filters:
+
+- `view_tag`
+- `from_timestamp`
+- `to_timestamp`
+- `offset`
+- `limit`
+
+## GET `/api/v1/registry/stats`
+
+Returns total count and non-zero view tag distribution.
+
+## Source references
+
+- `../SPECTER/specter/specter-api/src/handlers.rs`
+- `../SPECTER/specter/specter-api/src/dto.rs`
+- `../SPECTER/specter/specter-registry/src/memory.rs`

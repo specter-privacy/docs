@@ -1,0 +1,42 @@
+---
+title: "Set up ENS receiving"
+description: "Publish your SPECTER meta-address for ENS-based receiving"
+---
+
+## Goal
+
+Configure `name.eth` so senders can resolve your SPECTER meta-address.
+
+## Steps
+
+1. Generate keys using API or CLI.
+2. Upload `meta_address` to IPFS using `/api/v1/ipfs/upload`.
+3. Set ENS text record key `specter` to returned `ipfs://CID`.
+4. Verify with `GET /api/v1/ens/resolve/:name`.
+
+## CLI + curl example
+
+```bash
+# 1) Generate keys
+cargo run --bin specter -- generate --output /tmp/specter-keys.json
+
+# 2) Upload meta-address
+META_ADDRESS=$(jq -r '.meta_address' /tmp/specter-keys.json)
+curl -s -X POST http://localhost:3001/api/v1/ipfs/upload \
+  -H 'Content-Type: application/json' \
+  -d "{\"meta_address\":\"$META_ADDRESS\"}" | jq .
+```
+
+Then set ENS text record `specter` in your wallet/app.
+
+## Validation
+
+```bash
+curl -s http://localhost:3001/api/v1/ens/resolve/alice.eth | jq .
+```
+
+## Source references
+
+- `../SPECTER/specter/specter-api/src/handlers.rs`
+- `../SPECTER/specter/specter-ens/src/ens.rs`
+- `../SPECTER/specter/specter-ens/src/resolver.rs`

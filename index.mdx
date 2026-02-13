@@ -1,97 +1,59 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "SPECTER"
+description: "Post-quantum stealth addresses for Ethereum and Sui"
 ---
 
-## Setting up
+![SPECTER logo](/images/specter/logo-tagline.png)
 
-Get your documentation site up and running in minutes.
+SPECTER is a Rust-based protocol and API for private payment discovery using post-quantum key encapsulation.
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+It currently ships:
 
-## Make it yours
+- ML-KEM-768 key generation, encapsulation, and decapsulation
+- Stealth address derivation for Ethereum and Sui
+- Announcement creation, publishing, and scanning with 1-byte view tags
+- ENS and SuiNS name resolution via IPFS-hosted meta-addresses
+- REST API, CLI, and Yellow Network integration scaffolding
 
-Design a docs site that looks great and empowers your users.
+<Warning>
+This documentation only covers behavior verified from the repository code under `SPECTER/specter`. Claims from the long-form README that are not implemented are flagged in `reference/discrepancies-readme`.
+</Warning>
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+## Who this is for
 
-## Create beautiful pages
+- Developers integrating private payment flows into apps
+- Teams operating the SPECTER backend API
+- Contributors extending core crates (`specter-core`, `specter-crypto`, `specter-stealth`, and related crates)
 
-Everything you need to create world-class documentation.
+## High-level architecture
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+```mermaid
+flowchart TD
+    A["CLI / API / Frontend"] --> B["specter-stealth"]
+    B --> C["specter-crypto"]
+    B --> D["specter-core"]
+    A --> E["specter-registry"]
+    A --> F["specter-ens"]
+    A --> G["specter-suins"]
+    A --> H["specter-ipfs"]
+    A --> I["specter-yellow"]
+```
 
-## Need inspiration?
+## Start here
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+1. Install and run locally: `getting-started/installation`
+2. Run a full 5-minute flow: `getting-started/quickstart`
+3. Review protocol internals: `core-concepts/protocol-flow`
+4. Integrate API endpoints: `api/introduction`
+
+## Implementation status
+
+<Info>
+SPECTER is production-oriented but still evolving. Some Yellow and roadmap-style features are placeholders or partial implementations. See `reference/discrepancies-readme`.
+</Info>
+
+## Source references
+
+- `../SPECTER/specter/Cargo.toml`
+- `../SPECTER/specter/specter-core/src/lib.rs`
+- `../SPECTER/specter/specter-api/src/routes.rs`

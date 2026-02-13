@@ -1,0 +1,37 @@
+---
+title: "Performance tuning"
+description: "View-tag filtering, scanner controls, and benchmark commands"
+---
+
+## View-tag filtering
+
+With one-byte view tags, you avoid most decapsulation work.
+
+- Tag space: 256
+- Expected false positives: ~0.39%
+- Expected filtered announcements: ~99.6%
+
+## Scanner tuning
+
+Use scanner config for workload control:
+
+- Narrow by timestamps
+- Restrict view-tag buckets
+- Stop on first discovery for low-latency probes
+
+## Run benchmarks
+
+```bash
+cd SPECTER/specter
+cargo bench -p specter-crypto
+cargo run --bin specter -- bench --count 100000
+```
+
+![Benchmark snapshot](/images/specter/benchmarking.png)
+
+## Source references
+
+- `../SPECTER/specter/specter-core/src/constants.rs`
+- `../SPECTER/specter/specter-scanner/src/lib.rs`
+- `../SPECTER/specter/specter-crypto/benches/crypto_bench.rs`
+- `../SPECTER/specter/specter-cli/src/main.rs`

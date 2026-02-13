@@ -1,0 +1,31 @@
+---
+title: "Environment variables"
+description: "Complete runtime configuration reference"
+---
+
+## Core runtime variables
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `USE_TESTNET` | No | If `true`, uses Sepolia + Sui testnet defaults |
+| `ETH_RPC_URL` | No | Ethereum mainnet RPC (used when `USE_TESTNET=false`) |
+| `ETH_RPC_URL_SEPOLIA` | No | Sepolia RPC override |
+| `SUI_RPC_URL` | No | Sui RPC override |
+| `PINATA_GATEWAY_URL` | Yes for IPFS reads | Dedicated Pinata gateway host |
+| `PINATA_GATEWAY_TOKEN` | Yes for IPFS reads | Pinata gateway token |
+| `PINATA_JWT` | Required for uploads | Pinata JWT for upload/pin operations |
+| `ENABLE_CACHE` | No | Enables resolver/IPFS download caching |
+
+## Yellow-related variables
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `YELLOW_WS_URL` | No | Yellow WebSocket endpoint |
+| `YELLOW_CHAIN_ID` | No | Chain ID for Yellow integration |
+| `YELLOW_CUSTODY_ADDRESS` | No | Custody contract address |
+| `YELLOW_ADJUDICATOR_ADDRESS` | No | Adjudicator contract address |
+
+## Source references
+
+- `../SPECTER/specter/.env.example`
+- `../SPECTER/specter/specter-api/src/state.rs`

@@ -1,0 +1,46 @@
+---
+title: "Registry and scanning"
+description: "Announcement storage backends and scanner behavior"
+---
+
+## Registry backends
+
+SPECTER provides two registry implementations:
+
+- `MemoryRegistry`: concurrent in-memory store with view-tag indexing
+- `FileRegistry`: memory-backed store with disk persistence and autosave
+
+## Query patterns
+
+- `get_by_view_tag(tag)` for efficient bucket scans
+- `get_by_time_range(start, end)` for time windows
+- `get_by_id(id)` for point lookup
+- `count()` and `next_id()` for metadata
+
+## Scanner behavior
+
+`Scanner` supports:
+
+- Full scans (`scan_all`)
+- Filtered scans by time/view tags (`scan_with_config`)
+- Progress callbacks (`scan_with_progress`)
+- Stop-on-first discovery mode
+
+## Scanner configuration fields
+
+| Field | Description |
+| --- | --- |
+| `batch_size` | Logical batch control |
+| `stop_on_first` | Return after first discovery |
+| `from_timestamp` / `to_timestamp` | Time range filtering |
+| `view_tag_filter` | Scan only selected tag buckets |
+
+<Warning>
+`Scanner::from_wallet` is currently `todo!()` and not implemented.
+</Warning>
+
+## Source references
+
+- `../SPECTER/specter/specter-registry/src/memory.rs`
+- `../SPECTER/specter/specter-registry/src/file.rs`
+- `../SPECTER/specter/specter-scanner/src/lib.rs`

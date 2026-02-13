@@ -1,0 +1,28 @@
+---
+title: "Private payment workflow"
+description: "Operational guide for create, announce, and discover"
+---
+
+## Sender workflow
+
+1. Resolve recipient name to meta-address.
+2. Call `POST /api/v1/stealth/create`.
+3. Send funds to returned `stealth_address`.
+4. Publish announcement with `ephemeral_key`, `view_tag`, and `tx_hash`.
+
+## Recipient workflow
+
+1. Keep `viewing_sk`, `spending_pk`, and `spending_sk` secure.
+2. Call `POST /api/v1/stealth/scan` periodically.
+3. Import `eth_private_key` into wallet if needed to move funds.
+
+## Verification checks
+
+- Created and discovered `stealth_address` should match.
+- Discovery should include the same `announcement_id` and metadata you published.
+
+## Source references
+
+- `../SPECTER/specter/specter-api/src/handlers.rs`
+- `../SPECTER/specter/specter-stealth/src/payment.rs`
+- `../SPECTER/specter/specter-stealth/src/discovery.rs`

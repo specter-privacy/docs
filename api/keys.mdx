@@ -1,0 +1,40 @@
+---
+title: "Keys endpoint"
+description: "Generate SPECTER key material and meta-address"
+---
+
+## POST `/api/v1/keys/generate`
+
+Generate spending/viewing keypairs and a meta-address.
+
+### Example request
+
+```bash
+curl -s -X POST http://localhost:3001/api/v1/keys/generate
+```
+
+```javascript
+const res = await fetch("http://localhost:3001/api/v1/keys/generate", {
+  method: "POST"
+});
+const data = await res.json();
+console.log(data.meta_address);
+```
+
+### Example response fields
+
+- `spending_pk` (hex)
+- `spending_sk` (hex, sensitive)
+- `viewing_pk` (hex)
+- `viewing_sk` (hex, sensitive)
+- `meta_address` (hex)
+- `view_tag` (informational base tag)
+
+<Warning>
+Treat `spending_sk` and `viewing_sk` as secrets. Never log or commit them.
+</Warning>
+
+## Source references
+
+- `../SPECTER/specter/specter-api/src/handlers.rs`
+- `../SPECTER/specter/specter-api/src/dto.rs`

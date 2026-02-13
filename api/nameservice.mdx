@@ -1,0 +1,31 @@
+---
+title: "Name service endpoints"
+description: "Resolve ENS and SuiNS names to SPECTER meta-addresses"
+---
+
+## GET `/api/v1/ens/resolve/:name`
+
+Resolves ENS names (for example `alice.eth`) to a meta-address.
+
+### Behavior
+
+- Looks up ENS text record key `specter`
+- Falls back to ENS `contenthash` where available
+- Downloads meta-address bytes from IPFS
+
+## GET `/api/v1/suins/resolve/:name`
+
+Resolves SuiNS names (for example `alice.sui`) to a meta-address.
+
+### Behavior
+
+- Looks up SuiNS content hash
+- Downloads meta-address bytes from IPFS
+- Supports `?no_cache=1` to clear resolver cache before lookup
+
+## Source references
+
+- `../SPECTER/specter/specter-api/src/routes.rs`
+- `../SPECTER/specter/specter-api/src/handlers.rs`
+- `../SPECTER/specter/specter-ens/src/ens.rs`
+- `../SPECTER/specter/specter-suins/src/suins.rs`

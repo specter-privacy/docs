@@ -1,0 +1,24 @@
+---
+title: "Production checklist"
+description: "Checklist for operating SPECTER backend safely"
+---
+
+## Required before launch
+
+- Configure all required env vars
+- Validate `/health` and full create/publish/scan flow
+- Place service behind auth and rate-limiting controls
+- Enable observability and log retention
+- Define backup and restore process for registry data
+
+## Operational checks
+
+- Monitor error rates for ENS/SuiNS/IPFS lookups
+- Track registry growth and scanning latency
+- Rotate infrastructure credentials periodically
+
+## Source references
+
+- `../SPECTER/specter/specter-api/src/state.rs`
+- `../SPECTER/specter/specter-api/src/handlers.rs`
+- `../SPECTER/specter/specter-registry/src/file.rs`

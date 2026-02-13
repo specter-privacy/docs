@@ -1,0 +1,28 @@
+---
+title: "Yellow private channels"
+description: "Run SPECTER-backed channel discovery and management with Yellow endpoints"
+---
+
+## Create flow
+
+1. Call `POST /api/v1/yellow/channel/create` with recipient, token, amount.
+2. Receive generated stealth address and announcement data.
+3. Backend publishes announcement with channel metadata to registry.
+
+![Yellow private trading flow](/images/specter/yellow.png)
+
+## Discover flow
+
+1. Recipient calls `POST /api/v1/yellow/channel/discover` with keys.
+2. API scans registry and returns discovered channels.
+
+## Practical caveats
+
+- Fund and close endpoints return placeholder tx hashes in current backend behavior.
+- Final settlement is dependent on external Yellow infra and not fully executed by this backend.
+
+## Source references
+
+- `../SPECTER/specter/specter-api/src/handlers.rs`
+- `../SPECTER/specter/specter-yellow/src/discovery.rs`
+- `../SPECTER/specter/specter-yellow/src/settlement.rs`

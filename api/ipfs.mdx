@@ -1,0 +1,41 @@
+---
+title: "IPFS endpoints"
+description: "Upload and fetch meta-address payloads through Pinata-backed IPFS"
+---
+
+## POST `/api/v1/ipfs/upload`
+
+Upload a hex meta-address to IPFS.
+
+### Request body
+
+```json
+{
+  "meta_address": "<hex>",
+  "name": "alice.eth-specter-profile"
+}
+```
+
+### Response
+
+```json
+{
+  "cid": "...",
+  "text_record": "ipfs://..."
+}
+```
+
+## GET `/api/v1/ipfs/:cid`
+
+Returns raw bytes for a CID using configured gateway settings.
+
+## Operational requirements
+
+- `PINATA_GATEWAY_URL` and `PINATA_GATEWAY_TOKEN` are required for retrieval.
+- `PINATA_JWT` is required for upload.
+
+## Source references
+
+- `../SPECTER/specter/specter-api/src/handlers.rs`
+- `../SPECTER/specter/specter-ipfs/src/ipfs.rs`
+- `../SPECTER/specter/.env.example`

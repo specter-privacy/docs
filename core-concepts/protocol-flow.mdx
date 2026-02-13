@@ -1,0 +1,61 @@
+---
+title: "Protocol flow"
+description: "Registration, sending, and discovery lifecycle"
+---
+
+## Payment lifecycle
+
+```mermaid
+flowchart TD
+    A["Recipient generates spending + viewing keypairs"] --> B["Create meta-address"]
+    B --> C["Upload meta-address bytes to IPFS"]
+    C --> D["Store ipfs://CID in ENS text record or SuiNS content hash"]
+    D --> E["Sender resolves name -> meta-address"]
+    E --> F["Encapsulate to viewing_pk (ML-KEM)"]
+    F --> G["Compute view_tag from shared secret"]
+    G --> H["Derive stealth ETH/Sui addresses"]
+    H --> I["Sender transfers funds"]
+    I --> J["Publish announcement with ephemeral_key + view_tag"]
+    J --> K["Recipient scans announcements"]
+    K --> L["Decapsulate matching announcements"]
+    L --> M["Derive stealth private key and spend"]
+```
+
+## Registration details
+
+- Recipient creates two ML-KEM keypairs: spending and viewing
+- Recipient builds `MetaAddress { version, spending_pk, viewing_pk }`
+- Meta-address is serialized and uploaded to IPFS
+- Name service record points to CID (`ipfs://...`)
+
+![Registration flow](/images/specter/setup.png)
+
+## Sending details
+
+- Sender resolves name to recipient meta-address
+- Sender encapsulates to `viewing_pk`
+- Sender computes `view_tag`
+- Sender derives stealth address from shared secret and `spending_pk`
+- Sender publishes announcement to registry
+
+![Send flow](/images/specter/send.png)
+
+## Discovery details
+
+- Recipient scans announcements and decapsulates
+- If computed view tag matches announcement view tag, payment is for recipient
+- Recipient derives ETH-compatible private key from discovered stealth material
+
+![Receive flow](/images/specter/receive.png)
+
+<Warning>
+The backend does not include an on-chain announcer contract yet. Announcement publishing in current code is API/registry based.
+</Warning>
+
+## Source references
+
+- `../SPECTER/specter/specter-stealth/src/payment.rs`
+- `../SPECTER/specter/specter-stealth/src/discovery.rs`
+- `../SPECTER/specter/specter-api/src/handlers.rs`
+- `../SPECTER/specter/specter-ens/src/resolver.rs`
+- `../SPECTER/specter/specter-suins/src/resolver.rs`

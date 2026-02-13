@@ -1,0 +1,29 @@
+---
+title: "Security considerations"
+description: "Secret handling, cryptographic safety properties, and deployment precautions"
+---
+
+## Secret handling
+
+- Never expose `spending_sk` or `viewing_sk` in logs.
+- Discovery responses include `eth_private_key`; treat it as wallet-signing material.
+- Use environment secrets management for Pinata and RPC credentials.
+
+## Code-level protections
+
+- Secret keys and stealth private keys implement zeroization behavior.
+- Constant-time comparisons are used for sensitive equality checks.
+- Crates forbid `unsafe` code.
+- SHAKE256 operations use explicit domain separators.
+
+## API hardening recommendations
+
+- Put API behind authentication and role-based access.
+- Add per-IP and per-endpoint rate limiting.
+- Audit announcement publish permissions and tx-hash verification policies.
+
+## Source references
+
+- `../SPECTER/specter/specter-core/src/types/keys.rs`
+- `../SPECTER/specter/specter-crypto/src/view_tag.rs`
+- `../SPECTER/specter/specter-api/src/error.rs`

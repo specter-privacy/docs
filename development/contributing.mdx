@@ -1,0 +1,39 @@
+---
+title: "Contributing"
+description: "Set up your development environment and contribute safely"
+---
+
+## Setup
+
+```bash
+git clone https://github.com/pranshurastogi/SPECTER.git
+cd SPECTER/specter
+cp .env.example .env
+cargo build
+```
+
+## Recommended local checks
+
+```bash
+cargo test
+cargo run --bin specter -- --help
+```
+
+## Scripted workflow
+
+You can run the provided script:
+
+```bash
+./scripts/build-and-test.sh
+```
+
+## Contribution expectations
+
+- Keep protocol changes aligned across API, CLI, and core crates.
+- Add tests for behavioral changes.
+- Update docs and verification matrix for new user-visible behavior.
+
+## Source references
+
+- `../SPECTER/scripts/build-and-test.sh`
+- `../SPECTER/specter/Cargo.toml`

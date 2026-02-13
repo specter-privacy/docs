@@ -1,0 +1,64 @@
+---
+title: "Installation"
+description: "Install SPECTER from source and run backend/frontend locally"
+---
+
+## Prerequisites
+
+- Rust stable toolchain (`cargo`, `rustc`)
+- Node.js 18+
+- A Pinata gateway URL + token for IPFS retrieval
+
+## Clone the repository
+
+```bash
+git clone https://github.com/pranshurastogi/SPECTER.git
+cd SPECTER
+```
+
+## Backend (Rust workspace)
+
+```bash
+cd specter
+cp .env.example .env
+# Fill required env vars: PINATA_GATEWAY_URL and PINATA_GATEWAY_TOKEN
+cargo build --release
+cargo run --bin specter -- serve --port 3001
+```
+
+The API starts on `http://localhost:3001`.
+
+## Frontend (React + Vite)
+
+```bash
+cd ../SPECTER-web
+cp .env.example .env
+npm install
+npm run dev
+```
+
+## Docker (local image)
+
+SPECTER includes a Dockerfile in `specter/Dockerfile`.
+
+```bash
+cd ../specter
+docker build -t specter-api:local .
+docker run --rm -p 3001:3001 --env-file .env specter-api:local
+```
+
+<Tip>
+The backend binary listens on port `3001` by default and serves `GET /health`.
+</Tip>
+
+## Notes on package managers
+
+- The backend is not published as an npm package.
+- npm/yarn are used for the frontend only.
+
+## Source references
+
+- `../SPECTER/specter/.env.example`
+- `../SPECTER/specter/Dockerfile`
+- `../SPECTER/specter/specter-cli/src/main.rs`
+- `../SPECTER/SPECTER-web/package.json`

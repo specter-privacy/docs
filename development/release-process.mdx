@@ -1,0 +1,26 @@
+---
+title: "Release process"
+description: "Current release status and practical release checklist"
+---
+
+SPECTER does not currently include an automated release pipeline in-repo.
+
+## Suggested release checklist
+
+1. Run full test suite.
+2. Validate API compatibility on key endpoints.
+3. Rebuild release binary.
+4. Update docs for any API/schema/flow changes.
+5. Publish release notes in GitHub.
+
+## Build release binary
+
+```bash
+cd SPECTER/specter
+cargo build --release
+```
+
+## Source references
+
+- `../SPECTER/specter/Cargo.toml`
+- `../SPECTER/scripts/rebuild-backend.sh`

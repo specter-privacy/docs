@@ -1,0 +1,36 @@
+---
+title: "CLI reference"
+description: "Full command reference for the `specter` binary"
+---
+
+## Global usage
+
+```bash
+specter [OPTIONS] <COMMAND>
+```
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `generate` | Generate spending/viewing keys and meta-address |
+| `resolve` | Resolve ENS name to meta-address |
+| `create` | Create stealth payment info |
+| `scan` | Scan registry for discoverable payments |
+| `serve` | Start API server |
+| `bench` | Run benchmark workflow |
+
+## Examples
+
+```bash
+cargo run --bin specter -- generate --output keys.json
+cargo run --bin specter -- resolve alice.eth
+cargo run --bin specter -- create alice.eth
+cargo run --bin specter -- scan --keys keys.json
+cargo run --bin specter -- serve --port 3001
+cargo run --bin specter -- bench --count 100000
+```
+
+## Source references
+
+- `../SPECTER/specter/specter-cli/src/main.rs`

@@ -1,0 +1,32 @@
+---
+title: "Set up SuiNS receiving"
+description: "Publish your SPECTER meta-address for SuiNS-based receiving"
+---
+
+## Goal
+
+Configure `name.sui` so senders can resolve your SPECTER meta-address.
+
+## Steps
+
+1. Generate keys.
+2. Upload your meta-address bytes to IPFS.
+3. Set SuiNS `content_hash` to `ipfs://CID`.
+4. Verify with `GET /api/v1/suins/resolve/:name`.
+
+## Verify resolution
+
+```bash
+curl -s http://localhost:3001/api/v1/suins/resolve/alice.sui | jq .
+```
+
+## Notes
+
+- SuiNS resolution depends on configured `SUI_RPC_URL`.
+- `USE_TESTNET=true` switches SuiNS table/package constants to testnet values.
+
+## Source references
+
+- `../SPECTER/specter/specter-suins/src/suins.rs`
+- `../SPECTER/specter/specter-suins/src/resolver.rs`
+- `../SPECTER/specter/specter-core/src/constants.rs`

@@ -1,0 +1,55 @@
+---
+title: "Common issues"
+description: "Frequent errors and direct fixes"
+---
+
+## `PINATA_GATEWAY_URL` / `PINATA_GATEWAY_TOKEN` missing
+
+Symptoms:
+
+- ENS/SuiNS/IPFS endpoints fail
+
+Fix:
+
+- Set required gateway env vars in `.env`
+- Restart API server
+
+## `tx_hash is required` on publish
+
+Symptoms:
+
+- `POST /api/v1/registry/announcements` returns bad request
+
+Fix:
+
+- Include non-empty `tx_hash` field in request body
+
+## Name resolution returns no record
+
+Symptoms:
+
+- `NO_SPECTER_RECORD` or `NO_SUINS_SPECTER_RECORD`
+
+Fix:
+
+- Confirm ENS text key is exactly `specter` or SuiNS content hash is set
+- Confirm CID format is `ipfs://...` or raw CID
+
+## Scan returns no discoveries
+
+Symptoms:
+
+- `discoveries: []`
+
+Fix:
+
+- Verify keys correspond to the published meta-address
+- Verify announcement used matching `ephemeral_key` + `view_tag`
+- Confirm publish step succeeded and registry contains the record
+
+## Source references
+
+- `../SPECTER/specter/specter-api/src/handlers.rs`
+- `../SPECTER/specter/specter-api/src/error.rs`
+- `../SPECTER/specter/specter-ens/src/resolver.rs`
+- `../SPECTER/specter/specter-suins/src/resolver.rs`

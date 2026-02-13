@@ -1,0 +1,53 @@
+---
+title: "Cryptography"
+description: "ML-KEM sizes, view tags, and address derivation"
+---
+
+## ML-KEM-768 constants
+
+| Parameter | Size |
+| --- | --- |
+| Public key | 1184 bytes |
+| Secret key | 2400 bytes |
+| Ciphertext | 1088 bytes |
+| Shared secret | 32 bytes |
+
+## Core cryptographic operations
+
+1. `generate_keypair()` creates ML-KEM keypairs.
+2. `encapsulate(public_key)` returns `(ciphertext, shared_secret)`.
+3. `decapsulate(ciphertext, secret_key)` recovers `shared_secret`.
+4. `compute_view_tag(shared_secret)` computes a 1-byte tag.
+
+## View tags and scanning efficiency
+
+SPECTER uses a 1-byte view tag space (256 values):
+
+- False positive rate: `1 / 256` (about `0.39%`)
+- Filter efficiency: about `99.6%`
+
+## Address derivation
+
+SPECTER currently derives wallet-compatible stealth keys using secp256k1 seed derivation:
+
+- Seed is derived via SHAKE256 domain-separated hash
+- Ethereum address is derived from secp256k1 public key (`keccak256` path)
+- Sui address is derived from secp256k1 compressed key (`blake2b-256` path)
+
+<Info>
+The repository still contains legacy Kyber-public-key derivation helpers, but active send/scan paths use the secp256k1 seed flow for wallet compatibility.
+</Info>
+
+## Security properties implemented in code
+
+- `#![forbid(unsafe_code)]` across core crates
+- Secret material zeroization (`zeroize`)
+- Constant-time equality checks (`subtle::ConstantTimeEq`)
+- Domain separation constants for SHAKE256 operations
+
+## Source references
+
+- `../SPECTER/specter/specter-core/src/constants.rs`
+- `../SPECTER/specter/specter-crypto/src/kyber.rs`
+- `../SPECTER/specter/specter-crypto/src/view_tag.rs`
+- `../SPECTER/specter/specter-crypto/src/derive.rs`

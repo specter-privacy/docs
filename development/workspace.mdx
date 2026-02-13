@@ -1,0 +1,28 @@
+---
+title: "Workspace architecture"
+description: "How crates relate for contributors"
+---
+
+## Key dependency chain
+
+```mermaid
+flowchart LR
+    A["specter-core"] --> B["specter-crypto"]
+    B --> C["specter-stealth"]
+    C --> D["specter-api"]
+    C --> E["specter-scanner"]
+    F["specter-registry"] --> D
+    G["specter-ens"] --> D
+    H["specter-suins"] --> D
+```
+
+## Contributor tips
+
+- Start in `specter-core` when adding or changing shared types.
+- Keep serialization contracts consistent with API DTOs.
+- Prefer adding crate-level tests for any cryptographic or flow change.
+
+## Source references
+
+- `../SPECTER/specter/Cargo.toml`
+- `../SPECTER/specter/specter-api/Cargo.toml`

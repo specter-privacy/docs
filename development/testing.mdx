@@ -1,0 +1,34 @@
+---
+title: "Testing and benchmarks"
+description: "Run test suites, API checks, and benchmark commands"
+---
+
+## Core tests
+
+```bash
+cd SPECTER/specter
+cargo test -p specter-core -p specter-crypto -p specter-stealth -p specter-registry -p specter-scanner
+```
+
+## API tests
+
+```bash
+cargo test -p specter-api
+```
+
+## Benchmarks
+
+```bash
+cargo bench -p specter-crypto
+cargo run --bin specter -- bench --count 100000
+```
+
+## E2E helper script
+
+`../scripts/e2e-stealth-flow.sh` exists, but parts of it are out of sync with current API requirements (see discrepancies page).
+
+## Source references
+
+- `../SPECTER/scripts/build-and-test.sh`
+- `../SPECTER/scripts/e2e-stealth-flow.sh`
+- `../SPECTER/specter/specter-crypto/benches/crypto_bench.rs`

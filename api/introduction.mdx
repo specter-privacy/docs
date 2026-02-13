@@ -1,0 +1,37 @@
+---
+title: "API introduction"
+description: "Base URL, route map, and integration basics"
+---
+
+## Base URL
+
+Local default: `http://localhost:3001`
+
+## Route groups
+
+- Health: `/health`
+- Keys: `/api/v1/keys/*`
+- Stealth: `/api/v1/stealth/*`
+- Name service: `/api/v1/ens/*`, `/api/v1/suins/*`
+- IPFS: `/api/v1/ipfs/*`
+- Registry: `/api/v1/registry/*`
+- Yellow: `/api/v1/yellow/*`
+
+## Content types
+
+- Request bodies: JSON (`application/json`)
+- IPFS fetch endpoint returns raw bytes (`application/octet-stream`)
+
+## Authentication and rate limits
+
+- No authentication middleware is implemented in current API routes.
+- No server-side rate limiting is implemented.
+
+<Warning>
+Deploy behind your own auth, rate-limiting, and WAF controls for production use.
+</Warning>
+
+## Source references
+
+- `../SPECTER/specter/specter-api/src/routes.rs`
+- `../SPECTER/specter/specter-api/src/lib.rs`

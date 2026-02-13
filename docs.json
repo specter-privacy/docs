@@ -1,48 +1,94 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "SPECTER",
+  "description": "Post-quantum stealth address protocol for Ethereum and Sui",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#0F766E",
+    "light": "#14B8A6",
+    "dark": "#115E59"
   },
   "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/images/specter/logo.png",
+    "dark": "/images/specter/logo.png"
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Docs",
         "groups": [
           {
             "group": "Getting started",
             "pages": [
               "index",
-              "quickstart",
-              "development"
+              "getting-started/installation",
+              "getting-started/quickstart",
+              "getting-started/verify-deployment"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Core concepts",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "core-concepts/architecture",
+              "core-concepts/protocol-flow",
+              "core-concepts/cryptography",
+              "core-concepts/registry-and-scanning",
+              "core-concepts/terminology"
             ]
           },
           {
-            "group": "Writing content",
+            "group": "Guides",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
+              "guides/ens-setup",
+              "guides/suins-setup",
+              "guides/private-payment-workflow",
+              "guides/yellow-private-channels"
             ]
           },
           {
-            "group": "AI tools",
+            "group": "Configuration",
             "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "configuration/environment",
+              "configuration/security",
+              "configuration/performance"
+            ]
+          },
+          {
+            "group": "Deployment",
+            "pages": [
+              "deployment/production-checklist",
+              "deployment/docker",
+              "deployment/kubernetes",
+              "deployment/cloud"
+            ]
+          },
+          {
+            "group": "Development",
+            "pages": [
+              "development/contributing",
+              "development/workspace",
+              "development/testing",
+              "development/release-process"
+            ]
+          },
+          {
+            "group": "Troubleshooting",
+            "pages": [
+              "troubleshooting/common-issues",
+              "troubleshooting/faq"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "reference/cli",
+              "reference/crates",
+              "reference/glossary",
+              "reference/changelog",
+              "reference/license",
+              "reference/verification-matrix",
+              "reference/discrepancies-readme"
             ]
           }
         ]
@@ -51,18 +97,26 @@
         "tab": "API reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Overview",
             "pages": [
-              "api-reference/introduction"
+              "api/introduction",
+              "api/auth-and-errors"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Core endpoints",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api/keys",
+              "api/stealth",
+              "api/nameservice",
+              "api/ipfs",
+              "api/registry"
+            ]
+          },
+          {
+            "group": "Yellow endpoints",
+            "pages": [
+              "api/yellow"
             ]
           }
         ]
@@ -71,52 +125,34 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "GitHub",
+          "href": "https://github.com/pranshurastogi/SPECTER",
+          "icon": "github"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Backend README",
+          "href": "https://github.com/pranshurastogi/SPECTER/tree/main/specter",
+          "icon": "book-open-cover"
         }
       ]
     }
   },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "Research paper",
+        "href": "https://arxiv.org/pdf/2501.13733v1"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Open repository",
+      "href": "https://github.com/pranshurastogi/SPECTER"
     }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/pranshurastogi/SPECTER"
     }
   }
 }
