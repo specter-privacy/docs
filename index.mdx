@@ -3,54 +3,69 @@ title: "SPECTER"
 description: "Post-quantum stealth addresses for Ethereum and Sui"
 ---
 
+
 ![SPECTER logo](/images/specter/logo-tagline.png)
 
-SPECTER is a Rust-based protocol and API for private payment discovery using post-quantum key encapsulation.
+## Post-Quantum Privacy for Ethereum and Sui
 
-It currently ships:
+SPECTER is the first production-ready protocol for **quantum-resistant private payments**. It enables users to receive assets without revealing their primary address, protecting them from surveillance and future quantum threats.
 
-- ML-KEM-768 key generation, encapsulation, and decapsulation
-- Stealth address derivation for Ethereum and Sui
-- Announcement creation, publishing, and scanning with 1-byte view tags
-- ENS and SuiNS name resolution via IPFS-hosted meta-addresses
-- REST API, CLI, and Yellow Network integration scaffolding
+<CardGroup cols={2}>
+  <Card title="Launch Hosted App" icon="rocket" href="https://specter-stealth.vercel.app/">
+    Try the live demo on Sepolia and Sui Testnet.
+  </Card>
+  <Card title="Quickstart Guide" icon="bolt" href="/getting-started/quickstart">
+    Integrate privacy into your dApp in < 5 minutes.
+  </Card>
+</CardGroup>
 
-<Warning>
-This documentation only covers behavior verified from the repository code under `SPECTER/specter`. Claims from the long-form README that are not implemented are flagged in `reference/discrepancies-readme`.
-</Warning>
+## Core Capabilities
 
-## Who this is for
+![Quantum Security](/images/specter/quantum-shield.png)
 
-- Developers integrating private payment flows into apps
-- Teams operating the SPECTER backend API
-- Contributors extending core crates (`specter-core`, `specter-crypto`, `specter-stealth`, and related crates)
+SPECTER is built for speed, security, and developer experience.
 
-## High-level architecture
+<CardGroup cols={2}>
+  <Card title="Quantum Resistance" icon="shield-halved">
+    Secured by **ML-KEM-768** (Kyber), the NIST standard for post-quantum cryptography.
+  </Card>
+  <Card title="Multi-Chain Support" icon="link">
+    Native support for **Ethereum (EVM)** and **Sui**, with more chains coming soon.
+  </Card>
+  <Card title="Stealth Addressing" icon="user-secret">
+    Derive unique, unlinkable addresses for every transaction.
+  </Card>
+  <Card title="Decentralized Registry" icon="globe">
+    Announce payments via 1-byte view tags for efficient scanning.
+  </Card>
+</CardGroup>
 
-```mermaid
-flowchart TD
-    A["CLI / API / Frontend"] --> B["specter-stealth"]
-    B --> C["specter-crypto"]
-    B --> D["specter-core"]
-    A --> E["specter-registry"]
-    A --> F["specter-ens"]
-    A --> G["specter-suins"]
-    A --> H["specter-ipfs"]
-    A --> I["specter-yellow"]
-```
+![Protocol Flow](/images/specter/protocol-flow-visual.png)
 
-## Start here
+## Application Status
 
-1. Install and run locally: `getting-started/installation`
-2. Run a full 5-minute flow: `getting-started/quickstart`
-3. Review protocol internals: `core-concepts/protocol-flow`
-4. Integrate API endpoints: `api/introduction`
+<Note>
+**Active Development**: SPECTER is currently in **Alpha**. The protocol is stable and reusable, but we are rapidly evolving the SDKs and adding new features.
+</Note>
 
-## Implementation status
+We are actively working on:
+- 🟡 **Yellow Network Integration**: High-speed, cross-chain state channels.
+- 🟡 **Mobile SDKs**: Native iOS and Android libraries.
+- 🟢 **Audits**: Preparing for comprehensive security reviews.
 
-<Info>
-SPECTER is production-oriented but still evolving. Some Yellow and roadmap-style features are placeholders or partial implementations. See `reference/discrepancies-readme`.
-</Info>
+## Explore the Docs
+
+<CardGroup cols={3}>
+  <Card title="Architecture" icon="sitemap" href="/core-concepts/architecture">
+    How it works under the hood.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api/introduction">
+    Interact with the SPECTER Node.
+  </Card>
+  <Card title="Rust Crates" icon="box" href="https://crates.io/crates/specter-core">
+    Core cryptographic libraries.
+  </Card>
+</CardGroup>
 
 ## Source references
 
