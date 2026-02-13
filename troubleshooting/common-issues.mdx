@@ -3,6 +3,15 @@ title: "Common issues"
 description: "Frequent errors and direct fixes"
 ---
 
+<CardGroup cols={2}>
+  <Card title="Launch app" icon="rocket" href="https://specter-stealth.vercel.app/">
+    Reproduce and compare against hosted behavior.
+  </Card>
+  <Card title="API intro" icon="book-open" href="/api/introduction">
+    Validate base URL and route assumptions first.
+  </Card>
+</CardGroup>
+
 ## `PINATA_GATEWAY_URL` / `PINATA_GATEWAY_TOKEN` missing
 
 Symptoms:
@@ -46,6 +55,17 @@ Fix:
 - Verify keys correspond to the published meta-address
 - Verify announcement used matching `ephemeral_key` + `view_tag`
 - Confirm publish step succeeded and registry contains the record
+
+<details>
+<summary><strong>Quick diagnostic checklist (2-minute pass)</strong></summary>
+
+1. `curl /health`
+2. `curl /api/v1/registry/stats`
+3. Re-run `POST /api/v1/stealth/create`
+4. Re-run `POST /api/v1/registry/announcements` with valid `tx_hash`
+5. Re-run `POST /api/v1/stealth/scan`
+
+</details>
 
 ## Source references
 

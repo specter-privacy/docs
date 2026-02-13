@@ -3,6 +3,18 @@ title: "Architecture"
 description: "Crate-level architecture and responsibilities"
 ---
 
+<CardGroup cols={3}>
+  <Card title="Launch app" icon="rocket" href="https://specter-stealth.vercel.app/">
+    Explore the UX while reading internals.
+  </Card>
+  <Card title="Protocol flow" icon="sitemap" href="/core-concepts/protocol-flow">
+    See registration, send, and discovery lifecycle.
+  </Card>
+  <Card title="Crate reference" icon="box" href="/reference/crates">
+    Jump to crate-by-crate index.
+  </Card>
+</CardGroup>
+
 SPECTER is a Rust workspace split into focused crates.
 
 ## Workspace layout
@@ -44,6 +56,16 @@ flowchart LR
 - Registry is in-memory by default in API state.
 - File persistence exists but is used explicitly through `FileRegistry`.
 - ENS/SuiNS resolution is network lookups + IPFS retrieval.
+
+<details>
+<summary><strong>How to read this architecture quickly</strong></summary>
+
+1. Start at `specter-core` for shared types/constants.
+2. Move to `specter-crypto` for cryptographic primitives.
+3. Read `specter-stealth` for sender/recipient flows.
+4. Read `specter-api` for externally visible behavior.
+
+</details>
 
 ## Source references
 

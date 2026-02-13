@@ -1,41 +1,109 @@
 ---
 title: "IPFS endpoints"
-description: "Upload and fetch meta-address payloads through Pinata-backed IPFS"
+description: "Upload and retrieve SPECTER meta-address payloads through configured Pinata gateway"
 ---
 
-## POST `/api/v1/ipfs/upload`
+<CardGroup cols={2}>
+  <Card title="Upload meta-address" icon="upload">
+    `POST /api/v1/ipfs/upload` validates meta-address hex and uploads bytes through Pinata v3.
+  </Card>
+  <Card title="Retrieve raw bytes" icon="download">
+    `GET /api/v1/ipfs/:cid` returns `application/octet-stream` from backend proxy.
+  </Card>
+</CardGroup>
 
-Upload a hex meta-address to IPFS.
+## Endpoints
 
-### Request body
+- `POST /api/v1/ipfs/upload`
+- `GET /api/v1/ipfs/:cid`
 
-```json
-{
-  "meta_address": "<hex>",
-  "name": "alice.eth-specter-profile"
-}
+## Upload request schema
+
+<ParamField body="meta_address" type="string" required>
+Hex-encoded SPECTER meta-address.
+</ParamField>
+<ParamField body="name" type="string">
+Optional display/pin name sent to Pinata upload API.
+</ParamField>
+
+## Upload response schema
+
+<ParamField body="cid" type="string" required>
+Uploaded IPFS content identifier.
+</ParamField>
+<ParamField body="text_record" type="string" required>
+Formatted value for name service storage, e.g. `ipfs://<cid>`.
+</ParamField>
+
+## Retrieve request params
+
+<ParamField path="cid" type="string" required>
+CID to retrieve through backend gateway client.
+</ParamField>
+
+## Typical flow
+
+<Steps>
+  <Step title="Upload meta-address bytes">
+    Call `POST /api/v1/ipfs/upload` and capture the returned CID.
+  </Step>
+  <Step title="Set name-service record">
+    Write `text_record` into ENS `specter` text record or SuiNS content hash.
+  </Step>
+  <Step title="Verify retrieval">
+    Call `GET /api/v1/ipfs/:cid` and confirm raw bytes are returned.
+  </Step>
+</Steps>
+
+## Example calls
+
+<Tabs>
+  <Tab title="Upload (cURL)">
+
+```bash
+curl -s -X POST http://localhost:3001/api/v1/ipfs/upload \
+  -H "Content-Type: application/json" \
+  -d '{"meta_address":"<HEX_META_ADDRESS>","name":"alice.eth-specter"}' | jq .
 ```
 
-### Response
+  </Tab>
+  <Tab title="Retrieve (cURL)">
 
-```json
-{
-  "cid": "...",
-  "text_record": "ipfs://..."
-}
+```bash
+curl -s "http://localhost:3001/api/v1/ipfs/<CID>" --output meta-address.bin
 ```
 
-## GET `/api/v1/ipfs/:cid`
+  </Tab>
+  <Tab title="JavaScript">
 
-Returns raw bytes for a CID using configured gateway settings.
+```javascript
+const up = await fetch("http://localhost:3001/api/v1/ipfs/upload", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ meta_address, name: "alice.eth-specter" })
+});
 
-## Operational requirements
+const uploaded = await up.json();
+console.log(uploaded.cid, uploaded.text_record);
+```
 
-- `PINATA_GATEWAY_URL` and `PINATA_GATEWAY_TOKEN` are required for retrieval.
-- `PINATA_JWT` is required for upload.
+  </Tab>
+</Tabs>
+
+<AccordionGroup>
+  <Accordion title="Required environment variables">
+    Upload requires `PINATA_JWT`. Retrieval requires `PINATA_GATEWAY_URL` and `PINATA_GATEWAY_TOKEN`.
+  </Accordion>
+  <Accordion title="Gateway and caching behavior">
+    Downloads use configured dedicated gateway and can be cached in-memory by CID when cache is enabled.
+  </Accordion>
+  <Accordion title="Response content type for GET">
+    `GET /api/v1/ipfs/:cid` responds with raw bytes and `Content-Type: application/octet-stream`.
+  </Accordion>
+</AccordionGroup>
 
 ## Source references
 
 - `../SPECTER/specter/specter-api/src/handlers.rs`
 - `../SPECTER/specter/specter-ipfs/src/ipfs.rs`
-- `../SPECTER/specter/.env.example`
+- `../SPECTER/specter/specter-api/src/state.rs`

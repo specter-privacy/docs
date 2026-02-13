@@ -20,7 +20,7 @@ mint broken-links
 The docs are source-verified against backend code under `../SPECTER/specter`.
 
 - Implemented behavior is documented as active functionality.
-- Roadmap or unverified claims are explicitly flagged in `reference/discrepancies-readme.mdx`.
+- Roadmap or unverified claims are explicitly flagged in `roadmap/yet-to-implement.mdx`.
 
 ## Main config
 

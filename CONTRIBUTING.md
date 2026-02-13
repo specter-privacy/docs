@@ -22,4 +22,4 @@ If you change protocol or API behavior, update:
 
 - The affected guide/reference pages
 - `reference/verification-matrix.mdx`
-- `reference/discrepancies-readme.mdx` when roadmap/readme differences change
+- `roadmap/yet-to-implement.mdx` when roadmap/readme differences change

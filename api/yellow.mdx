@@ -1,9 +1,25 @@
 ---
 title: "Yellow endpoints"
-description: "Private channel API endpoints and current implementation boundaries"
+description: "Private-channel API surface and current implementation boundaries"
 ---
 
-## Endpoints
+<CardGroup cols={3}>
+  <Card title="Create private channel" icon="plus">
+    Build stealth channel metadata and publish announcement-linked channel ids.
+  </Card>
+  <Card title="Discover channels" icon="radar">
+    Scan existing announcements for channel-specific discoveries.
+  </Card>
+  <Card title="Read config" icon="gear">
+    Inspect Yellow ws/contract config exposed by backend.
+  </Card>
+</CardGroup>
+
+<Warning>
+Current Yellow endpoints are integration scaffolding. Several responses are placeholders and do not submit real L1 settlement transactions.
+</Warning>
+
+## Endpoint list
 
 - `POST /api/v1/yellow/channel/create`
 - `POST /api/v1/yellow/channel/discover`
@@ -13,24 +29,237 @@ description: "Private channel API endpoints and current implementation boundarie
 - `POST /api/v1/yellow/transfer`
 - `GET /api/v1/yellow/config`
 
-## What is implemented
+## Integration path
 
-- Channel-create flow generates stealth payment + announcement data
-- Channel discovery scans announcement registry with provided keys
-- Config endpoint returns Yellow network + token metadata
+<Steps>
+  <Step title="Create channel announcement">
+    Call `/api/v1/yellow/channel/create` with recipient, token, and amount.
+  </Step>
+  <Step title="Discover as recipient">
+    Call `/api/v1/yellow/channel/discover` with recipient key material.
+  </Step>
+  <Step title="Inspect and progress state">
+    Read status/config and optionally call fund, transfer, and close endpoints.
+  </Step>
+</Steps>
 
-## Important limitations
+## Endpoint schemas
 
-- Some responses are placeholders (`tx_hash` values in fund/close flows)
-- Close handler explicitly notes no L1 transaction submission by backend
-- `token` handling in discovery/status is simplified
+<AccordionGroup>
+  <Accordion title="POST /api/v1/yellow/channel/create">
 
-<Warning>
-Treat Yellow API behavior as integration scaffolding. Validate final settlement and balance behavior with the external Yellow stack before production rollout.
-</Warning>
+<ParamField body="recipient" type="string" required>
+Recipient ENS name ending in `.eth` or a hex meta-address string.
+</ParamField>
+<ParamField body="token" type="string" required>
+Token identifier string (currently logged but not enforced in backend channel state).
+</ParamField>
+<ParamField body="amount" type="string" required>
+Initial funding amount as string.
+</ParamField>
+<ParamField body="channel_id" type="string">
+Optional 32-byte channel id hex. If omitted, backend generates random id.
+</ParamField>
+
+<ParamField body="channel_id" type="string" required>
+Response channel id.
+</ParamField>
+<ParamField body="stealth_address" type="string" required>
+Recipient stealth EVM address.
+</ParamField>
+<ParamField body="announcement" type="object" required>
+Announcement payload for channel discovery.
+  <ParamField body="ephemeral_key" type="string" required>
+  Hex ciphertext.
+  </ParamField>
+  <ParamField body="view_tag" type="integer" required>
+  View tag byte.
+  </ParamField>
+  <ParamField body="channel_id" type="string" required>
+  Channel identifier.
+  </ParamField>
+</ParamField>
+<ParamField body="tx_hash" type="string" required>
+Synthetic hash-like value derived in handler.
+</ParamField>
+
+  </Accordion>
+  <Accordion title="POST /api/v1/yellow/channel/discover">
+
+<ParamField body="viewing_sk" type="string" required>
+Viewing secret key in hex.
+</ParamField>
+<ParamField body="spending_pk" type="string" required>
+Spending public key in hex.
+</ParamField>
+<ParamField body="spending_sk" type="string" required>
+Spending secret key in hex.
+</ParamField>
+
+<ParamField body="channels" type="array" required>
+Discovered channel rows.
+</ParamField>
+
+  </Accordion>
+  <Accordion title="POST /api/v1/yellow/channel/fund">
+
+<ParamField body="channel_id" type="string" required>
+Channel id string.
+</ParamField>
+<ParamField body="amount" type="string" required>
+Amount string.
+</ParamField>
+
+<ParamField body="tx_hash" type="string" required>
+Placeholder tx-like value.
+</ParamField>
+<ParamField body="new_balance" type="string" required>
+Echoed amount from request.
+</ParamField>
+
+  </Accordion>
+  <Accordion title="POST /api/v1/yellow/channel/close">
+
+<ParamField body="channel_id" type="string" required>
+Channel id string.
+</ParamField>
+
+<ParamField body="tx_hash" type="string" required>
+Placeholder tx-like value.
+</ParamField>
+<ParamField body="tx_hash_is_placeholder" type="boolean" required>
+Always `true` in current backend close handler.
+</ParamField>
+<ParamField body="final_balances" type="array" required>
+Final allocations returned by backend.
+</ParamField>
+
+  </Accordion>
+  <Accordion title="GET /api/v1/yellow/channel/:id/status">
+
+<ParamField path="id" type="string" required>
+Channel id path parameter.
+</ParamField>
+
+<ParamField body="channel_id" type="string" required>
+Channel id echoed in response.
+</ParamField>
+<ParamField body="status" type="string" required>
+`open` when announcement exists, otherwise `unknown`.
+</ParamField>
+<ParamField body="balances" type="array" required>
+Current balance entries.
+</ParamField>
+<ParamField body="participants" type="array" required>
+Participants list (empty in current implementation).
+</ParamField>
+<ParamField body="created_at" type="integer" required>
+Timestamp from matching announcement or `0`.
+</ParamField>
+<ParamField body="version" type="integer" required>
+Static state version (`1` currently).
+</ParamField>
+
+  </Accordion>
+  <Accordion title="POST /api/v1/yellow/transfer">
+
+<ParamField body="channel_id" type="string" required>
+Channel id string.
+</ParamField>
+<ParamField body="destination" type="string" required>
+Transfer destination.
+</ParamField>
+<ParamField body="amount" type="string" required>
+Amount to transfer.
+</ParamField>
+<ParamField body="asset" type="string" required>
+Asset identifier.
+</ParamField>
+
+<ParamField body="new_state_version" type="integer" required>
+Static value `2` in current implementation.
+</ParamField>
+<ParamField body="balances" type="array" required>
+Updated balances array.
+</ParamField>
+
+  </Accordion>
+  <Accordion title="GET /api/v1/yellow/config">
+
+<ParamField body="ws_url" type="string" required>
+Yellow websocket endpoint.
+</ParamField>
+<ParamField body="custody_address" type="string" required>
+Configured custody contract address.
+</ParamField>
+<ParamField body="adjudicator_address" type="string" required>
+Configured adjudicator contract address.
+</ParamField>
+<ParamField body="chain_id" type="integer" required>
+Configured chain id.
+</ParamField>
+<ParamField body="supported_tokens" type="array" required>
+Hardcoded token metadata list (currently USDC and ETH entries).
+</ParamField>
+
+  </Accordion>
+</AccordionGroup>
+
+## Example calls
+
+<Tabs>
+  <Tab title="Create channel">
+
+```bash
+curl -s -X POST http://localhost:3001/api/v1/yellow/channel/create \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipient":"bob.eth",
+    "token":"USDC",
+    "amount":"1000"
+  }' | jq .
+```
+
+  </Tab>
+  <Tab title="Discover channels">
+
+```bash
+curl -s -X POST http://localhost:3001/api/v1/yellow/channel/discover \
+  -H "Content-Type: application/json" \
+  -d '{
+    "viewing_sk":"<HEX_VIEWING_SK>",
+    "spending_pk":"<HEX_SPENDING_PK>",
+    "spending_sk":"<HEX_SPENDING_SK>"
+  }' | jq .
+```
+
+  </Tab>
+  <Tab title="Read config">
+
+```bash
+curl -s http://localhost:3001/api/v1/yellow/config | jq .
+```
+
+  </Tab>
+</Tabs>
+
+## Implementation caveats
+
+<AccordionGroup>
+  <Accordion title="Placeholder transaction fields">
+    Fund and close handlers return placeholder tx-like values. Close also marks `tx_hash_is_placeholder: true`.
+  </Accordion>
+  <Accordion title="Token handling simplification">
+    Discovery/status responses currently use simplified token behavior and do not represent full custody settlement logic.
+  </Accordion>
+  <Accordion title="No backend L1 close submission">
+    Close handler does not submit an L1 transaction; settlement is expected from Yellow Network processing outside this backend.
+  </Accordion>
+</AccordionGroup>
 
 ## Source references
 
+- `../SPECTER/specter/specter-api/src/routes.rs`
 - `../SPECTER/specter/specter-api/src/handlers.rs`
-- `../SPECTER/specter/specter-yellow/src/client.rs`
-- `../SPECTER/specter/specter-yellow/src/channel.rs`
+- `../SPECTER/specter/specter-api/src/dto.rs`
+- `../SPECTER/specter/specter-api/src/state.rs`

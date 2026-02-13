@@ -3,6 +3,34 @@ title: "Private payment workflow"
 description: "Operational guide for create, announce, and discover"
 ---
 
+<CardGroup cols={3}>
+  <Card title="Launch app" icon="rocket" href="https://specter-stealth.vercel.app/">
+    Follow this flow using the hosted UI.
+  </Card>
+  <Card title="API details" icon="code" href="/api/stealth">
+    Endpoint-level request and response schemas.
+  </Card>
+  <Card title="Quickstart commands" icon="terminal" href="/getting-started/quickstart">
+    Copy-paste shell flow for local testing.
+  </Card>
+</CardGroup>
+
+## End-to-end flow map
+
+```mermaid
+sequenceDiagram
+    participant Sender
+    participant API
+    participant Registry
+    participant Recipient
+    Sender->>API: resolve name -> meta-address
+    Sender->>API: POST /stealth/create
+    Sender->>Chain: send funds to stealth_address
+    Sender->>Registry: POST /registry/announcements
+    Recipient->>API: POST /stealth/scan
+    API-->>Recipient: discoveries + eth_private_key
+```
+
 ## Sender workflow
 
 1. Resolve recipient name to meta-address.
@@ -20,6 +48,18 @@ description: "Operational guide for create, announce, and discover"
 
 - Created and discovered `stealth_address` should match.
 - Discovery should include the same `announcement_id` and metadata you published.
+
+<details>
+<summary><strong>Production UX idea: reduce user mistakes</strong></summary>
+
+- Lock the “Publish announcement” button until a valid on-chain `tx_hash` is detected.
+- Show a side-by-side confirmation:
+  - `stealth_address` generated
+  - `stealth_address` discovered
+  - final status = match/mismatch
+- Save last scan checkpoint (`from_timestamp`) to speed up subsequent scans.
+
+</details>
 
 ## Source references
 

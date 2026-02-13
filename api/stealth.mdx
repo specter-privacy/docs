@@ -1,74 +1,191 @@
 ---
 title: "Stealth endpoints"
-description: "Create stealth payments and scan announcements"
+description: "Create stealth payment payloads and scan announcements for discoveries"
 ---
 
-## POST `/api/v1/stealth/create`
+<CardGroup cols={3}>
+  <Card title="Create payment payload" icon="wand-sparkles">
+    `POST /api/v1/stealth/create` derives stealth destination and announcement data.
+  </Card>
+  <Card title="Scan announcements" icon="radar">
+    `POST /api/v1/stealth/scan` discovers payments addressed to your keys.
+  </Card>
+  <Card title="Publish announcement" icon="megaphone" href="/api/registry">
+    Push announcement objects to the registry so recipients can discover them.
+  </Card>
+</CardGroup>
 
-Create payment data from a recipient meta-address.
+## Workflow
 
-### Request body
+<Steps>
+  <Step title="Create stealth payload">
+    Send recipient `meta_address` to `/api/v1/stealth/create`.
+  </Step>
+  <Step title="Publish announcement">
+    Store the returned `announcement` with `/api/v1/registry/announcements`.
+  </Step>
+  <Step title="Scan with recipient keys">
+    Use `/api/v1/stealth/scan` and recipient key material to recover discoveries.
+  </Step>
+</Steps>
 
-```json
-{
-  "meta_address": "<hex>",
-  "channel_id": null
-}
+## `POST /api/v1/stealth/create`
+
+### Request schema
+
+<ParamField body="meta_address" type="string" required>
+Hex-encoded recipient meta-address.
+</ParamField>
+<ParamField body="channel_id" type="string">
+Optional channel identifier field in DTO. Current create handler does not use this field.
+</ParamField>
+
+### Response schema
+
+<ParamField body="stealth_address" type="string" required>
+Checksummed stealth EVM address.
+</ParamField>
+<ParamField body="stealth_sui_address" type="string" required>
+Stealth Sui address derived from the same key material.
+</ParamField>
+<ParamField body="ephemeral_ciphertext" type="string" required>
+Hex-encoded ephemeral ciphertext.
+</ParamField>
+<ParamField body="view_tag" type="integer" required>
+1-byte view tag for fast filtering.
+</ParamField>
+<ParamField body="announcement" type="object" required>
+Announcement object ready for registry publication.
+  <ParamField body="id" type="integer" required>
+  Announcement ID value from in-memory construction.
+  </ParamField>
+  <ParamField body="ephemeral_key" type="string" required>
+  Hex ephemeral ciphertext.
+  </ParamField>
+  <ParamField body="view_tag" type="integer" required>
+  Announcement view tag.
+  </ParamField>
+  <ParamField body="timestamp" type="integer" required>
+  Unix timestamp set at creation.
+  </ParamField>
+  <ParamField body="channel_id" type="string">
+  Optional channel id.
+  </ParamField>
+  <ParamField body="tx_hash" type="string">
+  Optional transaction hash.
+  </ParamField>
+  <ParamField body="amount" type="string">
+  Optional amount string.
+  </ParamField>
+  <ParamField body="chain" type="string">
+  Optional chain identifier.
+  </ParamField>
+</ParamField>
+
+## `POST /api/v1/stealth/scan`
+
+### Request schema
+
+<ParamField body="viewing_sk" type="string" required>
+Viewing secret key in hex.
+</ParamField>
+<ParamField body="spending_pk" type="string" required>
+Spending public key in hex.
+</ParamField>
+<ParamField body="spending_sk" type="string" required>
+Spending secret key in hex.
+</ParamField>
+<ParamField body="view_tags" type="array">
+Optional list of specific view tags to pre-filter announcements.
+</ParamField>
+<ParamField body="from_timestamp" type="integer">
+Optional scan window start (Unix timestamp).
+</ParamField>
+<ParamField body="to_timestamp" type="integer">
+Optional scan window end (Unix timestamp).
+</ParamField>
+
+### Response schema
+
+<ParamField body="discoveries" type="array" required>
+Array of discovered payments.
+</ParamField>
+<ParamField body="stats" type="object" required>
+Scan execution metrics.
+  <ParamField body="total_scanned" type="integer" required>
+  Number of announcements scanned.
+  </ParamField>
+  <ParamField body="view_tag_matches" type="integer" required>
+  Count of matching results returned by the scan path.
+  </ParamField>
+  <ParamField body="discoveries" type="integer" required>
+  Number of discovered payments.
+  </ParamField>
+  <ParamField body="duration_ms" type="integer" required>
+  Total scan duration in milliseconds.
+  </ParamField>
+  <ParamField body="rate" type="number" required>
+  Scan throughput (announcements per second).
+  </ParamField>
+</ParamField>
+
+## Example calls
+
+<Tabs>
+  <Tab title="Create (cURL)">
+
+```bash
+curl -s -X POST http://localhost:3001/api/v1/stealth/create \
+  -H "Content-Type: application/json" \
+  -d '{"meta_address":"<HEX_META_ADDRESS>"}' | jq .
 ```
 
+  </Tab>
+  <Tab title="Scan (cURL)">
+
+```bash
+curl -s -X POST http://localhost:3001/api/v1/stealth/scan \
+  -H "Content-Type: application/json" \
+  -d '{
+    "viewing_sk":"<HEX_VIEWING_SK>",
+    "spending_pk":"<HEX_SPENDING_PK>",
+    "spending_sk":"<HEX_SPENDING_SK>",
+    "view_tags":[42]
+  }' | jq .
+```
+
+  </Tab>
+  <Tab title="JavaScript">
+
 ```javascript
-const create = await fetch("http://localhost:3001/api/v1/stealth/create", {
+const createRes = await fetch("http://localhost:3001/api/v1/stealth/create", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ meta_address })
 });
-const created = await create.json();
-console.log(created.stealth_address);
+
+const createData = await createRes.json();
+console.log(createData.stealth_address, createData.view_tag);
 ```
 
-### Response highlights
+  </Tab>
+</Tabs>
 
-- `stealth_address`
-- `stealth_sui_address`
-- `ephemeral_ciphertext`
-- `view_tag`
-- `announcement`
+<AccordionGroup>
+  <Accordion title="Filter precedence in scan handler">
+    Scan selection uses this order: `view_tags` filter first, else time range when both `from_timestamp` and `to_timestamp` are provided, else full registry scan.
+  </Accordion>
+  <Accordion title="Hex prefix handling">
+    Scan key fields accept values with or without a `0x` prefix (`strip_hex_prefix` in handler).
+  </Accordion>
+  <Accordion title="Secret material in discoveries">
+    Discovery output includes `stealth_sk` and `eth_private_key`. Treat response payload as highly sensitive.
+  </Accordion>
+</AccordionGroup>
 
-<Info>
-`channel_id` is present in the request DTO but not used in the current create handler.
-</Info>
-
-## POST `/api/v1/stealth/scan`
-
-Scan announcements with recipient keys.
-
-### Request body
-
-```json
-{
-  "viewing_sk": "<hex>",
-  "spending_pk": "<hex>",
-  "spending_sk": "<hex>",
-  "view_tags": [42],
-  "from_timestamp": 1700000000,
-  "to_timestamp": 1700003600
-}
-```
-
-```javascript
-const scan = await fetch("http://localhost:3001/api/v1/stealth/scan", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ viewing_sk, spending_pk, spending_sk })
-});
-const result = await scan.json();
-console.log(result.discoveries.length);
-```
-
-### Response highlights
-
-- `discoveries[]` with `stealth_address`, `eth_private_key`, and metadata
-- `stats` with scan counts, duration, and rate
+<Warning>
+Treat all secret key fields and scan discovery private keys as production secrets.
+</Warning>
 
 ## Source references
 

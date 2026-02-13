@@ -3,6 +3,15 @@ title: "Production checklist"
 description: "Checklist for operating SPECTER backend safely"
 ---
 
+<CardGroup cols={2}>
+  <Card title="Launch app" icon="rocket" href="https://specter-stealth.vercel.app/">
+    Validate user-facing behavior against your deployment.
+  </Card>
+  <Card title="Troubleshooting" icon="wrench" href="/troubleshooting/common-issues">
+    Keep this open during rollout.
+  </Card>
+</CardGroup>
+
 ## Required before launch
 
 - Configure all required env vars
@@ -16,6 +25,26 @@ description: "Checklist for operating SPECTER backend safely"
 - Monitor error rates for ENS/SuiNS/IPFS lookups
 - Track registry growth and scanning latency
 - Rotate infrastructure credentials periodically
+
+## Suggested rollout phases
+
+| Phase | Goal | Exit criteria |
+| --- | --- | --- |
+| Phase 1 | Internal validation | End-to-end quickstart succeeds repeatedly |
+| Phase 2 | Staging hardening | Auth/rate-limit/monitoring controls in place |
+| Phase 3 | Public exposure | Runbook + incident response documented |
+
+<details>
+<summary><strong>Helpful production UX idea</strong></summary>
+
+Build a simple operator dashboard with:
+
+- `/health` snapshot
+- announcement publish success/failure rate
+- scan latency percentile
+- ENS/SuiNS resolution error trend
+
+</details>
 
 ## Source references
 

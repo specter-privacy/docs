@@ -3,6 +3,15 @@ title: "Quickstart"
 description: "Run a full keygen -> stealth create -> publish -> scan loop in minutes"
 ---
 
+<CardGroup cols={2}>
+  <Card title="Launch app" icon="rocket" href="https://specter-stealth.vercel.app/">
+    Try the same flow in the UI while running CLI/curl locally.
+  </Card>
+  <Card title="API map" icon="sitemap" href="/api/introduction">
+    Keep route docs open while executing commands.
+  </Card>
+</CardGroup>
+
 This tutorial runs a full local stealth flow against the API.
 
 <Note>
@@ -58,6 +67,17 @@ curl -s -X POST http://localhost:3001/api/v1/stealth/scan \
 ```
 
 Expected: one discovery with `stealth_address` matching step 2.
+
+<details>
+<summary><strong>UX tip for teams</strong></summary>
+
+Run this quickstart as a team checklist during onboarding and release validation.
+
+- One person runs sender steps.
+- One person runs recipient scan.
+- Compare output addresses together.
+
+</details>
 
 ## Source references
 

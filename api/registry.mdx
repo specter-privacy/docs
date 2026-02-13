@@ -1,37 +1,139 @@
 ---
 title: "Registry endpoints"
-description: "Publish, list, and inspect announcement records"
+description: "Publish, list, and inspect SPECTER announcements in the in-memory registry"
 ---
 
-## POST `/api/v1/registry/announcements`
+<CardGroup cols={3}>
+  <Card title="Publish" icon="megaphone">
+    `POST /api/v1/registry/announcements` validates and stores new announcements.
+  </Card>
+  <Card title="List" icon="list">
+    `GET /api/v1/registry/announcements` returns paginated announcements with filters.
+  </Card>
+  <Card title="Stats" icon="chart-simple">
+    `GET /api/v1/registry/stats` returns total count and non-zero view-tag distribution.
+  </Card>
+</CardGroup>
 
-Publish an announcement.
+## `POST /api/v1/registry/announcements`
 
-### Required fields
+### Request schema
 
-- `ephemeral_key` (hex)
-- `view_tag` (u8)
-- `tx_hash` (non-empty string)
+<ParamField body="ephemeral_key" type="string" required>
+Hex-encoded ephemeral ciphertext.
+</ParamField>
+<ParamField body="view_tag" type="integer" required>
+Announcement view tag (`0-255`).
+</ParamField>
+<ParamField body="tx_hash" type="string" required>
+Transaction hash string. Must be non-empty.
+</ParamField>
+<ParamField body="channel_id" type="string">
+Optional 32-byte channel id as 64 hex characters.
+</ParamField>
+<ParamField body="amount" type="string">
+Optional human-readable amount string.
+</ParamField>
+<ParamField body="chain" type="string">
+Optional chain identifier (for example `ethereum`, `sui`).
+</ParamField>
 
-### Optional fields
+### Response schema
 
-- `channel_id` (32-byte hex)
-- `amount`
-- `chain`
+<ParamField body="id" type="integer" required>
+Assigned registry announcement id.
+</ParamField>
+<ParamField body="success" type="boolean" required>
+Publish confirmation.
+</ParamField>
 
-## GET `/api/v1/registry/announcements`
+## `GET /api/v1/registry/announcements`
 
-List announcements with optional filters:
+### Query parameters
 
-- `view_tag`
-- `from_timestamp`
-- `to_timestamp`
-- `offset`
-- `limit`
+<ParamField query="view_tag" type="integer">
+Filter announcements by a specific view tag.
+</ParamField>
+<ParamField query="from_timestamp" type="integer">
+Start of time-range filter (Unix timestamp).
+</ParamField>
+<ParamField query="to_timestamp" type="integer">
+End of time-range filter (Unix timestamp).
+</ParamField>
+<ParamField query="offset" type="integer" default={0}>
+Pagination offset.
+</ParamField>
+<ParamField query="limit" type="integer" default={100}>
+Pagination limit.
+</ParamField>
 
-## GET `/api/v1/registry/stats`
+### Response schema
 
-Returns total count and non-zero view tag distribution.
+<ParamField body="announcements" type="array" required>
+Paginated announcement rows.
+</ParamField>
+<ParamField body="total" type="integer" required>
+Total matching rows before pagination.
+</ParamField>
+
+## `GET /api/v1/registry/stats`
+
+### Response schema
+
+<ParamField body="total_announcements" type="integer" required>
+Current total number of stored announcements.
+</ParamField>
+<ParamField body="view_tag_distribution" type="array" required>
+Array of non-zero tag buckets (`tag`, `count`).
+</ParamField>
+
+## Example calls
+
+<Tabs>
+  <Tab title="Publish (cURL)">
+
+```bash
+curl -s -X POST http://localhost:3001/api/v1/registry/announcements \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ephemeral_key":"<HEX_CIPHERTEXT>",
+    "view_tag":42,
+    "tx_hash":"0xabc123...",
+    "chain":"ethereum",
+    "amount":"0.10"
+  }' | jq .
+```
+
+  </Tab>
+  <Tab title="List (cURL)">
+
+```bash
+curl -s "http://localhost:3001/api/v1/registry/announcements?view_tag=42&offset=0&limit=20" | jq .
+```
+
+  </Tab>
+  <Tab title="Stats (cURL)">
+
+```bash
+curl -s "http://localhost:3001/api/v1/registry/stats" | jq .
+```
+
+  </Tab>
+</Tabs>
+
+## Behavior notes
+
+<AccordionGroup>
+  <Accordion title="Duplicate transaction hashes are rejected">
+    The in-memory registry normalizes `tx_hash` and prevents duplicate entries with the same transaction hash.
+  </Accordion>
+  <Accordion title="List filter precedence">
+    Listing uses `view_tag` when present. If absent, it uses time range only when both `from_timestamp` and `to_timestamp` are provided. Otherwise it returns all.
+  </Accordion>
+  <Accordion title="Storage scope">
+    API state uses `MemoryRegistry`, so announcements are process-local and reset when the process restarts.
+  </Accordion>
+</AccordionGroup>
 
 ## Source references
 

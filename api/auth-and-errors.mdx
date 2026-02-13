@@ -1,11 +1,19 @@
 ---
 title: "Auth and errors"
-description: "Current auth model and API error contract"
+description: "Current auth model, error contract, and production hardening checklist"
 ---
 
-## Auth model
-
-Current server code does not enforce API keys, JWT auth, or wallet signatures at the HTTP layer.
+<CardGroup cols={3}>
+  <Card title="No built-in auth" icon="lock-open">
+    API routes currently do not require API keys, JWTs, or wallet signatures.
+  </Card>
+  <Card title="Stable error envelope" icon="triangle-exclamation">
+    Errors return a consistent JSON body with `code` and `message`.
+  </Card>
+  <Card title="Gateway required" icon="shield-halved">
+    Put auth and throttling in front of this API for production workloads.
+  </Card>
+</CardGroup>
 
 ## Error payload shape
 
@@ -13,21 +21,97 @@ Current server code does not enforce API keys, JWT auth, or wallet signatures at
 {
   "error": {
     "code": "BAD_REQUEST",
-    "message": "..."
+    "message": "Invalid hex: ..."
   }
 }
 ```
 
-## Common HTTP mappings
+<ParamField body="error" type="object" required>
+Top-level error object.
+  <ParamField body="code" type="string" required>
+  Machine-readable code such as `BAD_REQUEST`, `VALIDATION_ERROR`, `IPFS_ERROR`.
+  </ParamField>
+  <ParamField body="message" type="string" required>
+  Human-readable description derived from server-side error mapping.
+  </ParamField>
+</ParamField>
 
-| Condition | HTTP status | Example code |
+## HTTP status mapping
+
+| Condition | HTTP | Example codes |
 | --- | --- | --- |
-| Validation / malformed input | `422` or `400` | `VALIDATION_ERROR`, `BAD_REQUEST` |
-| Missing ENS/SuiNS records | `404` | `ENS_NAME_NOT_FOUND`, `NO_SPECTER_RECORD` |
-| IPFS download failure | `502` | `IPFS_ERROR` |
-| Internal failure | `500` | `INTERNAL_ERROR` |
+| Bad input or invalid hex | `400` | `BAD_REQUEST` |
+| Validation failure | `422` | `VALIDATION_ERROR` |
+| ENS/SuiNS record not found | `404` | `ENS_NAME_NOT_FOUND`, `SUINS_NAME_NOT_FOUND` |
+| IPFS gateway/download failure | `502` | `IPFS_ERROR` |
+| Unhandled internal failure | `500` | `INTERNAL_ERROR` |
+
+## Real response examples
+
+<Tabs>
+  <Tab title="400 bad request">
+
+```json
+{
+  "error": {
+    "code": "BAD_REQUEST",
+    "message": "Invalid meta_address: ..."
+  }
+}
+```
+
+  </Tab>
+  <Tab title="404 name not found">
+
+```json
+{
+  "error": {
+    "code": "ENS_NAME_NOT_FOUND",
+    "message": "ENS name not found: alice.eth"
+  }
+}
+```
+
+  </Tab>
+  <Tab title="502 IPFS error">
+
+```json
+{
+  "error": {
+    "code": "IPFS_ERROR",
+    "message": "IPFS download failed: HTTP 403"
+  }
+}
+```
+
+  </Tab>
+</Tabs>
+
+## Production hardening path
+
+<Steps>
+  <Step title="Add auth at the edge">
+    Require API key or wallet-authentication in your reverse proxy or API gateway.
+  </Step>
+  <Step title="Add rate limiting">
+    Throttle by IP and route group, especially on `/api/v1/stealth/*` scan endpoints.
+  </Step>
+  <Step title="Log error codes">
+    Track `error.code` values for alerting and integration diagnostics.
+  </Step>
+</Steps>
+
+<AccordionGroup>
+  <Accordion title="Where error codes come from">
+    `ApiError` maps from `SpecterError` in `specter-api/src/error.rs` and produces the final JSON envelope.
+  </Accordion>
+  <Accordion title="Why 422 and 400 both exist">
+    Validation errors from typed domain checks use `422`, while malformed request values and parse failures use `400`.
+  </Accordion>
+</AccordionGroup>
 
 ## Source references
 
 - `../SPECTER/specter/specter-api/src/error.rs`
 - `../SPECTER/specter/specter-core/src/error.rs`
+- `../SPECTER/specter/specter-api/src/lib.rs`

@@ -1,40 +1,97 @@
 ---
 title: "Keys endpoint"
-description: "Generate SPECTER key material and meta-address"
+description: "Generate SPECTER spending/viewing keys and meta-address payload"
 ---
 
-## POST `/api/v1/keys/generate`
+<CardGroup cols={2}>
+  <Card title="Single-call key generation" icon="key-round">
+    `POST /api/v1/keys/generate` returns spending and viewing keypairs plus a meta-address.
+  </Card>
+  <Card title="Use output in next steps" icon="arrow-right" href="/api/stealth">
+    Feed `meta_address` into the stealth create endpoint.
+  </Card>
+</CardGroup>
 
-Generate spending/viewing keypairs and a meta-address.
+## Endpoint
 
-### Example request
+`POST /api/v1/keys/generate`
+
+No request body is required.
+
+## Typical flow
+
+<Steps>
+  <Step title="Call the endpoint">
+    Trigger key generation once per new recipient identity.
+  </Step>
+  <Step title="Store secrets securely">
+    Persist `spending_sk` and `viewing_sk` in encrypted storage only.
+  </Step>
+  <Step title="Publish meta-address">
+    Use `meta_address` with IPFS + ENS/SuiNS registration.
+  </Step>
+</Steps>
+
+## Example calls
+
+<Tabs>
+  <Tab title="cURL">
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/keys/generate
+curl -s -X POST http://localhost:3001/api/v1/keys/generate | jq .
 ```
+
+  </Tab>
+  <Tab title="JavaScript">
 
 ```javascript
 const res = await fetch("http://localhost:3001/api/v1/keys/generate", {
   method: "POST"
 });
-const data = await res.json();
-console.log(data.meta_address);
+
+const keys = await res.json();
+console.log(keys.meta_address);
 ```
 
-### Example response fields
+  </Tab>
+</Tabs>
 
-- `spending_pk` (hex)
-- `spending_sk` (hex, sensitive)
-- `viewing_pk` (hex)
-- `viewing_sk` (hex, sensitive)
-- `meta_address` (hex)
-- `view_tag` (informational base tag)
+## Response schema
+
+<ParamField body="spending_pk" type="string" required>
+Hex-encoded spending public key.
+</ParamField>
+<ParamField body="spending_sk" type="string" required>
+Hex-encoded spending secret key (sensitive).
+</ParamField>
+<ParamField body="viewing_pk" type="string" required>
+Hex-encoded viewing public key.
+</ParamField>
+<ParamField body="viewing_sk" type="string" required>
+Hex-encoded viewing secret key (sensitive).
+</ParamField>
+<ParamField body="meta_address" type="string" required>
+Hex-encoded SPECTER meta-address combining spending + viewing public keys.
+</ParamField>
+<ParamField body="view_tag" type="integer" required>
+Base view tag derived from viewing public key bytes.
+</ParamField>
 
 <Warning>
-Treat `spending_sk` and `viewing_sk` as secrets. Never log or commit them.
+Never log or commit `spending_sk` or `viewing_sk`.
 </Warning>
+
+<AccordionGroup>
+  <Accordion title="How `view_tag` is computed here">
+    The endpoint computes `view_tag` from the viewing public key bytes (`compute_view_tag(viewing.public.as_bytes())`).
+  </Accordion>
+  <Accordion title="What this endpoint does not do">
+    It does not persist key material to disk and does not register ENS/SuiNS records.
+  </Accordion>
+</AccordionGroup>
 
 ## Source references
 
 - `../SPECTER/specter/specter-api/src/handlers.rs`
 - `../SPECTER/specter/specter-api/src/dto.rs`
+- `../SPECTER/specter/specter-crypto/src/view_tag.rs`
