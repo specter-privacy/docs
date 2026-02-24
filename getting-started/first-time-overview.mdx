@@ -101,7 +101,7 @@ flowchart TD
 
 <AccordionGroup>
   <Accordion title="What is ML-KEM-768?">
-    ML-KEM-768 (formerly Kyber) is a **post-quantum key encapsulation mechanism**. It lets two parties establish a shared secret even if an attacker has a quantum computer. SPECTER uses it to create the one-time stealth addresses.
+    ML-KEM-768 is a **NIST-standardized post-quantum key encapsulation mechanism** (FIPS 203). It lets two parties establish a shared secret even if an attacker has a quantum computer. SPECTER uses the [`ml-kem`](https://crates.io/crates/ml-kem) crate for all encapsulation and decapsulation operations.
 
     - **Public key size**: 1184 bytes
     - **Ciphertext size**: 1088 bytes  

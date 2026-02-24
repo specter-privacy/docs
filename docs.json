@@ -82,6 +82,12 @@
             ]
           },
           {
+            "group": "ERC Proposal",
+            "pages": [
+              "erc-proposal"
+            ]
+          },
+          {
             "group": "FAQ",
             "pages": [
               "faq"
@@ -157,7 +163,8 @@
   },
   "footer": {
     "socials": {
-      "github": "https://github.com/pranshurastogi/SPECTER"
+      "github": "https://github.com/pranshurastogi/SPECTER",
+      "x": "https://x.com/pranshurastogii"
     }
   }
 }

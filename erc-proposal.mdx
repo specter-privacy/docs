@@ -1,0 +1,359 @@
+---
+title: "ERC-XXXX: Post-Quantum Stealth Addresses"
+sidebarTitle: "ERC Proposal"
+description: "ML-KEM Extension of ERC-5564 — A standards track proposal for post-quantum stealth address generation on Ethereum"
+icon: "scroll"
+---
+
+<div style={{ borderLeft: "4px solid #6366f1", paddingLeft: "20px", marginBottom: "28px" }}>
+
+**ERC-XXXX: Post-Quantum Stealth Addresses (ML-KEM Extension of ERC-5564)**
+
+| | |
+|---|---|
+| **Author** | Pranshu Rastogi ([@pranshurastogi](https://x.com/pranshurastogii)) |
+| **Status** | Pre-Draft (Internal Working Document) |
+| **Type** | Standards Track |
+| **Category** | ERC |
+| **Created** | 2026-02-24 |
+| **Requires** | ERC-5564, ERC-6538 |
+
+</div>
+
+<Warning>
+  **Internal Working Document** — This proposal is currently in an early research and design phase. It has **not** been formally submitted as an Ethereum Improvement Proposal and is not listed on [eips.ethereum.org](https://eips.ethereum.org). The specification below represents our current thinking and is subject to revision as the design matures. Feedback and discussion are welcome — reach out via [𝕏 @pranshurastogii](https://x.com/pranshurastogii) or on [GitHub](https://github.com/pranshurastogi/SPECTER).
+</Warning>
+
+---
+
+## Abstract
+
+This ERC defines **schemeId 2**, a post-quantum stealth address scheme extending [ERC-5564](https://eips.ethereum.org/EIPS/eip-5564).
+
+It replaces the SECP256k1 ECDH shared-secret derivation used in schemeId 1 with **ML-KEM-768** (FIPS 203), a NIST-standardized lattice-based Key Encapsulation Mechanism.
+
+This proposal:
+
+- Reuses the existing `ERC5564Announcer` contract at `0x55649E01B5Df198D18D95b5cc5051630cfD45564`
+- Reuses the ERC-6538 stealth meta-address registry
+- Preserves the `Announcement` event structure
+- Preserves the view tag optimization
+
+Spending keys remain external to the Announcer and MAY use any signature scheme supported by the receiving wallet. This ERC specifies deterministic stealth key derivation compatible with **ML-DSA-65** (FIPS 204).
+
+<Note>
+  This proposal operates entirely at the **application layer** and does not require consensus-layer changes.
+</Note>
+
+---
+
+## Motivation
+
+ERC-5564 enables non-interactive stealth address generation using **elliptic curve Diffie–Hellman** over SECP256k1. However, SECP256k1 is vulnerable to **Shor's algorithm** on a sufficiently large quantum computer.
+
+Stealth address announcements persist **indefinitely** in event logs. An adversary who records ephemeral public keys and stealth meta-addresses may, in the future, derive shared secrets if elliptic curve discrete logarithms become tractable. This is the **harvest-now, decrypt-later** attack vector — uniquely dangerous for stealth address systems precisely because the cryptographic material is **permanently on-chain**.
+
+This proposal mitigates this threat by replacing ECDH with **ML-KEM-768**, whose security relies on the hardness of **Module Learning With Errors (MLWE)**, for which no efficient quantum attack is known.
+
+This proposal does **not** mandate immediate ecosystem migration. It defines a standard path for wallets and registries to begin post-quantum support while remaining **fully backwards compatible** with schemeId 1.
+
+---
+
+## Specification
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in **RFC 2119**.
+
+### 1. Scheme Identifier
+
+| schemeId | Description |
+|----------|-------------|
+| `1` | ERC-5564 original (SECP256k1) |
+| **`2`** | **This ERC: ML-KEM-768 post-quantum scheme** |
+
+### 2. Cryptographic Primitives
+
+Implementations of schemeId 2 **MUST** use:
+
+| Role | Algorithm | Standard | Key / Output Sizes |
+|------|-----------|----------|-------------------|
+| Key Encapsulation | **ML-KEM-768** | FIPS 203 | ek: 1184 B, dk: 2400 B, ct: 1088 B, K: 32 B |
+| KDF | **SHAKE-256** (XOF) | FIPS 202 | variable output |
+| Address hashing | **keccak256** | — | 32 B → 20 B |
+
+Spending keys MAY use ML-DSA-65 (FIPS 204) or any other post-quantum signature scheme supported by the wallet. This ERC standardizes shared-secret derivation and stealth key derivation. Signature verification at the spending key level remains wallet-defined.
+
+### 3. Key Structures
+
+<Tabs>
+  <Tab title="Viewing Keypair (ML-KEM-768)">
+    | Component | Size |
+    |-----------|------|
+    | Encapsulation key (public): `PK_view` | **1184 bytes** |
+    | Decapsulation key (private): `dk` | **2400 bytes** |
+  </Tab>
+  <Tab title="Spending Keypair (ML-DSA-65 example)">
+    | Component | Size |
+    |-----------|------|
+    | Spending public key: `PK_spend` | **1952 bytes** |
+    | Spending private key: `sk_spend` | **4032 bytes** |
+  </Tab>
+</Tabs>
+
+`PK_spend` used in key derivation (§6) **MUST** be the static spending public key registered in the ERC-6538 stealth meta-address for this recipient. Key rotation requires registration of a new stealth meta-address; partial rotation is not defined in this ERC.
+
+**Total stealth meta-address payload (ML-DSA-65 example):** 1952 + 1184 = **3136 bytes**.
+
+### 4. Stealth Meta-Address Format
+
+A schemeId 2 stealth meta-address encodes `PK_spend` followed by `PK_view`:
+
+```
+st:eth:0x<PK_spend_hex><PK_view_hex>
+```
+
+The byte boundary between `PK_spend` and `PK_view` is determined by the spending key scheme. Registries **MUST** associate schemeId 2 with this format and record the spending key scheme alongside the meta-address.
+
+### 5. Stealth Address Generation (Sender)
+
+```solidity
+function generateStealthAddress(bytes memory stealthMetaAddress)
+  external view
+  returns (address stealthAddress, bytes memory ephemeralPubKey, bytes1 viewTag);
+```
+
+Given `(PK_spend, PK_view)` parsed from `stealthMetaAddress`:
+
+<Steps>
+  <Step title="Encapsulate">
+    ```
+    (K, ct) = ML-KEM-768.Encaps(PK_view)
+    ```
+    `K` is a fresh 32-byte shared secret. `ct` is the 1088-byte ciphertext.
+  </Step>
+  <Step title="Derive hashed shared secret">
+    ```
+    h = SHA3-256(K)
+    ```
+  </Step>
+  <Step title="Derive stealth spending keypair">
+    ```
+    spend_seed = SHAKE-256(
+        "ETHEREUM_STEALTH_PQ_ML_KEM_V1" || PK_spend || h,
+        output_length
+    )
+    (sk_stealth, PK_stealth) = SpendKeyGen(spend_seed)
+    ```
+
+    Where:
+    - `output_length` is the seed size required by the spending key scheme (32 bytes for ML-DSA-65)
+    - `SpendKeyGen` is the deterministic key generation function of the wallet's spending key scheme
+    - For ML-DSA-65: `spend_seed` is 32 bytes and `SpendKeyGen = ML-DSA.KeyGen_internal(spend_seed)`
+  </Step>
+  <Step title="Derive stealth address">
+    ```
+    stealthAddress = last20bytes(keccak256(PK_stealth))
+    ```
+  </Step>
+  <Step title="Extract view tag">
+    ```
+    viewTag = h[0]
+    ```
+  </Step>
+  <Step title="Announce">
+    ```solidity
+    ERC5564Announcer.announce(
+        2,                        // schemeId
+        stealthAddress,
+        ct,                       // 1088-byte ML-KEM ciphertext
+        abi.encodePacked(viewTag, /* token metadata per ERC-5564 */)
+    );
+    ```
+  </Step>
+</Steps>
+
+<Info>
+  **Note on `ephemeralPubKey` field:** For schemeId 2, the `ephemeralPubKey` parameter of `announce()` carries `ct` (the 1088-byte ML-KEM ciphertext). Parsing implementations **MUST NOT** assume this field is an elliptic curve public key. The `schemeId` indexed field unambiguously identifies the field's semantics.
+</Info>
+
+### 6. Stealth Address Checking (Recipient)
+
+```solidity
+function checkStealthAddress(
+  address stealthAddress,
+  bytes memory ephemeralPubKey,   // = ct (ML-KEM ciphertext)
+  bytes memory viewingKey,         // = dk (ML-KEM decapsulation key)
+  bytes memory spendingPubKey      // = PK_spend (registered spending public key)
+) external view returns (bool);
+```
+
+<Steps>
+  <Step title="Check view tag (fast path)">
+    ```
+    K_candidate = ML-KEM-768.Decaps(dk, ct)
+    h = SHA3-256(K_candidate)
+    if h[0] != announced_viewTag: return false  // skip ~255/256 announcements
+    ```
+  </Step>
+  <Step title="Full check">
+    ```
+    spend_seed = SHAKE-256(
+        "ETHEREUM_STEALTH_PQ_ML_KEM_V1" || PK_spend || h,
+        output_length
+    )
+    (_, PK_stealth) = SpendKeyGen(spend_seed)
+    candidate = last20bytes(keccak256(PK_stealth))
+    return candidate == stealthAddress
+    ```
+  </Step>
+</Steps>
+
+### 7. Stealth Key Computation (Recipient)
+
+```solidity
+function computeStealthKey(
+  address stealthAddress,
+  bytes memory ephemeralPubKey,  // = ct
+  bytes memory viewingKey,        // = dk
+  bytes memory spendingKey        // = sk_spend (spending private key)
+) external view returns (bytes memory stealthKey);
+```
+
+**Algorithm:**
+
+```
+K = ML-KEM-768.Decaps(dk, ct)
+h = SHA3-256(K)
+spend_seed = SHAKE-256(
+    "ETHEREUM_STEALTH_PQ_ML_KEM_V1" || SpendKeyToPub(sk_spend) || h,
+    output_length
+)
+(sk_stealth, PK_stealth) = SpendKeyGen(spend_seed)
+
+// Optional verification
+assert last20bytes(keccak256(PK_stealth)) == stealthAddress
+
+return sk_stealth
+```
+
+Where `SpendKeyToPub(sk_spend)` derives the spending public key from the spending private key using the wallet's spending key scheme.
+
+### 8. Deterministic Stealth Key Derivation — Design Rationale
+
+Unlike SECP256k1, lattice-based signature schemes **do not support additive key offsets** of the form `sk_stealth = sk_spend + h`. ML-DSA keys are structured polynomial objects; adding an arbitrary scalar is not defined and would not preserve the keypair relationship.
+
+This ERC defines stealth keys as **fresh deterministic keypairs** derived from a domain-separated SHAKE-256 expansion:
+
+```
+seed = SHAKE-256(domain || PK_spend || h, output_length)
+(sk_stealth, PK_stealth) = SpendKeyGen(seed)
+```
+
+**Security properties of this construction:**
+
+| Property | Description |
+|----------|-------------|
+| **Unlinkability** | `PK_stealth` is computationally unlinkable to `PK_spend` without knowledge of `h` |
+| **One-wayness** | The sender cannot compute `sk_stealth` (they know `h` but not `sk_spend`) |
+| **Recipient derivability** | The recipient derives the identical `(sk_stealth, PK_stealth)` using `(sk_spend, h)` via `SpendKeyToPub(sk_spend)` |
+| **Security basis** | Reduces to PRF security of SHAKE-256 and the key generation security of the spending key scheme |
+
+<Warning>
+  **FIPS compliance note:** The deterministic stealth key derivation defined here uses SHAKE-256 as a KDF to derive the seed for `SpendKeyGen`. This construction is not intended to satisfy FIPS 203/204 operational requirements, which mandate that seeds originate from an approved DRBG. Ethereum is not a FIPS-regulated system; for Ethereum application-layer use, SHAKE-256 provides sufficient entropy and security. Implementers deploying this scheme in FIPS-regulated environments **MUST** consult applicable standards.
+</Warning>
+
+### 9. View Tag
+
+Identical to ERC-5564:
+
+```
+viewTag = h[0]  // first byte of SHA3-256(K)
+```
+
+Recipients skip **~255/256** announcements at the cost of one `ML-KEM-768.Decaps` and one `SHA3-256`, avoiding the full `SpendKeyGen` derivation for non-matching announcements.
+
+### 10. Backwards Compatibility
+
+This ERC:
+
+- Does not modify schemeId 1
+- Does not require new contract deployments
+- Does not require consensus-layer changes
+
+Wallets not supporting schemeId 2 simply ignore `Announcement` events where `schemeId == 2`. The `ERC5564Announcer` contract is scheme-agnostic and requires no changes.
+
+---
+
+## Security Considerations
+
+### Quantum Security
+
+ML-KEM-768 targets **NIST Category 3 security** (equivalent to AES-192 against quantum adversaries). Security relies on the hardness of MLWE, for which no polynomial-time quantum algorithm is known. If ML-KEM-768 is broken, stealth privacy degrades similarly to schemeId 1 under ECDLP failure.
+
+The hash function SHA3-256 / SHAKE-256 provides quantum security at half the classical bit length; SHAKE-256 with 256-bit output provides **128-bit post-quantum security**, sufficient for this application.
+
+### Harvest-Now-Decrypt-Later
+
+ML-KEM ciphertexts `ct` are stored in event logs permanently. Recipients of schemeId 2 announcements are protected against future quantum adversaries who attempt to recover `K` from `ct` and `PK_view`, as no known quantum algorithm breaks MLWE in polynomial time. This is the **primary security advantage** over schemeId 1.
+
+### Key Derivation Soundness
+
+The deterministic derivation ensures:
+
+- No algebraic linkage between `PK_stealth` and `PK_spend`
+- No reuse of `sk_spend`'s internal randomness
+- No additive structure assumptions on lattice keys
+- Security reduction to PRF security of SHAKE-256
+
+### Side-Channel Attacks
+
+`ML-KEM-768.Decaps` **MUST** be implemented in constant time. Non-constant-time implementations leak information about `dk` through timing channels. Implementers **MUST** use vetted constant-time implementations (e.g., from the reference NIST implementation or `liboqs`).
+
+### DoS Considerations
+
+`ct` is **1088 bytes**, compared to 33 bytes for an EC ephemeral key in schemeId 1. This increases calldata costs for `announce()` by approximately **17,000–18,000 gas** per announcement. Integrators SHOULD account for this in gas estimates.
+
+Spam-mitigation strategies from ERC-5564 (staking, tolls, indexed caller filtering) apply equally to schemeId 2.
+
+### Funding Stealth Addresses
+
+The wallet funding a schemeId 2 stealth address **MUST NOT** be linkable to the recipient. Senders SHOULD attach a small ETH amount to sponsor the recipient's initial transaction fee.
+
+---
+
+## Rationale
+
+**Why ML-KEM-768?** ML-KEM is standardized by NIST (FIPS 203, August 2024), widely implemented, and provides the best balance of key size, performance, and security margin among PQ KEMs. ML-KEM-768 offers Category 3 security (comparable to AES-192) while keeping encapsulation keys at 1184 bytes.
+
+**Why not NTRU or McEliece?** NTRU has a more complex security history. Classic McEliece requires ~1 MB public keys, making stealth meta-addresses impractically large for on-chain registration.
+
+**Why deterministic rekeying instead of additive offset?** ML-DSA keys are polynomial matrices. The SECP256k1 additive trick `sk_stealth = sk_spend + h mod n` has no direct lattice analog that preserves keypair validity. Deterministic rekeying via SHAKE-256 is clean, avoids algebraic hacks, and reduces security to well-understood PRF assumptions.
+
+**Why decouple spending keys from this ERC?** Different wallets use different signature schemes (ML-DSA-65, FALCON-512, SLH-DSA, or even ECDSA for wallets not yet migrated). The shared-secret derivation (ML-KEM) is what must be standardized for interoperability. Spending key management is wallet-internal.
+
+**Why reuse ERC5564Announcer?** The Announcer is a singleton deployed across multiple chains. The indexed `schemeId` field unambiguously disambiguates schemes. New contracts would fragment parsing infrastructure.
+
+---
+
+## Reference Implementation
+
+Reference implementation (SPECTER): [github.com/pranshurastogi/SPECTER](https://github.com/pranshurastogi/SPECTER)
+
+Implementations **MUST** use constant-time ML-KEM-768 decapsulation. Reference constant-time implementations are available in `liboqs` ([Open Quantum Safe](https://openquantumsafe.org/)) and the NIST reference code for FIPS 203.
+
+---
+
+## Copyright
+
+Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+
+---
+
+## Citation
+
+Pranshu Rastogi ([@pranshurastogi](https://x.com/pranshurastogii)), "ERC-XXXX: Post-Quantum Stealth Addresses — ML-KEM Extension of ERC-5564," Ethereum Improvement Proposals, Pre-Draft, February 2026.
+
+---
+
+<Note>
+  **Contact** — For questions, feedback, or collaboration on this proposal, reach out on [𝕏 @pranshurastogii](https://x.com/pranshurastogii) or open an issue on [GitHub](https://github.com/pranshurastogi/SPECTER).
+</Note>

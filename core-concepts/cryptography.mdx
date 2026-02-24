@@ -14,7 +14,7 @@ description: "ML-KEM sizes, view tags, and address derivation"
 
 ## Core cryptographic operations
 
-1. `generate_keypair()` creates ML-KEM keypairs.
+1. `generate_keypair()` creates ML-KEM-768 keypairs (via the `ml-kem` crate, FIPS 203).
 2. `encapsulate(public_key)` returns `(ciphertext, shared_secret)`.
 3. `decapsulate(ciphertext, secret_key)` recovers `shared_secret`.
 4. `compute_view_tag(shared_secret)` computes a 1-byte tag.
@@ -35,7 +35,7 @@ SPECTER currently derives wallet-compatible stealth keys using secp256k1 seed de
 - Sui address is derived from secp256k1 compressed key (`blake2b-256` path)
 
 <Info>
-The repository still contains legacy Kyber-public-key derivation helpers, but active send/scan paths use the secp256k1 seed flow for wallet compatibility.
+As of the latest release, the `pqcrypto-kem` (Kyber) dependency has been fully replaced by the [`ml-kem`](https://crates.io/crates/ml-kem) crate, which implements the final NIST FIPS 203 standard. All encapsulation and decapsulation paths now use `ml-kem` directly. Stealth address derivation uses secp256k1 seed expansion for Ethereum/Sui wallet compatibility.
 </Info>
 
 ## Security properties implemented in code
