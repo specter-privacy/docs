@@ -1,0 +1,63 @@
+---
+title: "Use cases and Yellow integration"
+description: "What is live today, what is planned, and how Yellow integration maps to the code"
+---
+
+<CardGroup cols={3}>
+  <Card title="Live today: private channel trading" icon="sitemap" href="/guides/yellow-private-channels">
+    Use SPECTER announcements and stealth addresses in Yellow channel flows.
+  </Card>
+  <Card title="Yellow API surface" icon="code" href="/api/yellow">
+    Use `/api/v1/yellow/*` endpoints for create, discover, transfer, and status reads.
+  </Card>
+  <Card title="Try it in app" icon="globe" href="https://specterpq.com/yellow">
+    Open the Yellow page in the hosted app and run the flow end-to-end.
+  </Card>
+</CardGroup>
+
+## Integration snapshot
+
+![SPECTER cover](/images/specter/cover-specter.png)
+
+```mermaid
+flowchart LR
+    A["Sender"] --> B["Resolve recipient\nmeta-address"]
+    B --> C["Create stealth address\nand announcement"]
+    C --> D["Create Yellow channel"]
+    D --> E["Recipient scans\nannouncements"]
+    E --> F["Discover channel bound\nto stealth address"]
+
+    style B fill:#0f766e,color:#fff
+    style C fill:#115e59,color:#fff
+    style D fill:#14b8a6,color:#fff
+```
+
+## Use case status
+
+| Status | Use case | Notes |
+| --- | --- | --- |
+| Live | <img src="/images/icons/tabler/chart-line.svg" alt="Trading icon" width="16" /> Private channel trading with Yellow | Implemented in backend routes and frontend Yellow page. |
+| Planned | <img src="/images/icons/tabler/cpu-2.svg" alt="Payroll icon" width="16" /> Private payroll and streaming | Keep this in roadmap until dedicated flows and API contracts are merged. |
+| Planned | <img src="/images/icons/tabler/shield-lock.svg" alt="DAO payouts icon" width="16" /> Privacy-preserving DAO payouts | Keep this in roadmap until payout orchestration and policy controls are implemented. |
+| Planned | <img src="/images/icons/tabler/network.svg" alt="OTC icon" width="16" /> Confidential OTC settlement | Keep this in roadmap until order-routing and settlement guarantees are documented in code. |
+
+<Info>
+Only the Yellow private channel integration is documented as available product functionality today.
+</Info>
+
+## Yellow integration evidence (source-backed)
+
+- API routes expose the Yellow namespace in `specter/specter-api/src/routes.rs`.
+- Endpoint handler behavior is implemented in `specter/specter-api/src/handlers.rs` (`yellow_create_channel`, `yellow_discover_channels`, `yellow_fund_channel`, `yellow_close_channel`, `yellow_transfer`, `yellow_config`).
+- Default Yellow runtime configuration is initialized in `specter/specter-api/src/state.rs`.
+- Frontend Yellow flow is implemented in `SPECTER-web/src/pages/YellowPage.tsx`.
+- Frontend use case presentation is implemented in `SPECTER-web/src/pages/UseCasesPage.tsx`.
+
+## Official domains
+
+- Primary: [specterpq.com](https://specterpq.com)
+- Mirror: [specterpq.info](https://specterpq.info)
+
+<Info>
+If you run local environments, keep using local API URLs and local frontend URLs. Official domains are for hosted access.
+</Info>

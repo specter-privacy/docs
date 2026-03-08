@@ -32,7 +32,9 @@
           {
             "group": "Explore product",
             "pages": [
-              "explore/frontend-experience"
+              "explore/frontend-experience",
+              "explore/playground",
+              "explore/contact-feedback"
             ]
           },
           {
@@ -48,6 +50,7 @@
           {
             "group": "Integration guides",
             "pages": [
+              "guides/use-cases-and-yellow-integration",
               "guides/integration-playbook",
               "guides/ens-setup",
               "guides/suins-setup",
@@ -127,9 +130,14 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Launch app",
-          "href": "https://specter-stealth.vercel.app/",
-          "icon": "rocket"
+          "anchor": "Official site",
+          "href": "https://specterpq.com/",
+          "icon": "globe"
+        },
+        {
+          "anchor": "Mirror",
+          "href": "https://specterpq.info/",
+          "icon": "globe"
         },
         {
           "anchor": "GitHub",
@@ -147,6 +155,14 @@
   "navbar": {
     "links": [
       {
+        "label": "Website",
+        "href": "https://specterpq.com/"
+      },
+      {
+        "label": "Mirror",
+        "href": "https://specterpq.info/"
+      },
+      {
         "label": "GitHub",
         "href": "https://github.com/pranshurastogi/SPECTER"
       },
@@ -158,7 +174,7 @@
     "primary": {
       "type": "button",
       "label": "Launch app",
-      "href": "https://specter-stealth.vercel.app/"
+      "href": "https://specterpq.com/"
     }
   },
   "footer": {

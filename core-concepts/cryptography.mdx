@@ -1,46 +1,48 @@
 ---
 title: "Cryptography"
-description: "ML-KEM sizes, view tags, and address derivation"
+description: "ML-KEM-768 constants, view tags, and stealth derivation model"
 ---
 
 ## ML-KEM-768 constants
 
 | Parameter | Size |
 | --- | --- |
-| Public key | 1184 bytes |
-| Secret key | 2400 bytes |
-| Ciphertext | 1088 bytes |
+| Public key (`spending_pk` or `viewing_pk`) | 1184 bytes |
+| Secret key (`spending_sk` or `viewing_sk`) | 2400 bytes |
+| Ciphertext (`ephemeral_key`) | 1088 bytes |
 | Shared secret | 32 bytes |
 
-## Core cryptographic operations
+![ML-KEM-768 diagram](/images/specter/ml-kem-768-diagram.png)
 
-1. `generate_keypair()` creates ML-KEM-768 keypairs (via the `ml-kem` crate, FIPS 203).
-2. `encapsulate(public_key)` returns `(ciphertext, shared_secret)`.
-3. `decapsulate(ciphertext, secret_key)` recovers `shared_secret`.
-4. `compute_view_tag(shared_secret)` computes a 1-byte tag.
+## Core operations
 
-## View tags and scanning efficiency
+1. `generate_keypair()` creates ML-KEM-768 keypairs via `ml-kem`.
+2. `encapsulate(public_key)` returns ciphertext + shared secret.
+3. `decapsulate(ciphertext, secret_key)` recovers the shared secret.
+4. `compute_view_tag(shared_secret)` computes a 1-byte filter value.
 
-SPECTER uses a 1-byte view tag space (256 values):
+## View tag efficiency
 
-- False positive rate: `1 / 256` (about `0.39%`)
-- Filter efficiency: about `99.6%`
+SPECTER uses a 1-byte view tag space (`256` values):
 
-## Address derivation
+- False-positive rate: `1 / 256` (~`0.39%`)
+- Expected filtering efficiency: ~`99.6%`
 
-SPECTER currently derives wallet-compatible stealth keys using secp256k1 seed derivation:
+## Stealth derivation notes
 
-- Seed is derived via SHAKE256 domain-separated hash
-- Ethereum address is derived from secp256k1 public key (`keccak256` path)
-- Sui address is derived from secp256k1 compressed key (`blake2b-256` path)
+- Shared secret + recipient key material derive one-time stealth key material.
+- Ethereum and Sui compatibility paths use deterministic seed expansion and chain-specific address derivation.
+- Domain-separated SHAKE256 labels avoid cross-operation collisions.
+
+## Migration status: ML-KEM-768
 
 <Info>
-As of the latest release, the `pqcrypto-kem` (Kyber) dependency has been fully replaced by the [`ml-kem`](https://crates.io/crates/ml-kem) crate, which implements the final NIST FIPS 203 standard. All encapsulation and decapsulation paths now use `ml-kem` directly. Stealth address derivation uses secp256k1 seed expansion for Ethereum/Sui wallet compatibility.
+SPECTER has migrated from the previous `pqcrypto-kem` dependency to RustCrypto `ml-kem` for the finalized FIPS 203 ML-KEM standard.
 </Info>
 
-## Security properties implemented in code
+## Source-backed references
 
-- `#![forbid(unsafe_code)]` across core crates
-- Secret material zeroization (`zeroize`)
-- Constant-time equality checks (`subtle::ConstantTimeEq`)
-- Domain separation constants for SHAKE256 operations
+- Workspace dependency on `ml-kem`: `specter/Cargo.toml`
+- Constants and sizes: `specter/specter-core/src/constants.rs`
+- Crypto module and API surface: `specter/specter-crypto/src/lib.rs`
+- ML-KEM implementation module: `specter/specter-crypto/src/kyber.rs`
