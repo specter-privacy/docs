@@ -70,21 +70,21 @@ CID where meta-address bytes were fetched.
   <Tab title="ENS">
 
 ```bash
-curl -s "http://localhost:3001/api/v1/ens/resolve/alice.eth" | jq .
+curl -s "https://backend.specterpq.com/api/v1/ens/resolve/alice.eth" | jq .
 ```
 
   </Tab>
   <Tab title="SuiNS">
 
 ```bash
-curl -s "http://localhost:3001/api/v1/suins/resolve/alice.sui?no_cache=1" | jq .
+curl -s "https://backend.specterpq.com/api/v1/suins/resolve/alice.sui?no_cache=1" | jq .
 ```
 
   </Tab>
   <Tab title="JavaScript">
 
 ```javascript
-const ensRes = await fetch("http://localhost:3001/api/v1/ens/resolve/alice.eth");
+const ensRes = await fetch("https://backend.specterpq.com/api/v1/ens/resolve/alice.eth");
 const ensData = await ensRes.json();
 console.log(ensData.meta_address);
 ```

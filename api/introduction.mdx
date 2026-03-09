@@ -1,23 +1,24 @@
 ---
 title: "API introduction"
-description: "Start quickly with SPECTER API route groups, integration flow, and operational boundaries"
+description: "The fastest way to understand the hosted API, the route groups, and the current operational boundaries"
 ---
 
 <CardGroup cols={3}>
-  <Card title="Launch app" icon="rocket" href="https://specterpq.com/">
-    Use the hosted interface while you test endpoint payloads.
+  <Card title="Quickstart" icon="rocket" href="/getting-started/quickstart">
+    Run the hosted flow against `backend.specterpq.com`.
   </Card>
-  <Card title="Run quickstart" icon="bolt" href="/getting-started/quickstart">
-    Execute a full create -> publish -> scan loop in minutes.
+  <Card title="Stealth endpoints" icon="code" href="/api/stealth">
+    Create and scan stealth payments.
   </Card>
-  <Card title="View API auth and errors" icon="shield" href="/api/auth-and-errors">
-    Confirm error shapes and production hardening requirements.
+  <Card title="Yellow endpoints" icon="chart-line" href="/api/yellow">
+    Explore the private-channel use case.
   </Card>
 </CardGroup>
 
-## Base URL
+## Base URLs
 
-- Local default: `http://localhost:3001`
+- Hosted backend: `https://backend.specterpq.com`
+- Local development: `http://localhost:3001`
 
 ## Route groups
 
@@ -26,25 +27,25 @@ flowchart LR
     A["/health"] --> B["/api/v1/keys/*"]
     B --> C["/api/v1/stealth/*"]
     C --> D["/api/v1/registry/*"]
-    C --> E["/api/v1/ens/* + /api/v1/suins/*"]
+    C --> E["/api/v1/ens/* and /api/v1/suins/*"]
     E --> F["/api/v1/ipfs/*"]
     C --> G["/api/v1/yellow/*"]
 ```
 
-## Integration path
+## The core integration loop
 
 <Steps>
-  <Step title="Verify server health">
-    Call `GET /health` and confirm `status: "ok"` before sending write requests.
+  <Step title="Check health">
+    Confirm the backend is alive with `GET /health`.
   </Step>
-  <Step title="Generate recipient keys">
-    Call `POST /api/v1/keys/generate` and securely store secret fields.
+  <Step title="Generate keys">
+    Call `POST /api/v1/keys/generate` and store the secret fields carefully.
   </Step>
-  <Step title="Create and publish stealth announcement">
-    Use `POST /api/v1/stealth/create`, then publish with `POST /api/v1/registry/announcements`.
+  <Step title="Create and publish">
+    Create a stealth payload with `POST /api/v1/stealth/create`, then publish the returned announcement.
   </Step>
-  <Step title="Scan for discoveries">
-    Use `POST /api/v1/stealth/scan` with your viewing/spending keys and optional filters.
+  <Step title="Scan">
+    Call `POST /api/v1/stealth/scan` to recover matching discoveries.
   </Step>
 </Steps>
 
@@ -54,14 +55,14 @@ flowchart LR
   <Tab title="cURL">
 
 ```bash
-curl -s http://localhost:3001/health | jq .
+curl -s https://backend.specterpq.com/health | jq .
 ```
 
   </Tab>
   <Tab title="JavaScript">
 
 ```javascript
-const res = await fetch("http://localhost:3001/health");
+const res = await fetch("https://backend.specterpq.com/health");
 const data = await res.json();
 console.log(data.status, data.version);
 ```
@@ -69,38 +70,20 @@ console.log(data.status, data.version);
   </Tab>
 </Tabs>
 
-## Health response schema
+## What the current server actually includes
 
-<ParamField body="status" type="string" required>
-Server status string (`"ok"` when healthy).
-</ParamField>
-<ParamField body="version" type="string" required>
-Current backend package version.
-</ParamField>
-<ParamField body="uptime_seconds" type="integer" required>
-Elapsed process uptime in seconds.
-</ParamField>
-<ParamField body="announcements_count" type="integer" required>
-Current in-memory registry count.
-</ParamField>
-<ParamField body="use_testnet" type="boolean" required>
-`true` when backend is configured for Sepolia/testnet.
-</ParamField>
+The API server wires in security middleware in `specter/specter-api/src/lib.rs` and `specter/specter-api/src/middleware.rs`.
 
-## Operational boundaries
+That includes:
 
-<AccordionGroup>
-  <Accordion title="Authentication">
-    No HTTP auth middleware is implemented in current routes.
-  </Accordion>
-  <Accordion title="Rate limiting">
-    No API-level rate limiter is implemented in current server code.
-  </Accordion>
-  <Accordion title="CORS">
-    CORS allows any origin, method, and header (`CorsLayer::allow_origin(Any)` etc.).
-  </Accordion>
-</AccordionGroup>
+- API-key auth for mutating routes when `API_KEY` is configured
+- per-IP rate limiting
+- security headers
+- body size limits
+- CORS configuration from `ALLOWED_ORIGINS`
+
+## Important caveat
 
 <Warning>
-Run production traffic behind your own gateway controls for auth, rate limiting, and abuse protection.
+Security behavior is environment-driven. If `API_KEY` is not configured, write routes are effectively open in dev mode.
 </Warning>

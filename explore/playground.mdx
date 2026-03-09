@@ -11,37 +11,34 @@ description: "Try SPECTER flows quickly with hosted app links and copy-paste API
     Start from live use cases and then test endpoint contracts.
   </Card>
   <Card title="Yellow API" icon="code" href="/api/yellow">
-    Use channel endpoints directly against your local backend.
+    Use channel endpoints directly against the hosted backend.
   </Card>
 </CardGroup>
 
 ## Quick launch links
 
 - App (primary): [https://specterpq.com](https://specterpq.com)
-- App (mirror): [https://specterpq.info](https://specterpq.info)
 - Yellow page: [https://specterpq.com/yellow](https://specterpq.com/yellow)
 
-## Local API playground
+## API playground
 
-Use `http://localhost:3001` as the default base URL.
+Use `https://backend.specterpq.com` as the default base URL.
 
 <Tabs>
   <Tab title="1) Generate keys">
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/keys/generate | jq .
+curl -s -X POST https://backend.specterpq.com/api/v1/keys/generate | jq .
 ```
 
   </Tab>
   <Tab title="2) Create stealth payment">
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/stealth/create \
+curl -s -X POST https://backend.specterpq.com/api/v1/stealth/create \
   -H "Content-Type: application/json" \
   -d '{
-    "recipient":"<meta_address_hex>",
-    "amount":"100",
-    "asset":"ETH"
+    "meta_address":"<meta_address_hex>"
   }' | jq .
 ```
 
@@ -49,12 +46,14 @@ curl -s -X POST http://localhost:3001/api/v1/stealth/create \
   <Tab title="3) Publish announcement">
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/registry/announcements \
+curl -s -X POST https://backend.specterpq.com/api/v1/registry/announcements \
   -H "Content-Type: application/json" \
   -d '{
     "ephemeral_key":"<hex>",
     "view_tag":123,
-    "metadata":"demo payment"
+    "tx_hash":"0x1111111111111111111111111111111111111111111111111111111111111111",
+    "amount":"0.01",
+    "chain":"ethereum"
   }' | jq .
 ```
 
@@ -62,7 +61,7 @@ curl -s -X POST http://localhost:3001/api/v1/registry/announcements \
   <Tab title="4) Scan announcements">
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/stealth/scan \
+curl -s -X POST https://backend.specterpq.com/api/v1/stealth/scan \
   -H "Content-Type: application/json" \
   -d '{
     "viewing_sk":"<hex>",

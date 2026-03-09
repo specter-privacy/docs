@@ -135,7 +135,7 @@ Scan execution metrics.
   <Tab title="Create (cURL)">
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/stealth/create \
+curl -s -X POST https://backend.specterpq.com/api/v1/stealth/create \
   -H "Content-Type: application/json" \
   -d '{"meta_address":"<HEX_META_ADDRESS>"}' | jq .
 ```
@@ -144,7 +144,7 @@ curl -s -X POST http://localhost:3001/api/v1/stealth/create \
   <Tab title="Scan (cURL)">
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/stealth/scan \
+curl -s -X POST https://backend.specterpq.com/api/v1/stealth/scan \
   -H "Content-Type: application/json" \
   -d '{
     "viewing_sk":"<HEX_VIEWING_SK>",
@@ -158,7 +158,7 @@ curl -s -X POST http://localhost:3001/api/v1/stealth/scan \
   <Tab title="JavaScript">
 
 ```javascript
-const createRes = await fetch("http://localhost:3001/api/v1/stealth/create", {
+const createRes = await fetch("https://backend.specterpq.com/api/v1/stealth/create", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ meta_address })

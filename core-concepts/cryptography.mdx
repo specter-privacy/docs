@@ -1,48 +1,114 @@
 ---
-title: "Cryptography"
-description: "ML-KEM-768 constants, view tags, and stealth derivation model"
+title: "Why post-quantum matters"
+description: "A plain-language guide to ML-KEM, view tags, and what SPECTER protects today"
 ---
 
-## ML-KEM-768 constants
+![Post-quantum sketch](/images/specter/pq-boundary.svg)
 
-| Parameter | Size |
-| --- | --- |
-| Public key (`spending_pk` or `viewing_pk`) | 1184 bytes |
-| Secret key (`spending_sk` or `viewing_sk`) | 2400 bytes |
-| Ciphertext (`ephemeral_key`) | 1088 bytes |
-| Shared secret | 32 bytes |
+## First: what does post-quantum mean?
 
-![ML-KEM-768 diagram](/images/specter/ml-kem-768-diagram.png)
+It means preparing for a world where large quantum computers can break some of the public-key systems we use today.
 
-## Core operations
+Ethereum wallets and signatures are still built around elliptic-curve cryptography.
 
-1. `generate_keypair()` creates ML-KEM-768 keypairs via `ml-kem`.
-2. `encapsulate(public_key)` returns ciphertext + shared secret.
-3. `decapsulate(ciphertext, secret_key)` recovers the shared secret.
-4. `compute_view_tag(shared_secret)` computes a 1-byte filter value.
+That works well against classical computers.
 
-## View tag efficiency
+The long-term concern is that a cryptographically relevant quantum computer could use Shor's algorithm against that class of system.
 
-SPECTER uses a 1-byte view tag space (`256` values):
+For privacy protocols, that matters a lot because the evidence is public and long-lived.
 
-- False-positive rate: `1 / 256` (~`0.39%`)
-- Expected filtering efficiency: ~`99.6%`
+## Why stealth systems care more than most products
 
-## Stealth derivation notes
+A stealth system leaves behind durable public data:
 
-- Shared secret + recipient key material derive one-time stealth key material.
-- Ethereum and Sui compatibility paths use deterministic seed expansion and chain-specific address derivation.
-- Domain-separated SHAKE256 labels avoid cross-operation collisions.
+- announcements
+- ciphertexts
+- identifiers
+- sometimes recoverable public keys after spending
 
-## Migration status: ML-KEM-768
+If the privacy layer depends on a system that later becomes breakable, an attacker can collect the data now and attack it later.
 
-<Info>
-SPECTER has migrated from the previous `pqcrypto-kem` dependency to RustCrypto `ml-kem` for the finalized FIPS 203 ML-KEM standard.
-</Info>
+That is why SPECTER replaces classical ECDH-style recipient discovery with **ML-KEM-768**.
 
-## Source-backed references
+## What SPECTER uses today
 
-- Workspace dependency on `ml-kem`: `specter/Cargo.toml`
-- Constants and sizes: `specter/specter-core/src/constants.rs`
-- Crypto module and API surface: `specter/specter-crypto/src/lib.rs`
-- ML-KEM implementation module: `specter/specter-crypto/src/kyber.rs`
+The cryptography crate states this directly in `specter/specter-crypto/src/kyber.rs`:
+
+- ML-KEM-768
+- FIPS 203 aligned
+- public key size: `1184` bytes
+- secret key size: `2400` bytes
+- ciphertext size: `1088` bytes
+- shared secret size: `32` bytes
+
+Those same sizes are referenced in `specter/specter-core/src/constants.rs`.
+
+## The two jobs in SPECTER's crypto model
+
+<CardGroup cols={2}>
+  <Card title="Job 1: discovery privacy" icon="shield-lock">
+    The sender uses `viewing_pk` to create a shared secret through ML-KEM.
+  </Card>
+  <Card title="Job 2: wallet compatibility" icon="wallet">
+    The current implementation turns that shared secret into a usable `secp256k1` wallet key so the result can be spent in existing Ethereum flows.
+  </Card>
+</CardGroup>
+
+## What is a view tag?
+
+A **view tag** is the cheapest possible early filter.
+
+SPECTER computes one byte from the shared secret and stores it in the announcement.
+
+When you scan:
+
+- most announcements fail the filter immediately
+- only the likely matches need the full work
+
+That logic appears throughout the crypto and discovery flow:
+
+- `compute_view_tag` in `specter/specter-crypto/src/lib.rs`
+- scan handling in `specter/specter-stealth/src/discovery.rs`
+
+### Why a single byte helps
+
+Because `1 / 256` announcements should match by chance on average.
+
+So the filter rejects roughly `99.6%` of irrelevant entries before you do more expensive processing.
+
+## The simple mental model
+
+```mermaid
+flowchart TD
+    A["Sender reads viewing_pk"] --> B["ML-KEM shared secret"]
+    B --> C["view_tag for fast scanning"]
+    B --> D["one-time address derivation"]
+    C --> E["announcement"]
+    D --> F["stealth address"]
+
+    style B fill:#0f766e,color:#fff
+    style C fill:#115e59,color:#fff
+    style D fill:#14b8a6,color:#fff
+```
+
+## What SPECTER does not claim
+
+<Warning>
+The current docs do not claim fully post-quantum spending, because the code does not implement that yet.
+</Warning>
+
+The honest line is:
+
+- **recipient discovery**: post-quantum
+- **wallet-compatible spending**: classical
+
+That distinction comes from `specter/specter-crypto/src/derive.rs`, where the shared secret is turned into a valid `secp256k1` seed and then an Ethereum address.
+
+## Where this can go next
+
+Future-friendly paths exist, but they are not implemented in this repo today:
+
+1. **ERC-4337 smart accounts** can use custom validation logic, so a smart account could verify a post-quantum signature scheme instead of ECDSA. The standard leaves signature validation to the account implementation itself. Source: [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337).
+2. **EIP-8141 frame transactions** are now a draft as of January 29, 2026 and explicitly aim to let accounts define transaction validity with arbitrary cryptographic systems. Source: [EIP-8141](https://eips.ethereum.org/EIPS/eip-8141).
+
+Those are migration directions, not current product claims.

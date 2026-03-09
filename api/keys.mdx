@@ -38,14 +38,14 @@ No request body is required.
   <Tab title="cURL">
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/keys/generate | jq .
+curl -s -X POST https://backend.specterpq.com/api/v1/keys/generate | jq .
 ```
 
   </Tab>
   <Tab title="JavaScript">
 
 ```javascript
-const res = await fetch("http://localhost:3001/api/v1/keys/generate", {
+const res = await fetch("https://backend.specterpq.com/api/v1/keys/generate", {
   method: "POST"
 });
 

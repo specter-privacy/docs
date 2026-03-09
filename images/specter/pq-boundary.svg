@@ -1,0 +1,23 @@
+<svg width="1200" height="680" viewBox="0 0 1200 680" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="680" rx="28" fill="#FBF7EF"/>
+  <rect x="54" y="60" width="478" height="560" rx="28" fill="#E8FBF7" stroke="#0F766E" stroke-width="2"/>
+  <rect x="668" y="60" width="478" height="560" rx="28" fill="#FFF3E0" stroke="#B45309" stroke-width="2"/>
+  <path d="M600 60V620" stroke="#1F2937" stroke-width="4" stroke-dasharray="14 14"/>
+  <text x="110" y="126" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="36" font-weight="700">Receiving side</text>
+  <text x="110" y="166" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="26">ML-KEM discovery path</text>
+  <text x="110" y="232" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="24">• sender encapsulates to viewing key</text>
+  <text x="110" y="276" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="24">• announcement stores ciphertext + view tag</text>
+  <text x="110" y="320" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="24">• recipient decapsulates to discover payment</text>
+  <text x="110" y="388" fill="#0F766E" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="700">Stronger post-quantum posture</text>
+  <text x="110" y="442" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="22">Good place to protect against</text>
+  <text x="110" y="474" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="22">harvest-now, decrypt-later privacy risk.</text>
+  <text x="724" y="126" fill="#7C2D12" font-family="Helvetica, Arial, sans-serif" font-size="36" font-weight="700">Spending side</text>
+  <text x="724" y="166" fill="#7C2D12" font-family="Helvetica, Arial, sans-serif" font-size="26">Ethereum wallet compatibility</text>
+  <text x="724" y="232" fill="#7C2D12" font-family="Helvetica, Arial, sans-serif" font-size="24">• shared secret becomes secp256k1 seed</text>
+  <text x="724" y="276" fill="#7C2D12" font-family="Helvetica, Arial, sans-serif" font-size="24">• scan returns eth_private_key</text>
+  <text x="724" y="320" fill="#7C2D12" font-family="Helvetica, Arial, sans-serif" font-size="24">• spend path still follows classical execution</text>
+  <text x="724" y="388" fill="#B45309" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="700">Not fully post-quantum yet</text>
+  <text x="724" y="442" fill="#7C2D12" font-family="Helvetica, Arial, sans-serif" font-size="22">Future path: smart-account or native</text>
+  <text x="724" y="474" fill="#7C2D12" font-family="Helvetica, Arial, sans-serif" font-size="22">abstract validation with PQ signatures.</text>
+  <text x="525" y="645" fill="#1F2937" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="700">Current boundary</text>
+</svg>

@@ -1,167 +1,149 @@
 ---
 title: "What is SPECTER?"
-description: "Everything you need to know about SPECTER — explained simply, with diagrams and analogies"
+description: "A first-time user guide to post-quantum stealth addresses, keys, and the product flow"
 ---
 
-<CardGroup cols={3}>
-  <Card title="Launch App" icon="rocket" href="https://specterpq.com/">
-    Try the full experience right now — zero setup.
-  </Card>
-  <Card title="Integration Quickstart" icon="bolt" href="/getting-started/quickstart">
-    Run your first integration loop in minutes.
-  </Card>
-  <Card title="Explore the Product" icon="globe" href="/explore/frontend-experience">
-    Take a visual tour of what users see.
-  </Card>
-</CardGroup>
+![SPECTER overview sketch](/images/specter/first-payment-journey.svg)
 
----
+## Start with the human version
 
-## The Problem We Solve
+SPECTER is not a chain.
 
-Every blockchain transaction is public. When someone sends you money, anyone can trace that payment back to your identity, see your balance, and track your activity.
+It is not a token.
 
-**SPECTER makes payments private.** It gives every recipient a way to receive funds at unique, one-time addresses that cannot be linked back to their main wallet — even by someone watching every transaction on the chain.
+It is not a new wallet standard you have to memorize before using it.
 
-And it does this with **post-quantum cryptography** (ML-KEM-768), meaning your privacy stays safe even when quantum computers arrive.
+SPECTER is a **private receiving system**.
 
----
+You publish one public profile, and each sender turns that profile into a different one-time receiving address.
 
-## The Analogy — Think "Secure Mail Concierge"
+To everyone else, the payment lands at an address that looks unrelated to you.
 
-Imagine you live in an apartment building:
+## If you are new to this space
+
+### What is a stealth address?
+
+A stealth address is a one-time destination created for a single payment.
+
+You do not reuse it.
+
+You do not hand it out in advance.
+
+The sender derives it from your public **meta-address**, and you later recover it by scanning announcements.
+
+### What is a meta-address?
+
+A meta-address is SPECTER's public receiving profile.
+
+It bundles:
+
+- `spending_pk`
+- `viewing_pk`
+
+In the current backend, both come from ML-KEM key generation in `specter/specter-api/src/handlers.rs`.
+
+### What is an announcement?
+
+An announcement is the public breadcrumb that lets you find your payment later.
+
+The current wire format includes:
+
+- `ephemeral_key` as the ML-KEM ciphertext
+- `view_tag` as a 1-byte scan filter
+- optional `channel_id`, `tx_hash`, `amount`, and `chain`
+
+That structure is defined in `specter/specter-core/src/types/announcement.rs`.
+
+## Think of it like this
 
 <Steps>
-  <Step title="You share your building address" icon="building">
-    You give out your building's public address — anyone can send you packages. This is your **meta-address** (public profile).
+  <Step title="You publish a mailbox blueprint" icon="mail">
+    Your meta-address is not a wallet you receive into directly. It is a public instruction set that lets someone create a one-time mailbox for you.
   </Step>
-  <Step title="Every package goes to a fresh locker" icon="lock">
-    Instead of delivering to your door, each package gets its own **brand-new private locker**. This is the **stealth address** — unique for every payment.
+  <Step title="The sender creates a fresh mailbox" icon="sparkles">
+    They use your public data to derive a new stealth address that has not appeared before.
   </Step>
-  <Step title="A delivery notice is posted" icon="bell">
-    The concierge posts a coded notice on the board. This is the **announcement** — it's public, but only you can decode which locker is yours.
+  <Step title="They leave a coded note" icon="bell">
+    The announcement tells you that something is waiting, but not in a way outsiders can decode into your identity.
   </Step>
-  <Step title="Only you can find your lockers" icon="key">
-    You have a special **viewing key** that lets you scan all the notices and figure out which lockers belong to you. No one else can.
+  <Step title="You scan and recover the payment" icon="radar">
+    Your viewing secret key lets you find which announcement is yours and recover the spendable result.
   </Step>
 </Steps>
 
-<Tip>
-Replace "packages" with crypto payments and "lockers" with blockchain addresses — that's SPECTER in a nutshell.
-</Tip>
-
----
-
-## How It Works — The 4-Step Flow
+## The real product flow
 
 ```mermaid
 flowchart TD
-    A["Recipient creates a profile (once)"] --> B["Sender opens the profile"]
-    B --> C["Sender creates a one-time stealth address"]
-    C --> D["Announcement is published"]
-    D --> E["Recipient scans and discovers their payment"]
+    A["Generate keys once"] --> B["Publish meta-address through ENS or SuiNS"]
+    B --> C["Sender resolves your profile"]
+    C --> D["Sender creates stealth address + announcement"]
+    D --> E["Funds go to the one-time address"]
+    E --> F["You scan announcements"]
+    F --> G["You recover the payment details"]
 
     style A fill:#0f766e,color:#fff
-    style B fill:#14b8a6,color:#fff
-    style C fill:#115e59,color:#fff
-    style D fill:#0f766e,color:#fff
-    style E fill:#14b8a6,color:#fff
-```
-
-| Step | What happens | Who does it |
-| --- | --- | --- |
-| **1. Profile** | Recipient generates a public meta-address (spending key + viewing key) | Recipient |
-| **2. Create** | Sender uses the meta-address to derive a fresh one-time stealth address | Sender |
-| **3. Publish** | Sender publishes an announcement so recipient can find their payment | Sender |
-| **4. Scan** | Recipient scans announcements with their private viewing key | Recipient |
-
----
-
-## What We Built — Three Layers
-
-<CardGroup cols={3}>
-  <Card title="Intro Layer" icon="sparkles">
-    **The idea**: Private one-time receiving addresses that break the link between sender and recipient.
-  </Card>
-  <Card title="Product Layer" icon="globe">
-    **The app**: A full frontend for key generation, stealth payment creation, publishing, and scanning — [try it live](https://specterpq.com/).
-  </Card>
-  <Card title="Tech Layer" icon="shield-halved">
-    **The crypto**: ML-KEM-768 (post-quantum) + view tags for fast filtering + announcement registry.
-  </Card>
-</CardGroup>
-
-![Setup — one-time key generation](/images/specter/Setup-image.png)
-![Send — create a stealth payment](/images/specter/Send-image.png)
-![Scan — discover your payments](/images/specter/Scan-image.png)
-
----
-
-## Under the Hood — For the Curious
-
-<AccordionGroup>
-  <Accordion title="What is ML-KEM-768?">
-    ML-KEM-768 is a **NIST-standardized post-quantum key encapsulation mechanism** (FIPS 203). It lets two parties establish a shared secret even if an attacker has a quantum computer. SPECTER uses the [`ml-kem`](https://crates.io/crates/ml-kem) crate for all encapsulation and decapsulation operations.
-
-    - **Public key size**: 1184 bytes
-    - **Ciphertext size**: 1088 bytes  
-    - **Shared secret**: 32 bytes
-
-    This replaces the traditional elliptic curve Diffie-Hellman used in classical stealth address protocols.
-  </Accordion>
-  <Accordion title="What are view tags?">
-    A **view tag** is a 1-byte fingerprint computed from the shared secret. When the recipient scans announcements, they first check the view tag — if it doesn't match, they skip the expensive decapsulation step. This makes scanning **~256× faster** on average.
-  </Accordion>
-  <Accordion title="How does the announcement registry work?">
-    When a sender creates a stealth payment, they publish an **announcement** containing the ephemeral ciphertext and view tag. The recipient periodically scans these announcements using their viewing secret key. The registry can be in-memory (for testing) or file-based (for persistence).
-  </Accordion>
-  <Accordion title="What chains does SPECTER support?">
-    Currently, SPECTER supports **Ethereum** and **Sui** chains. It uses ENS for Ethereum name resolution and SuiNS for Sui name resolution. The core cryptography is chain-agnostic — only the name resolution and on-chain settlement differ.
-  </Accordion>
-</AccordionGroup>
-
----
-
-## Technical Flow — How the Crypto Maps
-
-```mermaid
-flowchart LR
-    A["Meta-address\n(spending_pk + viewing_pk)"] --> B["Encapsulate\nto viewing_pk"]
-    B --> C["Ciphertext +\nshared secret"]
-    C --> D["Compute\nview_tag"]
-    C --> E["Derive stealth\naddress"]
-    D --> F["Publish\nannouncement"]
-    E --> F
-    F --> G["Recipient scan +\ndecapsulation"]
-
-    style A fill:#0f766e,color:#fff
-    style B fill:#115e59,color:#fff
-    style C fill:#14b8a6,color:#fff
-    style D fill:#0f766e,color:#fff
-    style E fill:#0f766e,color:#fff
-    style F fill:#115e59,color:#fff
+    style D fill:#115e59,color:#fff
     style G fill:#14b8a6,color:#fff
 ```
 
----
+## What does post-quantum mean here?
 
-## What's Next?
+It means the privacy layer is not relying on classical elliptic-curve key exchange.
 
-<CardGroup cols={2}>
-  <Card title="Explore the Product" icon="globe" href="/explore/frontend-experience">
-    Take a visual tour of the hosted app and see every step in action.
+Instead, SPECTER uses **ML-KEM-768**, the finalized NIST standard for key encapsulation, implemented in `specter/specter-crypto/src/kyber.rs`.
+
+That matters because stealth systems leave cryptographic breadcrumbs on-chain for a very long time.
+
+If your discovery layer depended only on classical ECDH, a future attacker with a strong enough quantum computer could potentially use old public data to break the privacy of old payments.
+
+SPECTER avoids that specific failure mode on the receiving side by using ML-KEM for the sender-to-recipient shared secret.
+
+## What are the keys actually doing?
+
+<AccordionGroup>
+  <Accordion title="`viewing_pk` and `viewing_sk`">
+    These are for **discovery**.
+
+    The sender encapsulates to `viewing_pk`.
+
+    You later decapsulate with `viewing_sk` while scanning announcements.
+  </Accordion>
+  <Accordion title="`spending_pk`">
+    In the current wallet-compatible flow, the sender combines the ML-KEM shared secret with `spending_pk` to deterministically derive the one-time stealth address.
+
+    That logic lives in `specter/specter-crypto/src/derive.rs`.
+  </Accordion>
+  <Accordion title="The spendable result">
+    When you scan successfully, the API returns an `eth_private_key` derived from the same shared secret path.
+
+    That is what makes the resulting address usable in existing Ethereum wallet flows today.
+  </Accordion>
+</AccordionGroup>
+
+## The honest security summary
+
+<Warning>
+SPECTER today is best described as **post-quantum recipient privacy with classical spend security**.
+</Warning>
+
+Why:
+
+- The sender-recipient shared secret uses ML-KEM-768.
+- The current spendable wallet output is still a derived `secp256k1` key for Ethereum compatibility.
+
+The full explanation is on **[Quantum safety boundaries](/core-concepts/quantum-safety-boundaries)**.
+
+## What should you open next?
+
+<CardGroup cols={3}>
+  <Card title="See the full key flow" icon="key" href="/core-concepts/protocol-flow">
+    Follow every object and every step from key generation to scan output.
   </Card>
-  <Card title="Integration Quickstart" icon="bolt" href="/getting-started/quickstart">
-    Run the full keygen → create → publish → scan loop with copy-paste commands.
+  <Card title="Understand PQ safety" icon="shield-lock" href="/core-concepts/quantum-safety-boundaries">
+    See exactly what is quantum-resistant today and what still needs new execution rails.
   </Card>
-  <Card title="Core Concepts" icon="book-open" href="/core-concepts/architecture">
-    Dive deeper into architecture, protocol flow, and cryptography.
-  </Card>
-  <Card title="FAQ" icon="circle-question" href="/faq">
-    Get answers to common beginner and integration questions.
+  <Card title="Try the hosted backend" icon="rocket" href="/getting-started/quickstart">
+    Run the live API flow against `backend.specterpq.com`.
   </Card>
 </CardGroup>
-
-<Info>
-You don't need to understand the cryptography to use SPECTER. Start with the product tour, then integrate — the crypto details are always here when you're ready.
-</Info>

@@ -1,71 +1,120 @@
 ---
 title: "SPECTER"
-description: "Private payments with post-quantum stealth addresses for Ethereum and Sui"
+description: "Private receiving for Ethereum and Sui, explained for real users first and integrators second"
 ---
 
-![SPECTER logo](/images/specter/logo-tagline.png)
+![SPECTER user journey sketch](/images/specter/first-payment-journey.svg)
 
-## Build private payments with post-quantum security
+## Private payments, without asking users to become cryptographers
 
-SPECTER lets you receive funds at one-time **stealth addresses** so observers cannot link payments back to you. It uses **ML-KEM-768** for recipient privacy against classical and quantum-capable adversaries.
+SPECTER gives you a fresh **stealth address** for every payment.
+
+That means a sender can pay you without exposing your main wallet to everyone watching the chain.
+
+The privacy layer is built with **ML-KEM-768**, the finalized post-quantum key encapsulation standard used in the codebase through RustCrypto `ml-kem` (`specter/specter-crypto/src/kyber.rs`).
 
 <CardGroup cols={3}>
+  <Card title="Start here" icon="sparkles" href="/getting-started/first-time-overview">
+    Learn what SPECTER is, why it exists, and what each key does in plain language.
+  </Card>
+  <Card title="How a payment works" icon="sitemap" href="/core-concepts/protocol-flow">
+    Follow the full send, announce, scan, and spend flow step by step.
+  </Card>
   <Card title="Launch app" icon="rocket" href="https://specterpq.com/">
-    Open the hosted experience on the official domain.
-  </Card>
-  <Card title="Use cases + Yellow" icon="sitemap" href="/guides/use-cases-and-yellow-integration">
-    Start from the live Yellow integration and roadmap boundaries.
-  </Card>
-  <Card title="API reference" icon="code" href="/api/introduction">
-    Integrate endpoint-by-endpoint with verified request/response contracts.
+    Use the hosted product.
   </Card>
 </CardGroup>
 
-## Official domains
+## What problem does SPECTER solve?
 
-- Primary: [specterpq.com](https://specterpq.com)
-- Mirror: [specterpq.info](https://specterpq.info)
+On a normal public chain, your address becomes your identity.
 
-## Architecture at a glance
+Once someone knows your address, they can often follow your incoming payments, your balances, and your counterparties.
+
+SPECTER changes the receiving side of that experience:
+
+1. You publish one public **meta-address**.
+2. Every sender derives a different one-time **stealth address** from it.
+3. The sender posts an **announcement** that only you can decode.
+4. You scan announcements and recover the payment meant for you.
 
 ```mermaid
 flowchart LR
-    A["Name resolution\n(ENS/SuiNS)"] --> B["Resolve recipient\nmeta-address"]
-    B --> C["ML-KEM-768 encapsulation\n+ view tag"]
-    C --> D["Generate stealth address\n+ announcement"]
-    D --> E["Publish announcement"]
-    E --> F["Recipient scanning\n+ discovery"]
+    A["You publish a meta-address"] --> B["Sender derives one-time stealth address"]
+    B --> C["Sender sends funds"]
+    C --> D["Sender publishes announcement"]
+    D --> E["You scan and discover the payment"]
 
     style A fill:#0f766e,color:#fff
+    style B fill:#115e59,color:#fff
     style C fill:#14b8a6,color:#fff
-    style F fill:#115e59,color:#fff
+    style E fill:#0f766e,color:#fff
 ```
 
-## Quick paths
+## What should a new user understand first?
 
 <CardGroup cols={2}>
-  <Card title="What is SPECTER?" icon="sparkles" href="/getting-started/first-time-overview">
-    Read a beginner-friendly explanation with diagrams.
+  <Card title="What is post-quantum?" icon="shield" href="/core-concepts/cryptography">
+    Start here if the words sound familiar but still abstract.
   </Card>
-  <Card title="Playground" icon="bolt" href="/explore/playground">
-    Run copy-paste API flows and test the Yellow path.
+  <Card title="What are the keys?" icon="key" href="/core-concepts/protocol-flow">
+    See how `spending_pk`, `viewing_pk`, announcements, and scan results fit together.
   </Card>
-  <Card title="Protocol flow" icon="sitemap" href="/core-concepts/protocol-flow">
-    Follow registration, sending, and recipient discovery.
+  <Card title="What is quantum-safe today?" icon="radar" href="/core-concepts/quantum-safety-boundaries">
+    Understand the honest security boundary: receiving is stronger than spending.
   </Card>
-  <Card title="Contact and feedback" icon="mail" href="/explore/contact-feedback">
-    Send docs or integration feedback directly by email.
+  <Card title="Why Yellow?" icon="chart-line" href="/guides/use-cases-and-yellow-integration">
+    See how private receiving becomes private channels and private trading discovery.
   </Card>
 </CardGroup>
 
-## Core properties
+## The full story in one screen
 
-| Property | Detail |
+<Tabs>
+  <Tab title="For users">
+    You do not hand out one public wallet forever.
+
+    You publish a meta-address once, and SPECTER turns it into a new receiving destination each time.
+
+    The sender never needs your real wallet address.
+  </Tab>
+  <Tab title="For builders">
+    The core API loop is:
+
+    - `POST https://backend.specterpq.com/api/v1/keys/generate`
+    - `POST https://backend.specterpq.com/api/v1/stealth/create`
+    - `POST https://backend.specterpq.com/api/v1/registry/announcements`
+    - `POST https://backend.specterpq.com/api/v1/stealth/scan`
+
+    That flow maps directly to `specter/specter-api/src/handlers.rs`.
+  </Tab>
+  <Tab title="For researchers">
+    SPECTER already uses ML-KEM-768 for recipient discovery and announcement privacy, but the current wallet-compatible spend path still derives a `secp256k1` key (`specter/specter-crypto/src/derive.rs`).
+
+    That is why the docs now separate **post-quantum recipient privacy** from **classical spend security**.
+  </Tab>
+</Tabs>
+
+## Why this matters
+
+| Question | Short answer |
 | --- | --- |
-| <img src="/images/icons/tabler/shield-lock.svg" alt="Security icon" width="16" /> Post-quantum privacy | ML-KEM-768 encapsulation for shared-secret derivation. |
-| <img src="/images/icons/tabler/hash.svg" alt="View tag icon" width="16" /> Fast scanning | 1-byte view tags filter most non-matching announcements. |
-| <img src="/images/icons/tabler/network.svg" alt="Integration icon" width="16" /> Multi-surface integration | Backend API, frontend app, and CLI share the same core primitives. |
+| Can people watch the chain and see a payment happened? | Yes. |
+| Can they easily link every payment back to your public receiving identity? | SPECTER is designed to make that much harder. |
+| Is the receiving privacy layer post-quantum? | Yes, for the ML-KEM announcement/discovery path. |
+| Is the current spend path fully post-quantum? | No. The spendable wallet key remains `secp256k1` today. |
 
 <Info>
-If you are new, start with **[What is SPECTER?](/getting-started/first-time-overview)**, then run the **[Playground](/explore/playground)**.
+If you only read three pages, read **[What is SPECTER?](/getting-started/first-time-overview)**, **[How a payment works](/core-concepts/protocol-flow)**, and **[Quantum safety boundaries](/core-concepts/quantum-safety-boundaries)**.
 </Info>
+
+## Research and writing
+
+<CardGroup cols={2}>
+  <Card title="Research notes" icon="book-open" href="/blog/index">
+    Read the user-friendly research and design notes section.
+  </Card>
+  <Card title="Receiving is PQ-safe, spending is not" icon="book-open" href="/blog/receiving-vs-spending">
+    The March 9, 2026 article preview and the longer explanation behind it.
+  </Card>
+</CardGroup>

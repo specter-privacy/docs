@@ -1,79 +1,89 @@
 ---
 title: "Yellow private channels"
-description: "Run private channel workflows with SPECTER announcements and Yellow endpoints"
+description: "The practical SPECTER x Yellow flow, with clear labels for what is live, partial, and placeholder"
 ---
 
-<CardGroup cols={3}>
-  <Card title="Use case overview" icon="map" href="/guides/use-cases-and-yellow-integration">
-    See what is live now versus roadmap-only use cases.
-  </Card>
-  <Card title="Yellow API reference" icon="code" href="/api/yellow">
-    Review full endpoint schemas and example payloads.
-  </Card>
-  <Card title="Open Yellow app" icon="rocket" href="https://specterpq.com/yellow">
-    Run the hosted frontend path for channel creation and discovery.
-  </Card>
-</CardGroup>
+![Yellow private channel flow](/images/specter/yellow-map.svg)
 
-## Integration flow
+## What this page is for
+
+If the previous page explained **why** Yellow matters, this page explains **how the current implementation behaves**.
+
+## The request flow
 
 ```mermaid
 flowchart TD
-    A["Sender provides recipient\nname or meta-address"] --> B["Create channel request\n/api/v1/yellow/channel/create"]
-    B --> C["Backend creates stealth address\n+ announcement"]
-    C --> D["Announcement stored in registry\nwith channel_id"]
-    D --> E["Recipient discovers\n/api/v1/yellow/channel/discover"]
-    E --> F["Recipient receives channel metadata\n+ stealth key material"]
+    A["POST /yellow/channel/create"] --> B["Resolve recipient input"]
+    B --> C["Create stealth address + announcement"]
+    C --> D["Attach channel_id"]
+    D --> E["Store announcement in registry"]
+    E --> F["POST /yellow/channel/discover"]
+    F --> G["Recipient recovers channel-linked discovery"]
 
-    style B fill:#0f766e,color:#fff
-    style C fill:#14b8a6,color:#fff
-    style E fill:#115e59,color:#fff
+    style A fill:#0f766e,color:#fff
+    style C fill:#115e59,color:#fff
+    style G fill:#14b8a6,color:#fff
 ```
 
-![Yellow private trading flow](/images/specter/yellow.png)
+## The main endpoints
 
-## Current backend behavior
-
-<Steps>
-  <Step title="Create channel announcement" icon="plus">
-    `POST /api/v1/yellow/channel/create` resolves recipient input, builds a stealth address, and publishes an announcement with `channel_id`.
-  </Step>
-  <Step title="Discover incoming channels" icon="radar">
-    `POST /api/v1/yellow/channel/discover` scans announcements and returns channel rows that decode for recipient keys.
-  </Step>
-  <Step title="Manage channel state" icon="gear">
-    `fund`, `transfer`, `status`, and `close` endpoints expose a practical API contract for integration testing.
-  </Step>
-</Steps>
-
-## Implementation status
-
-| Surface | Status |
+| Endpoint | What it does now |
 | --- | --- |
-| Channel create | Implemented and publishes an announcement entry with `channel_id`. |
-| Channel discover | Implemented and returns discovered channels from registry scans. |
-| Channel fund | Returns a synthetic tx-like hash in current backend behavior. |
-| Channel close | Returns placeholder tx hash and sets `tx_hash_is_placeholder: true`. |
-| L1 settlement submission | Not submitted by this backend. Settlement execution is expected through Yellow infrastructure. |
+| `POST /api/v1/yellow/channel/create` | Resolves the recipient, derives a stealth address, creates an announcement, and binds a `channel_id`. |
+| `POST /api/v1/yellow/channel/discover` | Scans announcements and returns only channel-linked discoveries. |
+| `GET /api/v1/yellow/config` | Returns current websocket and contract config from backend state. |
+| `POST /api/v1/yellow/channel/fund` | Exposes a funding API shape, but current response behavior is still simplified. |
+| `POST /api/v1/yellow/channel/close` | Returns placeholder-style close output and does not perform backend L1 submission. |
 
-<Warning>
-Do not treat `fund` and `close` tx hashes as confirmed on-chain transaction hashes in the current backend implementation.
-</Warning>
+## Example: create a channel-linked announcement
 
-## Configuration defaults
+```bash
+curl -s -X POST https://backend.specterpq.com/api/v1/yellow/channel/create \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipient":"bob.eth",
+    "token":"USDC",
+    "amount":"1000"
+  }'
+```
 
-The API exposes defaults through `GET /api/v1/yellow/config`:
+## Example: discover incoming channels
 
-- `ws_url`: `wss://clearnet.yellow.com/ws`
-- `chain_id`: `11155111` (Sepolia)
-- `custody_address`: `0x019B65A265EB3363822f2752141b3dF16131b262`
-- `adjudicator_address`: `0x7c7ccbc98469190849BCC6c926307794fDfB11F2`
-- `supported_tokens`: USDC and ETH entries
+```bash
+curl -s -X POST https://backend.specterpq.com/api/v1/yellow/channel/discover \
+  -H "Content-Type: application/json" \
+  -d '{
+    "viewing_sk":"<HEX_VIEWING_SK>",
+    "spending_pk":"<HEX_SPENDING_PK>",
+    "spending_sk":"<HEX_SPENDING_SK>"
+  }'
+```
 
-## Source-backed references
+## What is source-backed here
 
-- Route wiring: `specter/specter-api/src/routes.rs`
-- Endpoint behavior: `specter/specter-api/src/handlers.rs`
-- Runtime config defaults: `specter/specter-api/src/state.rs`
-- Yellow integration crate: `specter/specter-yellow/src/`
-- Frontend Yellow page: `SPECTER-web/src/pages/YellowPage.tsx`
+- Yellow route handlers: `specter/specter-api/src/handlers.rs`
+- Yellow default config: `specter/specter-api/src/state.rs`
+- Yellow client and channel types: `specter/specter-yellow/src/client.rs`, `specter/specter-yellow/src/channel.rs`, `specter/specter-yellow/src/types.rs`
+- Hosted frontend page: `SPECTER-web/src/pages/YellowPage.tsx`
+
+## Current boundary, stated plainly
+
+<AccordionGroup>
+  <Accordion title="What is already useful">
+    The repo shows how to connect stealth discovery with a private-channel use case.
+
+    That is valuable because it turns SPECTER from a pure payment primitive into a real privacy coordination layer.
+  </Accordion>
+  <Accordion title="What is still partial">
+    The fund and close paths include placeholder-style behavior in the backend.
+
+    You should treat them as integration scaffolding, not final custody settlement guarantees.
+  </Accordion>
+  <Accordion title="Why this still matters">
+    The hardest part in privacy products is often not the cryptography.
+
+    It is attaching the privacy layer to something people already need.
+
+    Yellow is the clearest example of that in this repo.
+  </Accordion>
+</AccordionGroup>

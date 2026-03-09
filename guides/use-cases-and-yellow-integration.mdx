@@ -1,63 +1,129 @@
 ---
-title: "Use cases and Yellow integration"
-description: "What is live today, what is planned, and how Yellow integration maps to the code"
+title: "Yellow use case"
+description: "Why Yellow matters for users, how the private-channel idea works, and what the repo implements today"
 ---
 
-<CardGroup cols={3}>
-  <Card title="Live today: private channel trading" icon="sitemap" href="/guides/yellow-private-channels">
-    Use SPECTER announcements and stealth addresses in Yellow channel flows.
-  </Card>
-  <Card title="Yellow API surface" icon="code" href="/api/yellow">
-    Use `/api/v1/yellow/*` endpoints for create, discover, transfer, and status reads.
-  </Card>
-  <Card title="Try it in app" icon="globe" href="https://specterpq.com/yellow">
-    Open the Yellow page in the hosted app and run the flow end-to-end.
-  </Card>
-</CardGroup>
+![Yellow use case sketch](/images/specter/yellow-map.svg)
 
-## Integration snapshot
+## Why Yellow belongs in SPECTER
 
-![SPECTER cover](/images/specter/cover-specter.png)
+Private receiving is valuable on its own.
+
+But private receiving becomes much more interesting when it is attached to an actual use case.
+
+Yellow is that use case in this repo.
+
+The idea is simple:
+
+1. A counterparty wants to open a private channel with you.
+2. They do not want that public relationship to be obvious on-chain.
+3. They derive a one-time stealth destination for you first.
+4. The channel is then tied to that one-time destination instead of your long-lived public identity.
+
+## The theory
+
+Without SPECTER:
+
+- Alice opens a channel with Bob
+- observers learn Alice and Bob are connected
+
+With SPECTER + Yellow:
+
+- Alice resolves Bob's meta-address
+- Alice derives a one-time stealth address for Bob
+- Alice binds the channel flow to that destination
+- Bob discovers the channel through the announcement path
 
 ```mermaid
 flowchart LR
-    A["Sender"] --> B["Resolve recipient\nmeta-address"]
-    B --> C["Create stealth address\nand announcement"]
-    C --> D["Create Yellow channel"]
-    D --> E["Recipient scans\nannouncements"]
-    E --> F["Discover channel bound\nto stealth address"]
+    A["Alice wants a private channel"] --> B["Resolve Bob's meta-address"]
+    B --> C["Create Bob's stealth destination"]
+    C --> D["Bind channel id to announcement"]
+    D --> E["Bob scans and discovers it"]
 
     style B fill:#0f766e,color:#fff
     style C fill:#115e59,color:#fff
-    style D fill:#14b8a6,color:#fff
+    style E fill:#14b8a6,color:#fff
 ```
 
-## Use case status
+## What is implemented today
 
-| Status | Use case | Notes |
-| --- | --- | --- |
-| Live | <img src="/images/icons/tabler/chart-line.svg" alt="Trading icon" width="16" /> Private channel trading with Yellow | Implemented in backend routes and frontend Yellow page. |
-| Planned | <img src="/images/icons/tabler/cpu-2.svg" alt="Payroll icon" width="16" /> Private payroll and streaming | Keep this in roadmap until dedicated flows and API contracts are merged. |
-| Planned | <img src="/images/icons/tabler/shield-lock.svg" alt="DAO payouts icon" width="16" /> Privacy-preserving DAO payouts | Keep this in roadmap until payout orchestration and policy controls are implemented. |
-| Planned | <img src="/images/icons/tabler/network.svg" alt="OTC icon" width="16" /> Confidential OTC settlement | Keep this in roadmap until order-routing and settlement guarantees are documented in code. |
+The repo has a real Yellow integration surface, but it is important to separate live scaffolding from finished settlement.
 
-<Info>
-Only the Yellow private channel integration is documented as available product functionality today.
-</Info>
+### Implemented in the backend
 
-## Yellow integration evidence (source-backed)
+- create channel announcement flow
+- discover private channels by scanning announcements
+- read Yellow config
+- fund, transfer, close, and status endpoints for integration testing
 
-- API routes expose the Yellow namespace in `specter/specter-api/src/routes.rs`.
-- Endpoint handler behavior is implemented in `specter/specter-api/src/handlers.rs` (`yellow_create_channel`, `yellow_discover_channels`, `yellow_fund_channel`, `yellow_close_channel`, `yellow_transfer`, `yellow_config`).
-- Default Yellow runtime configuration is initialized in `specter/specter-api/src/state.rs`.
-- Frontend Yellow flow is implemented in `SPECTER-web/src/pages/YellowPage.tsx`.
-- Frontend use case presentation is implemented in `SPECTER-web/src/pages/UseCasesPage.tsx`.
+This behavior is defined in:
 
-## Official domains
+- `specter/specter-api/src/handlers.rs`
+- `specter/specter-api/src/state.rs`
+- `specter/specter-yellow/src/`
 
-- Primary: [specterpq.com](https://specterpq.com)
-- Mirror: [specterpq.info](https://specterpq.info)
+### Important limitations from the code
 
-<Info>
-If you run local environments, keep using local API URLs and local frontend URLs. Official domains are for hosted access.
-</Info>
+<Warning>
+The current backend does not submit the final L1 settlement transaction for Yellow closes.
+</Warning>
+
+The close handler itself states this, and it returns `tx_hash_is_placeholder: true` for the placeholder close hash.
+
+So the docs present Yellow as:
+
+- a meaningful private-channel use case
+- partially implemented integration scaffolding
+- not a finished end-to-end settlement product inside this backend alone
+
+## Theory vs current implementation
+
+<Tabs>
+  <Tab title="Conceptual value">
+    Yellow shows why stealth addresses are not only a payments primitive.
+
+    They can also hide counterparty identity around channels, trading relationships, and recurring off-chain coordination.
+  </Tab>
+  <Tab title="What works in this repo">
+    You can create, publish, discover, and inspect channel-linked announcements.
+
+    You can also exercise the API surface for fund, transfer, status, and close.
+  </Tab>
+  <Tab title="What is still not product-finished">
+    The backend does not itself finalize L1 settlement submission for closes.
+
+    Placeholder transaction fields are still present in parts of the flow.
+  </Tab>
+</Tabs>
+
+## User journey
+
+<Steps>
+  <Step title="Alice chooses a recipient" icon="user-plus">
+    Alice enters Bob's ENS name or meta-address.
+  </Step>
+  <Step title="SPECTER creates a private destination" icon="shield-lock">
+    The backend derives Bob's stealth address and creates an announcement with a `channel_id`.
+  </Step>
+  <Step title="Yellow channel metadata is linked" icon="link">
+    The announcement becomes the discovery layer for the private channel relationship.
+  </Step>
+  <Step title="Bob discovers the channel" icon="radar">
+    Bob scans with SPECTER keys and recovers the matching channel data.
+  </Step>
+</Steps>
+
+## Try the current flow
+
+<CardGroup cols={3}>
+  <Card title="Yellow walkthrough" icon="map" href="/guides/yellow-private-channels">
+    Go deeper into the actual request and response flow.
+  </Card>
+  <Card title="Yellow API" icon="code" href="/api/yellow">
+    See every current endpoint and the implementation caveats.
+  </Card>
+  <Card title="Open app" icon="rocket" href="https://specterpq.com/yellow">
+    Use the hosted Yellow page.
+  </Card>
+</CardGroup>

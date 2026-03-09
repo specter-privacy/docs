@@ -1,80 +1,69 @@
 ---
-title: "Integration Quickstart"
-description: "Integrate the full loop into your app: keygen → create → publish → scan"
+title: "Integration quickstart"
+description: "Run the full hosted flow: keygen, create, publish, and scan"
 ---
 
 <CardGroup cols={3}>
-  <Card title="Launch app" icon="rocket" href="https://specterpq.com/">
-    Mirror these steps visually in the frontend.
+  <Card title="Launch app" icon="globe" href="https://specterpq.com/">
+    Follow the same journey in the hosted UI.
   </Card>
-  <Card title="API route map" icon="sitemap" href="/api/introduction">
-    Keep endpoint docs open while executing commands.
+  <Card title="API introduction" icon="code" href="/api/introduction">
+    Keep the route map open while you test.
   </Card>
   <Card title="FAQ" icon="circle-question" href="/faq">
-    Use detailed answers if any response is unexpected.
+    Check the fast answers if a response surprises you.
   </Card>
 </CardGroup>
 
 <Note>
-Start backend first: `cargo run --bin specter -- serve --port 3001` from `SPECTER/specter`.
+This quickstart uses the hosted backend at `https://backend.specterpq.com`.
 </Note>
 
-## Integration loop
-
-<Steps>
-  <Step title="Generate recipient keys">
+## Step 1: generate recipient keys
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/keys/generate | tee /tmp/specter-keys.json
+curl -s -X POST https://backend.specterpq.com/api/v1/keys/generate | tee /tmp/specter-keys.json
 META_ADDRESS=$(jq -r '.meta_address' /tmp/specter-keys.json)
 VIEWING_SK=$(jq -r '.viewing_sk' /tmp/specter-keys.json)
 SPENDING_PK=$(jq -r '.spending_pk' /tmp/specter-keys.json)
 SPENDING_SK=$(jq -r '.spending_sk' /tmp/specter-keys.json)
 ```
 
-  </Step>
-  <Step title="Create stealth payload">
+## Step 2: create the stealth payload
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/stealth/create \
+curl -s -X POST https://backend.specterpq.com/api/v1/stealth/create \
   -H 'Content-Type: application/json' \
   -d "{\"meta_address\":\"$META_ADDRESS\"}" | tee /tmp/specter-create.json
 
 EPHEMERAL_KEY=$(jq -r '.ephemeral_ciphertext' /tmp/specter-create.json)
 VIEW_TAG=$(jq -r '.view_tag' /tmp/specter-create.json)
 STEALTH_ADDRESS=$(jq -r '.stealth_address' /tmp/specter-create.json)
-
 echo "Stealth destination: $STEALTH_ADDRESS"
 ```
 
-  </Step>
-  <Step title="Publish announcement">
+## Step 3: publish the announcement
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/registry/announcements \
+curl -s -X POST https://backend.specterpq.com/api/v1/registry/announcements \
   -H 'Content-Type: application/json' \
   -d "{\"ephemeral_key\":\"$EPHEMERAL_KEY\",\"view_tag\":$VIEW_TAG,\"tx_hash\":\"0x1111111111111111111111111111111111111111111111111111111111111111\",\"amount\":\"0.01\",\"chain\":\"ethereum\"}" | jq .
 ```
 
-  </Step>
-  <Step title="Scan and discover">
+## Step 4: scan and recover the discovery
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/stealth/scan \
+curl -s -X POST https://backend.specterpq.com/api/v1/stealth/scan \
   -H 'Content-Type: application/json' \
   -d "{\"viewing_sk\":\"$VIEWING_SK\",\"spending_pk\":\"$SPENDING_PK\",\"spending_sk\":\"$SPENDING_SK\"}" | jq .
 ```
 
-Expected result: one discovery with `stealth_address` matching the create step.
+Expected result:
 
-  </Step>
-</Steps>
+- one discovery
+- `stealth_address` matches the create step
+- sensitive material such as `eth_private_key` is present in the scan result
 
-<AccordionGroup>
-  <Accordion title="What this proves">
-    You validated the core integration loop and payload contract: keygen → create → publish → scan. Your app can now use these exact calls.
-  </Accordion>
-  <Accordion title="Next step after quickstart">
-    Move to the [Integration playbook](/guides/integration-playbook) to fit this loop into your app architecture.
-  </Accordion>
-</AccordionGroup>
+<Warning>
+Treat the scan response like wallet secret material. Do not log or expose it in client analytics.
+</Warning>

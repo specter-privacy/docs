@@ -61,7 +61,7 @@ CID to retrieve through backend gateway client.
   <Tab title="Upload (cURL)">
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/ipfs/upload \
+curl -s -X POST https://backend.specterpq.com/api/v1/ipfs/upload \
   -H "Content-Type: application/json" \
   -d '{"meta_address":"<HEX_META_ADDRESS>","name":"alice.eth-specter"}' | jq .
 ```
@@ -70,14 +70,14 @@ curl -s -X POST http://localhost:3001/api/v1/ipfs/upload \
   <Tab title="Retrieve (cURL)">
 
 ```bash
-curl -s "http://localhost:3001/api/v1/ipfs/<CID>" --output meta-address.bin
+curl -s "https://backend.specterpq.com/api/v1/ipfs/<CID>" --output meta-address.bin
 ```
 
   </Tab>
   <Tab title="JavaScript">
 
 ```javascript
-const up = await fetch("http://localhost:3001/api/v1/ipfs/upload", {
+const up = await fetch("https://backend.specterpq.com/api/v1/ipfs/upload", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ meta_address, name: "alice.eth-specter" })

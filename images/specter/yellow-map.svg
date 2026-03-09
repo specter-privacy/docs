@@ -1,0 +1,34 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="700" rx="28" fill="#F4F0FF"/>
+  <rect x="54" y="56" width="1092" height="588" rx="28" fill="#FFFEFF" stroke="#5B21B6" stroke-width="2"/>
+  <circle cx="190" cy="202" r="78" fill="#FFF0EB" stroke="#9A3412" stroke-width="2"/>
+  <circle cx="510" cy="202" r="78" fill="#E8FBF7" stroke="#0F766E" stroke-width="2"/>
+  <circle cx="830" cy="202" r="78" fill="#FFF7D6" stroke="#B45309" stroke-width="2"/>
+  <circle cx="1010" cy="432" r="78" fill="#EAF1FF" stroke="#1D4ED8" stroke-width="2"/>
+  <circle cx="510" cy="432" r="78" fill="#F0FDF4" stroke="#15803D" stroke-width="2"/>
+  <circle cx="190" cy="432" r="78" fill="#FDF2F8" stroke="#BE185D" stroke-width="2"/>
+  <path d="M268 202H432" stroke="#5B21B6" stroke-width="4" stroke-linecap="round" stroke-dasharray="12 12"/>
+  <path d="M588 202H752" stroke="#5B21B6" stroke-width="4" stroke-linecap="round" stroke-dasharray="12 12"/>
+  <path d="M882 252L958 366" stroke="#5B21B6" stroke-width="4" stroke-linecap="round" stroke-dasharray="12 12"/>
+  <path d="M432 432H268" stroke="#5B21B6" stroke-width="4" stroke-linecap="round" stroke-dasharray="12 12"/>
+  <path d="M588 432H932" stroke="#5B21B6" stroke-width="4" stroke-linecap="round" stroke-dasharray="12 12"/>
+  <text x="156" y="198" fill="#7C2D12" font-family="Helvetica, Arial, sans-serif" font-size="26" font-weight="700">Alice</text>
+  <text x="130" y="232" fill="#7C2D12" font-family="Helvetica, Arial, sans-serif" font-size="20">Wants a private</text>
+  <text x="138" y="258" fill="#7C2D12" font-family="Helvetica, Arial, sans-serif" font-size="20">channel with Bob</text>
+  <text x="450" y="198" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="26" font-weight="700">SPECTER</text>
+  <text x="448" y="232" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="20">Derive Bob's</text>
+  <text x="438" y="258" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="20">stealth address</text>
+  <text x="768" y="198" fill="#7C2D12" font-family="Helvetica, Arial, sans-serif" font-size="26" font-weight="700">Announcement</text>
+  <text x="786" y="232" fill="#7C2D12" font-family="Helvetica, Arial, sans-serif" font-size="20">Bind</text>
+  <text x="760" y="258" fill="#7C2D12" font-family="Helvetica, Arial, sans-serif" font-size="20">channel_id</text>
+  <text x="956" y="428" fill="#1E3A8A" font-family="Helvetica, Arial, sans-serif" font-size="26" font-weight="700">Yellow</text>
+  <text x="934" y="462" fill="#1E3A8A" font-family="Helvetica, Arial, sans-serif" font-size="20">Private channel</text>
+  <text x="458" y="428" fill="#166534" font-family="Helvetica, Arial, sans-serif" font-size="26" font-weight="700">Bob scans</text>
+  <text x="448" y="462" fill="#166534" font-family="Helvetica, Arial, sans-serif" font-size="20">Discovers the</text>
+  <text x="452" y="488" fill="#166534" font-family="Helvetica, Arial, sans-serif" font-size="20">linked channel</text>
+  <text x="118" y="428" fill="#9D174D" font-family="Helvetica, Arial, sans-serif" font-size="26" font-weight="700">Privacy win</text>
+  <text x="104" y="462" fill="#9D174D" font-family="Helvetica, Arial, sans-serif" font-size="20">Relationship is less</text>
+  <text x="112" y="488" fill="#9D174D" font-family="Helvetica, Arial, sans-serif" font-size="20">publicly obvious</text>
+  <text x="54" y="676" fill="#5B21B6" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700">Yellow as a SPECTER use case</text>
+  <text x="395" y="676" fill="#6B7280" font-family="Helvetica, Arial, sans-serif" font-size="22">Private receiving becomes private channel discovery.</text>
+</svg>

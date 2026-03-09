@@ -93,7 +93,7 @@ Array of non-zero tag buckets (`tag`, `count`).
   <Tab title="Publish (cURL)">
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/registry/announcements \
+curl -s -X POST https://backend.specterpq.com/api/v1/registry/announcements \
   -H "Content-Type: application/json" \
   -d '{
     "ephemeral_key":"<HEX_CIPHERTEXT>",
@@ -108,14 +108,14 @@ curl -s -X POST http://localhost:3001/api/v1/registry/announcements \
   <Tab title="List (cURL)">
 
 ```bash
-curl -s "http://localhost:3001/api/v1/registry/announcements?view_tag=42&offset=0&limit=20" | jq .
+curl -s "https://backend.specterpq.com/api/v1/registry/announcements?view_tag=42&offset=0&limit=20" | jq .
 ```
 
   </Tab>
   <Tab title="Stats (cURL)">
 
 ```bash
-curl -s "http://localhost:3001/api/v1/registry/stats" | jq .
+curl -s "https://backend.specterpq.com/api/v1/registry/stats" | jq .
 ```
 
   </Tab>

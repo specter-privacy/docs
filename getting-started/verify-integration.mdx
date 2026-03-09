@@ -18,7 +18,7 @@ description: "A practical checklist to confirm your integration is working end-t
   <Step title="Backend health is stable">
 
 ```bash
-curl -s http://localhost:3001/health | jq .
+curl -s https://backend.specterpq.com/health | jq .
 ```
 
 Confirm `status` is `ok` and version is present.
@@ -27,8 +27,8 @@ Confirm `status` is `ok` and version is present.
   <Step title="Core endpoints respond">
 
 ```bash
-curl -s -X POST http://localhost:3001/api/v1/keys/generate | jq .
-curl -s http://localhost:3001/api/v1/registry/stats | jq .
+curl -s -X POST https://backend.specterpq.com/api/v1/keys/generate | jq .
+curl -s https://backend.specterpq.com/api/v1/registry/stats | jq .
 ```
 
   </Step>

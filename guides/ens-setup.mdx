@@ -22,7 +22,7 @@ cargo run --bin specter -- generate --output /tmp/specter-keys.json
 
 # 2) Upload meta-address
 META_ADDRESS=$(jq -r '.meta_address' /tmp/specter-keys.json)
-curl -s -X POST http://localhost:3001/api/v1/ipfs/upload \
+curl -s -X POST https://backend.specterpq.com/api/v1/ipfs/upload \
   -H 'Content-Type: application/json' \
   -d "{\"meta_address\":\"$META_ADDRESS\"}" | jq .
 ```
@@ -32,5 +32,5 @@ Then set ENS text record `specter` in your wallet/app.
 ## Validation
 
 ```bash
-curl -s http://localhost:3001/api/v1/ens/resolve/alice.eth | jq .
+curl -s https://backend.specterpq.com/api/v1/ens/resolve/alice.eth | jq .
 ```

@@ -1,0 +1,34 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="720" rx="28" fill="#F6F5EF"/>
+  <rect x="42" y="42" width="1116" height="636" rx="24" fill="#FFFDF8" stroke="#0F766E" stroke-width="2"/>
+  <path d="M94 148C94 117.072 119.072 92 150 92H357C387.928 92 413 117.072 413 148V232C413 262.928 387.928 288 357 288H150C119.072 288 94 262.928 94 232V148Z" fill="#E7F7F2"/>
+  <path d="M492 148C492 117.072 517.072 92 548 92H755C785.928 92 811 117.072 811 148V232C811 262.928 785.928 288 755 288H548C517.072 288 492 262.928 492 232V148Z" fill="#FFF3D8"/>
+  <path d="M890 148C890 117.072 915.072 92 946 92H1053C1083.93 92 1109 117.072 1109 148V232C1109 262.928 1083.93 288 1053 288H946C915.072 288 890 262.928 890 232V148Z" fill="#EAF1FF"/>
+  <path d="M94 430C94 399.072 119.072 374 150 374H357C387.928 374 413 399.072 413 430V514C413 544.928 387.928 570 357 570H150C119.072 570 94 544.928 94 514V430Z" fill="#FFF0EB"/>
+  <path d="M492 430C492 399.072 517.072 374 548 374H755C785.928 374 811 399.072 811 430V514C811 544.928 785.928 570 755 570H548C517.072 570 492 544.928 492 514V430Z" fill="#E8FBF7"/>
+  <path d="M890 430C890 399.072 915.072 374 946 374H1053C1083.93 374 1109 399.072 1109 430V514C1109 544.928 1083.93 570 1053 570H946C915.072 570 890 544.928 890 514V430Z" fill="#F5F0FF"/>
+  <path d="M413 190H492" stroke="#0F766E" stroke-width="4" stroke-linecap="round" stroke-dasharray="12 12"/>
+  <path d="M811 190H890" stroke="#0F766E" stroke-width="4" stroke-linecap="round" stroke-dasharray="12 12"/>
+  <path d="M413 472H492" stroke="#0F766E" stroke-width="4" stroke-linecap="round" stroke-dasharray="12 12"/>
+  <path d="M811 472H890" stroke="#0F766E" stroke-width="4" stroke-linecap="round" stroke-dasharray="12 12"/>
+  <text x="126" y="145" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="32" font-weight="700">1. Publish</text>
+  <text x="126" y="184" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="24">Create a meta-address once.</text>
+  <text x="126" y="218" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="24">Share a name, not a wallet.</text>
+  <text x="528" y="145" fill="#523500" font-family="Helvetica, Arial, sans-serif" font-size="32" font-weight="700">2. Derive</text>
+  <text x="528" y="184" fill="#523500" font-family="Helvetica, Arial, sans-serif" font-size="24">Sender uses ML-KEM to create</text>
+  <text x="528" y="218" fill="#523500" font-family="Helvetica, Arial, sans-serif" font-size="24">a one-time destination.</text>
+  <text x="923" y="145" fill="#17305B" font-family="Helvetica, Arial, sans-serif" font-size="32" font-weight="700">3. Send</text>
+  <text x="923" y="184" fill="#17305B" font-family="Helvetica, Arial, sans-serif" font-size="24">Funds land at a fresh address</text>
+  <text x="923" y="218" fill="#17305B" font-family="Helvetica, Arial, sans-serif" font-size="24">that looks unrelated.</text>
+  <text x="126" y="427" fill="#652B17" font-family="Helvetica, Arial, sans-serif" font-size="32" font-weight="700">4. Announce</text>
+  <text x="126" y="466" fill="#652B17" font-family="Helvetica, Arial, sans-serif" font-size="24">A public breadcrumb is posted.</text>
+  <text x="126" y="500" fill="#652B17" font-family="Helvetica, Arial, sans-serif" font-size="24">Only the recipient can decode it.</text>
+  <text x="528" y="427" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="32" font-weight="700">5. Scan</text>
+  <text x="528" y="466" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="24">The recipient filters by view tag</text>
+  <text x="528" y="500" fill="#0B3B36" font-family="Helvetica, Arial, sans-serif" font-size="24">and recovers the payment.</text>
+  <text x="923" y="427" fill="#43246A" font-family="Helvetica, Arial, sans-serif" font-size="32" font-weight="700">6. Spend</text>
+  <text x="923" y="466" fill="#43246A" font-family="Helvetica, Arial, sans-serif" font-size="24">Today this step stays wallet-</text>
+  <text x="923" y="500" fill="#43246A" font-family="Helvetica, Arial, sans-serif" font-size="24">compatible through secp256k1.</text>
+  <text x="94" y="642" fill="#0F766E" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="700">SPECTER user journey</text>
+  <text x="292" y="642" fill="#4B5563" font-family="Helvetica, Arial, sans-serif" font-size="22">Private receiving first. Honest spend boundary second.</text>
+</svg>
