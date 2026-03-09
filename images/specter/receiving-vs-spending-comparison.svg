@@ -1,0 +1,71 @@
+<svg width="1200" height="1450" viewBox="0 0 1200 1450" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1450" fill="#262626"/>
+  <text x="600" y="110" text-anchor="middle" fill="#F5F5F4" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="42" font-weight="700">Quantum Safety Boundary in SPECTER</text>
+
+  <rect x="70" y="180" width="320" height="110" rx="12" fill="#6D7E38"/>
+  <rect x="430" y="180" width="340" height="110" rx="12" fill="#7A7A7A"/>
+  <rect x="810" y="180" width="320" height="110" rx="12" fill="#7A7A7A"/>
+  <text x="230" y="245" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="32" font-weight="700">Characteristic</text>
+  <text x="600" y="235" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="30" font-weight="700">Receiving</text>
+  <text x="600" y="272" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="30" font-weight="700">Side</text>
+  <text x="970" y="235" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="30" font-weight="700">Spending</text>
+  <text x="970" y="272" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="30" font-weight="700">Side</text>
+
+  <rect x="70" y="320" width="320" height="150" rx="12" fill="#867D2F"/>
+  <rect x="430" y="320" width="340" height="150" rx="12" fill="#867D2F"/>
+  <rect x="810" y="320" width="320" height="150" rx="12" fill="#867D2F"/>
+  <text x="95" y="400" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="34" font-weight="700">Privacy</text>
+  <text x="600" y="380" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="27" font-weight="700">ML-KEM</text>
+  <text x="600" y="415" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="27" font-weight="700">discovery and</text>
+  <text x="600" y="450" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="27" font-weight="700">recipient privacy</text>
+  <text x="970" y="360" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="25" font-weight="700">Ethereum wallet</text>
+  <text x="970" y="393" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="25" font-weight="700">compatibility and</text>
+  <text x="970" y="426" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="25" font-weight="700">current execution</text>
+  <text x="970" y="459" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="25" font-weight="700">limits</text>
+
+  <rect x="70" y="500" width="320" height="120" rx="12" fill="#956B3F"/>
+  <rect x="430" y="500" width="340" height="120" rx="12" fill="#956B3F"/>
+  <rect x="810" y="500" width="320" height="120" rx="12" fill="#956B3F"/>
+  <text x="95" y="572" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="34" font-weight="700">Security</text>
+  <text x="600" y="553" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="27" font-weight="700">Stronger post-</text>
+  <text x="600" y="588" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="27" font-weight="700">quantum posture</text>
+  <text x="970" y="553" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="27" font-weight="700">Not fully post-</text>
+  <text x="970" y="588" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="27" font-weight="700">quantum yet</text>
+
+  <rect x="70" y="650" width="320" height="180" rx="12" fill="#A04B45"/>
+  <rect x="430" y="650" width="340" height="180" rx="12" fill="#A04B45"/>
+  <rect x="810" y="650" width="320" height="180" rx="12" fill="#A04B45"/>
+  <text x="95" y="748" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="34" font-weight="700">Compatibility</text>
+  <text x="600" y="716" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="26" font-weight="700">Designed to</text>
+  <text x="600" y="749" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="26" font-weight="700">resist long-term</text>
+  <text x="600" y="782" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="26" font-weight="700">privacy risk</text>
+  <text x="970" y="706" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="25" font-weight="700">Follows</text>
+  <text x="970" y="739" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="25" font-weight="700">constraints of</text>
+  <text x="970" y="772" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="25" font-weight="700">today's Ethereum</text>
+  <text x="970" y="805" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="25" font-weight="700">wallet</text>
+
+  <rect x="70" y="860" width="320" height="210" rx="12" fill="#994B7E"/>
+  <rect x="430" y="860" width="340" height="210" rx="12" fill="#994B7E"/>
+  <rect x="810" y="860" width="320" height="210" rx="12" fill="#994B7E"/>
+  <text x="95" y="975" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="34" font-weight="700">Future</text>
+  <text x="600" y="940" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="24" font-weight="700">Protects recipient</text>
+  <text x="600" y="972" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="24" font-weight="700">discovery,</text>
+  <text x="600" y="1004" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="24" font-weight="700">payment</text>
+  <text x="600" y="1036" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="24" font-weight="700">unlinkability, and</text>
+  <text x="600" y="1068" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="24" font-weight="700">long-term privacy</text>
+  <text x="970" y="936" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="24" font-weight="700">Depends on</text>
+  <text x="970" y="968" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="24" font-weight="700">newer account</text>
+  <text x="970" y="1000" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="24" font-weight="700">models and</text>
+  <text x="970" y="1032" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="24" font-weight="700">execution</text>
+  <text x="970" y="1064" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="24" font-weight="700">standards</text>
+
+  <rect x="70" y="1100" width="320" height="120" rx="12" fill="#8D4CB0"/>
+  <rect x="430" y="1100" width="340" height="120" rx="12" fill="#8D4CB0"/>
+  <rect x="810" y="1100" width="320" height="120" rx="12" fill="#8D4CB0"/>
+  <text x="95" y="1172" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="34" font-weight="700">Summary</text>
+  <text x="600" y="1152" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="26" font-weight="700">Post-quantum</text>
+  <text x="600" y="1185" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="26" font-weight="700">recipient privacy</text>
+  <text x="600" y="1218" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="26" font-weight="700">today</text>
+  <text x="970" y="1152" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="26" font-weight="700">Classical spend</text>
+  <text x="970" y="1185" text-anchor="middle" fill="#F8FAFC" font-family="Trebuchet MS, Helvetica, Arial, sans-serif" font-size="26" font-weight="700">security for now</text>
+</svg>
