@@ -13,6 +13,8 @@ This page answers the question a new user usually has:
 
 **What exactly happens between “someone wants to pay me” and “I can spend the funds”?**
 
+![SPECTER six-step flow](/images/specter/payment-visuals.png)
+
 ## Step 1: you create your public receiving profile
 
 The backend key generation route creates two ML-KEM keypairs:
@@ -39,6 +41,8 @@ The flow is:
 2. Point your ENS or SuiNS record at that content.
 3. Let the sender resolve your name into your meta-address.
 
+![SPECTER setup sequence](/images/specter/setup.png)
+
 ## Step 3: the sender creates the payment
 
 This is the sender-side logic in `specter/specter-stealth/src/payment.rs`.
@@ -53,20 +57,7 @@ At a high level:
 4. They derive a one-time Ethereum address and Sui address from the shared secret plus your `spending_pk`.
 5. They package the ciphertext and `view_tag` into an announcement.
 
-```mermaid
-flowchart LR
-    A["meta-address"] --> B["read viewing_pk + spending_pk"]
-    B --> C["ML-KEM encapsulate(viewing_pk)"]
-    C --> D["ciphertext + shared secret"]
-    D --> E["compute view_tag"]
-    D --> F["derive one-time stealth address"]
-    E --> G["publish announcement"]
-    F --> H["send funds"]
-
-    style C fill:#0f766e,color:#fff
-    style F fill:#115e59,color:#fff
-    style G fill:#14b8a6,color:#fff
-```
+![SPECTER send flow](/images/specter/send.png)
 
 ## Step 4: the sender publishes the announcement
 
@@ -98,6 +89,8 @@ The scan process is:
 4. Derive the stealth output for the matching entries.
 
 The API surface for this is `POST /api/v1/stealth/scan`.
+
+![SPECTER receive flow](/images/specter/receive.png)
 
 ## Step 6: you recover a spendable result
 

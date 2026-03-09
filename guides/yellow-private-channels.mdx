@@ -11,19 +11,7 @@ If the previous page explained **why** Yellow matters, this page explains **how 
 
 ## The request flow
 
-```mermaid
-flowchart TD
-    A["POST /yellow/channel/create"] --> B["Resolve recipient input"]
-    B --> C["Create stealth address + announcement"]
-    C --> D["Attach channel_id"]
-    D --> E["Store announcement in registry"]
-    E --> F["POST /yellow/channel/discover"]
-    F --> G["Recipient recovers channel-linked discovery"]
-
-    style A fill:#0f766e,color:#fff
-    style C fill:#115e59,color:#fff
-    style G fill:#14b8a6,color:#fff
-```
+![Yellow request flow](/images/specter/yellow_inte.png)
 
 ## The main endpoints
 

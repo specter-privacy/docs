@@ -3,9 +3,7 @@ title: "SPECTER"
 description: "Private receiving for Ethereum and Sui, explained for real users first and integrators second"
 ---
 
-<Info>
-SPECTER is easiest to understand as a six-part flow: publish a meta-address, let the sender derive a one-time destination, send funds to that destination, publish an announcement, scan for matches, and recover the spendable result. The docs focus on the logic first so the visuals can be upgraded later without changing the underlying explanation.
-</Info>
+![SPECTER cover](/images/specter/cover-specter.png)
 
 ## Private payments, without asking users to become cryptographers
 
@@ -40,18 +38,7 @@ SPECTER changes the receiving side of that experience:
 3. The sender posts an **announcement** that only you can decode.
 4. You scan announcements and recover the payment meant for you.
 
-```mermaid
-flowchart LR
-    A["You publish a meta-address"] --> B["Sender derives one-time stealth address"]
-    B --> C["Sender sends funds"]
-    C --> D["Sender publishes announcement"]
-    D --> E["You scan and discover the payment"]
-
-    style A fill:#0f766e,color:#fff
-    style B fill:#115e59,color:#fff
-    style C fill:#14b8a6,color:#fff
-    style E fill:#0f766e,color:#fff
-```
+![SPECTER user journey](/images/specter/specter-user-jurney.png)
 
 ## What should a new user understand first?
 

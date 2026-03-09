@@ -54,19 +54,7 @@ That means the recovered spend result is still classical Ethereum key material.
 
 ## Visual boundary
 
-```mermaid
-flowchart LR
-    A["Meta-address"] --> B["ML-KEM encapsulation"]
-    B --> C["Stealth destination discovered privately"]
-    C --> D["Funds sit at one-time address"]
-    D --> E["Spend with Ethereum-compatible key"]
-
-    style A fill:#0f766e,color:#fff
-    style B fill:#0f766e,color:#fff
-    style C fill:#14b8a6,color:#fff
-    style D fill:#14b8a6,color:#fff
-    style E fill:#b45309,color:#fff
-```
+![Quantum defense visual](/images/specter/quantum-shield.png)
 
 Green side: stronger post-quantum posture.
 

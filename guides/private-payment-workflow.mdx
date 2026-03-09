@@ -17,19 +17,7 @@ description: "Operational guide for create, announce, and discover"
 
 ## End-to-end flow map
 
-```mermaid
-sequenceDiagram
-    participant Sender
-    participant API
-    participant Registry
-    participant Recipient
-    Sender->>API: resolve name -> meta-address
-    Sender->>API: POST /stealth/create
-    Sender->>Chain: send funds to stealth_address
-    Sender->>Registry: POST /registry/announcements
-    Recipient->>API: POST /stealth/scan
-    API-->>Recipient: discoveries + eth_private_key
-```
+![SPECTER end-to-end payment flow](/images/specter/protocol-flow-visual.png)
 
 ## Sender workflow
 
@@ -38,11 +26,15 @@ sequenceDiagram
 3. Send funds to returned `stealth_address`.
 4. Publish announcement with `ephemeral_key`, `view_tag`, and `tx_hash`.
 
+![SPECTER sender flow](/images/specter/send.png)
+
 ## Recipient workflow
 
 1. Keep `viewing_sk`, `spending_pk`, and `spending_sk` secure.
 2. Call `POST /api/v1/stealth/scan` periodically.
 3. Import `eth_private_key` into wallet if needed to move funds.
+
+![SPECTER recipient flow](/images/specter/receive.png)
 
 ## Verification checks
 

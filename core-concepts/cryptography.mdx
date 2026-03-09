@@ -80,18 +80,7 @@ So the filter rejects roughly `99.6%` of irrelevant entries before you do more e
 
 ## The simple mental model
 
-```mermaid
-flowchart TD
-    A["Sender reads viewing_pk"] --> B["ML-KEM shared secret"]
-    B --> C["view_tag for fast scanning"]
-    B --> D["one-time address derivation"]
-    C --> E["announcement"]
-    D --> F["stealth address"]
-
-    style B fill:#0f766e,color:#fff
-    style C fill:#115e59,color:#fff
-    style D fill:#14b8a6,color:#fff
-```
+![ML-KEM-768 cryptographic workflow](/images/specter/ml-kem-768-diagram.png)
 
 ## What SPECTER does not claim
 

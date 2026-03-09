@@ -34,17 +34,7 @@ With SPECTER + Yellow:
 - Alice binds the channel flow to that destination
 - Bob discovers the channel through the announcement path
 
-```mermaid
-flowchart LR
-    A["Alice wants a private channel"] --> B["Resolve Bob's meta-address"]
-    B --> C["Create Bob's stealth destination"]
-    C --> D["Bind channel id to announcement"]
-    D --> E["Bob scans and discovers it"]
-
-    style B fill:#0f766e,color:#fff
-    style C fill:#115e59,color:#fff
-    style E fill:#14b8a6,color:#fff
-```
+![Yellow integration flow](/images/specter/yellow_inte.png)
 
 ## What is implemented today
 
