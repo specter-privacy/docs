@@ -4,8 +4,8 @@ description: "Current auth model, error contract, and production hardening check
 ---
 
 <CardGroup cols={3}>
-  <Card title="No built-in auth" icon="lock-open">
-    API routes currently do not require API keys, JWTs, or wallet signatures.
+  <Card title="Optional API key auth" icon="lock">
+    Write endpoints require an API key when `API_KEY` is configured in the environment.
   </Card>
   <Card title="Stable error envelope" icon="triangle-exclamation">
     Errors return a consistent JSON body with `code` and `message`.

@@ -1,0 +1,173 @@
+---
+title: "Architecture"
+description: "How SPECTER is built: crates, frontend, deployment, and data flow"
+---
+
+## System overview
+
+SPECTER is a Rust backend + React frontend with a clean separation between cryptographic operations, API surface, and storage.
+
+```mermaid
+flowchart TD
+    subgraph Frontend["Frontend (React + TypeScript)"]
+        UI["SPECTER Web App"]
+    end
+
+    subgraph API["API Layer (Axum)"]
+        Routes["REST Endpoints"]
+        MW["Middleware\n(Rate limit, CORS, Auth)"]
+    end
+
+    subgraph Core["Core Crates"]
+        Crypto["specter-crypto\n(ML-KEM-768)"]
+        Stealth["specter-stealth\n(Payment + Discovery)"]
+        Scanner["specter-scanner\n(Batch processing)"]
+    end
+
+    subgraph Storage["Storage & Services"]
+        Registry["specter-registry\n(Turso / Memory)"]
+        Cache["specter-cache\n(Lock-free)"]
+        IPFS["specter-ipfs\n(Pinata)"]
+    end
+
+    subgraph Names["Name Services"]
+        ENS["specter-ens"]
+        SuiNS["specter-suins"]
+    end
+
+    subgraph Integration["Integrations"]
+        Yellow["specter-yellow\n(Private channels)"]
+    end
+
+    UI --> Routes
+    Routes --> MW
+    MW --> Stealth
+    Stealth --> Crypto
+    MW --> Scanner
+    Scanner --> Registry
+    Scanner --> Crypto
+    MW --> ENS
+    MW --> SuiNS
+    ENS --> IPFS
+    SuiNS --> IPFS
+    MW --> Yellow
+    Yellow --> Stealth
+    Stealth --> Registry
+    Registry --> Cache
+
+    style Crypto fill:#0F766E,color:#fff
+    style Stealth fill:#0F766E,color:#fff
+```
+
+## The Rust workspace
+
+SPECTER's backend is organized as a Cargo workspace with 12 crates. Each crate has a single responsibility:
+
+| Crate | Purpose |
+|-------|---------|
+| **specter-core** | Shared types (`KeyPair`, `MetaAddress`, `Announcement`), error types, constants |
+| **specter-crypto** | ML-KEM-768 encapsulation/decapsulation, view tags, SHAKE-256 derivation |
+| **specter-stealth** | Payment creation (`create_stealth_payment`) and discovery (`scan_announcement`) |
+| **specter-scanner** | Batch scanning with progress callbacks, resumable scans |
+| **specter-registry** | Announcement storage: in-memory (dev) or Turso/libSQL (production) |
+| **specter-cache** | Lock-free concurrent caching via `dashmap` |
+| **specter-ens** | ENS name resolution to IPFS-hosted meta-addresses |
+| **specter-suins** | SuiNS name resolution |
+| **specter-ipfs** | IPFS meta-address storage via Pinata gateway |
+| **specter-yellow** | Yellow Network private channel integration |
+| **specter-api** | Axum REST server, route handlers, middleware, DTOs |
+| **specter-cli** | CLI tool for generate, create, scan, bench, serve |
+
+## Data flow
+
+### Sending a payment
+
+```mermaid
+sequenceDiagram
+    participant Sender
+    participant API as SPECTER API
+    participant Crypto as specter-crypto
+    participant Registry as specter-registry
+
+    Sender->>API: POST /stealth/create {meta_address}
+    API->>Crypto: encapsulate(viewing_pk)
+    Crypto-->>API: ciphertext + shared_secret
+    API->>Crypto: derive_stealth_address(spending_pk, shared_secret)
+    Crypto-->>API: stealth_address + view_tag
+    API-->>Sender: {stealth_address, ephemeral_ciphertext, view_tag}
+
+    Note over Sender: Sends ETH/tokens to stealth_address
+
+    Sender->>API: POST /registry/announcements
+    API->>Registry: store(announcement)
+```
+
+### Scanning for payments
+
+```mermaid
+sequenceDiagram
+    participant Recipient
+    participant API as SPECTER API
+    participant Scanner as specter-scanner
+    participant Registry as specter-registry
+    participant Crypto as specter-crypto
+
+    Recipient->>API: POST /stealth/scan {viewing_sk, spending_pk, spending_sk}
+    API->>Scanner: scan(keys)
+    Scanner->>Registry: load announcements
+
+    loop For each announcement
+        Scanner->>Crypto: decapsulate(ciphertext, viewing_sk)
+        Crypto-->>Scanner: shared_secret
+        Scanner->>Crypto: compute_view_tag(shared_secret)
+        alt view_tag matches
+            Scanner->>Crypto: derive_stealth_keys(spending_sk, shared_secret)
+            Crypto-->>Scanner: stealth_private_key
+        else view_tag doesn't match
+            Note over Scanner: Skip (~99.6% of announcements)
+        end
+    end
+
+    Scanner-->>API: discovered_payments[]
+    API-->>Recipient: [{stealth_address, eth_private_key, ...}]
+```
+
+## Frontend
+
+The React frontend (`SPECTER-web/`) provides:
+
+- **Generate Keys** page - Create ML-KEM keypairs and save encrypted to browser
+- **Send Payment** page - Resolve names, create stealth payments
+- **Scan Payments** page - Discover incoming payments
+- **Yellow** page - Private channel management
+
+Keys are stored in an encrypted browser vault using AES-GCM. The frontend calls the same REST API documented in the API reference.
+
+## Deployment
+
+The backend runs on Google Cloud Run:
+
+- Docker multi-stage build (Rust 1.88 builder + Debian slim runtime)
+- Auto-scaling: 0-10 instances
+- 512Mi memory, 1 CPU per instance
+- Concurrency: 80 requests per instance
+- Turso (libSQL) for production announcement storage
+- Secrets managed via Google Secret Manager
+
+## Registry backends
+
+| Backend | Use case | Config |
+|---------|----------|--------|
+| Memory | Development, testing | `REGISTRY_BACKEND=memory` (default) |
+| Turso | Production | `REGISTRY_BACKEND=turso` + `TURSO_DATABASE_URL` |
+
+The registry interface is pluggable. Both backends implement the same `AnnouncementRegistry` trait, so the rest of the system doesn't care which one is active.
+
+<CardGroup cols={2}>
+  <Card title="Development setup" icon="wrench" href="/build/development-setup">
+    Set up the backend and frontend locally.
+  </Card>
+  <Card title="API reference" icon="code" href="/api/introduction">
+    Full endpoint documentation.
+  </Card>
+</CardGroup>

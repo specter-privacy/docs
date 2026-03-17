@@ -1,0 +1,105 @@
+---
+title: "Development Setup"
+description: "Set up the SPECTER workspace for local development, testing, and contribution"
+---
+
+## Prerequisites
+
+- Rust 1.88+ (`rustup update stable`)
+- Node.js 18+ (for frontend)
+- Git
+
+## Clone and build
+
+```bash
+git clone https://github.com/pranshurastogi/SPECTER.git
+cd SPECTER/specter
+cargo build
+```
+
+The workspace compiles 12 crates. First build takes a few minutes; subsequent builds are incremental.
+
+## Run tests
+
+```bash
+cargo test
+```
+
+This runs the full test suite (~195 tests) across all crates. Tests cover:
+- ML-KEM key generation, encapsulation, decapsulation
+- Stealth address derivation and scanning
+- View tag computation and verification
+- API route handlers
+- Registry backends
+- Name service resolution
+- Yellow channel operations
+
+## Run the API server locally
+
+```bash
+cp .env.example .env
+# Edit .env if you want to configure Pinata, Turso, etc.
+# Default: memory registry, no external dependencies needed
+
+cargo run --bin specter-cli -- serve
+```
+
+Server starts on `http://localhost:3001`. The memory registry works out of the box for development.
+
+## Workspace structure
+
+```
+specter/
+├── specter-core/       # Shared types, errors, constants
+├── specter-crypto/     # ML-KEM-768, SHAKE-256, view tags
+├── specter-stealth/    # Payment creation and discovery logic
+├── specter-scanner/    # Batch scanning engine
+├── specter-registry/   # Announcement storage (memory + Turso)
+├── specter-cache/      # Lock-free concurrent cache
+├── specter-ens/        # ENS name resolution
+├── specter-suins/      # SuiNS name resolution
+├── specter-ipfs/       # IPFS via Pinata
+├── specter-yellow/     # Yellow Network integration
+├── specter-api/        # Axum REST server
+└── specter-cli/        # CLI tool
+```
+
+## Frontend development
+
+```bash
+cd SPECTER-web
+npm install
+npm run dev
+```
+
+Frontend runs on `http://localhost:5173`. Edit `VITE_API_URL` in `.env` to point at your local backend.
+
+## Scripts
+
+The `scripts/` directory has helpers:
+
+| Script | Purpose |
+|--------|---------|
+| `build-and-test.sh` | Build all crates + run tests |
+| `e2e-stealth-flow.sh` | Full end-to-end payment test |
+| `interactive-ens-test.sh` | ENS resolution demo |
+| `rebuild-backend.sh` | Quick backend rebuild |
+
+## CI/CD
+
+GitHub Actions runs on every push to main and on PRs:
+
+1. `rustfmt` - Code formatting check
+2. `clippy` - Lint with warnings-as-errors
+3. `cargo test` - Full test suite
+
+Make sure `cargo fmt --check` and `cargo clippy -- -D warnings` pass before pushing.
+
+<CardGroup cols={2}>
+  <Card title="Contributing" icon="git-alt" href="/build/contributing">
+    PR workflow and conventions.
+  </Card>
+  <Card title="Architecture" icon="sitemap" href="/how-it-works/architecture">
+    How the crates connect.
+  </Card>
+</CardGroup>

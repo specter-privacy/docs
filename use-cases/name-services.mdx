@@ -1,0 +1,105 @@
+---
+title: "Name Services"
+description: "How SPECTER integrates with ENS and SuiNS for human-readable stealth payments"
+---
+
+## Pay by name, not by hex
+
+Nobody wants to share a 2,368-byte hex string. SPECTER integrates with ENS (Ethereum Name Service) and SuiNS (Sui Name Service) so senders can just use a name like `alice.eth` or `alice.sui`.
+
+```mermaid
+flowchart LR
+    A["Sender enters\nalice.eth"] --> B["ENS resolves to\nIPFS CID"]
+    B --> C["IPFS returns\nmeta-address"]
+    C --> D["SPECTER derives\nstealth address"]
+
+    style A fill:#0F766E,color:#fff
+    style D fill:#0F766E,color:#fff
+```
+
+## How it works
+
+1. You upload your meta-address to IPFS (via Pinata gateway)
+2. You set your ENS or SuiNS text record to point at the IPFS content hash (CID)
+3. A sender resolves your name, fetches the meta-address from IPFS, and proceeds with normal stealth payment creation
+
+The API handles the resolution automatically:
+
+```bash
+# Resolve an ENS name
+curl -s -X POST https://backend.specterpq.com/api/v1/ens/resolve \
+  -H "Content-Type: application/json" \
+  -d '{"name": "alice.eth"}' | jq .
+
+# Resolve a SuiNS name
+curl -s -X POST https://backend.specterpq.com/api/v1/suins/resolve \
+  -H "Content-Type: application/json" \
+  -d '{"name": "alice.sui"}' | jq .
+```
+
+## ENS setup
+
+<Steps>
+  <Step title="Upload meta-address to IPFS" icon="upload">
+    ```bash
+    curl -s -X POST https://backend.specterpq.com/api/v1/ipfs/upload \
+      -H "Content-Type: application/json" \
+      -d '{"meta_address": "<YOUR_META_ADDRESS>"}' | jq .
+    ```
+    Save the returned IPFS CID.
+  </Step>
+  <Step title="Set ENS text record" icon="pen">
+    Go to the [ENS Manager App](https://app.ens.domains) and set a text record on your name:
+    - Key: `specter.meta-address`
+    - Value: the IPFS CID from step 1
+  </Step>
+  <Step title="Verify resolution" icon="check">
+    ```bash
+    curl -s -X POST https://backend.specterpq.com/api/v1/ens/resolve \
+      -H "Content-Type: application/json" \
+      -d '{"name": "yourname.eth"}' | jq .
+    ```
+  </Step>
+</Steps>
+
+## SuiNS setup
+
+Same pattern, different name service:
+
+<Steps>
+  <Step title="Upload meta-address to IPFS" icon="upload">
+    Same as ENS: upload via the IPFS endpoint and save the CID.
+  </Step>
+  <Step title="Set SuiNS record" icon="pen">
+    Configure your SuiNS name to include the IPFS CID pointing to your meta-address.
+  </Step>
+  <Step title="Verify resolution" icon="check">
+    ```bash
+    curl -s -X POST https://backend.specterpq.com/api/v1/suins/resolve \
+      -H "Content-Type: application/json" \
+      -d '{"name": "yourname.sui"}' | jq .
+    ```
+  </Step>
+</Steps>
+
+## IPFS endpoints
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/v1/ipfs/upload` | Upload meta-address, returns IPFS CID |
+| `GET /api/v1/ipfs/fetch/:cid` | Fetch meta-address by CID |
+
+SPECTER uses Pinata as the IPFS gateway. The backend needs `PINATA_JWT`, `PINATA_GATEWAY_URL`, and `PINATA_GATEWAY_TOKEN` environment variables configured.
+
+## Why IPFS?
+
+Meta-addresses are ~2.4 KB (two ML-KEM public keys). Storing that directly in ENS text records works but is gas-expensive. IPFS stores the full payload off-chain with a small CID on-chain, keeping costs reasonable.
+
+<CardGroup cols={2}>
+  <Card title="Private payments" icon="shield" href="/use-cases/private-payments">
+    How the full payment flow works with name resolution.
+  </Card>
+  <Card title="API reference" icon="code" href="/api/nameservice">
+    Full ENS and SuiNS endpoint documentation.
+  </Card>
+</CardGroup>

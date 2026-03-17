@@ -1,25 +1,27 @@
 ---
-title: "Integration quickstart"
-description: "Run the full hosted flow: keygen, create, publish, and scan"
+title: "API Quickstart"
+description: "Run the full SPECTER flow in four API calls against the hosted backend"
 ---
 
-<CardGroup cols={3}>
-  <Card title="Launch app" icon="globe" href="https://specterpq.com/">
-    Follow the same journey in the hosted UI.
-  </Card>
-  <Card title="API introduction" icon="code" href="/api/introduction">
-    Keep the route map open while you test.
-  </Card>
-  <Card title="FAQ" icon="circle-question" href="/faq">
-    Check the fast answers if a response surprises you.
-  </Card>
-</CardGroup>
-
 <Note>
-This quickstart uses the hosted backend at `https://backend.specterpq.com`.
+This quickstart uses the hosted backend at `https://backend.specterpq.com`. For local development, see [Development Setup](/build/development-setup).
 </Note>
 
-## Step 1: generate recipient keys
+## The full flow in 4 steps
+
+```mermaid
+flowchart LR
+    A["Generate\nkeys"] --> B["Create stealth\npayment"]
+    B --> C["Publish\nannouncement"]
+    C --> D["Scan &\nrecover"]
+
+    style A fill:#0F766E,color:#fff
+    style B fill:#14B8A6,color:#fff
+    style C fill:#0F766E,color:#fff
+    style D fill:#14B8A6,color:#fff
+```
+
+### Step 1: Generate recipient keys
 
 ```bash
 curl -s -X POST https://backend.specterpq.com/api/v1/keys/generate | tee /tmp/specter-keys.json
@@ -29,7 +31,9 @@ SPENDING_PK=$(jq -r '.spending_pk' /tmp/specter-keys.json)
 SPENDING_SK=$(jq -r '.spending_sk' /tmp/specter-keys.json)
 ```
 
-## Step 2: create the stealth payload
+This creates two ML-KEM-768 keypairs and bundles the public keys into a `meta_address`.
+
+### Step 2: Create the stealth payload
 
 ```bash
 curl -s -X POST https://backend.specterpq.com/api/v1/stealth/create \
@@ -42,7 +46,9 @@ STEALTH_ADDRESS=$(jq -r '.stealth_address' /tmp/specter-create.json)
 echo "Stealth destination: $STEALTH_ADDRESS"
 ```
 
-## Step 3: publish the announcement
+The API encapsulates to the recipient's `viewing_pk`, derives a shared secret, and computes the stealth address + view tag.
+
+### Step 3: Publish the announcement
 
 ```bash
 curl -s -X POST https://backend.specterpq.com/api/v1/registry/announcements \
@@ -50,7 +56,7 @@ curl -s -X POST https://backend.specterpq.com/api/v1/registry/announcements \
   -d "{\"ephemeral_key\":\"$EPHEMERAL_KEY\",\"view_tag\":$VIEW_TAG,\"tx_hash\":\"0x1111111111111111111111111111111111111111111111111111111111111111\",\"amount\":\"0.01\",\"chain\":\"ethereum\"}" | jq .
 ```
 
-## Step 4: scan and recover the discovery
+### Step 4: Scan and recover
 
 ```bash
 curl -s -X POST https://backend.specterpq.com/api/v1/stealth/scan \
@@ -58,12 +64,34 @@ curl -s -X POST https://backend.specterpq.com/api/v1/stealth/scan \
   -d "{\"viewing_sk\":\"$VIEWING_SK\",\"spending_pk\":\"$SPENDING_PK\",\"spending_sk\":\"$SPENDING_SK\"}" | jq .
 ```
 
-Expected result:
-
-- one discovery
-- `stealth_address` matches the create step
-- sensitive material such as `eth_private_key` is present in the scan result
+You should see:
+- One discovery in the results
+- `stealth_address` matching what you got in step 2
+- `eth_private_key` for spending the funds
 
 <Warning>
-Treat the scan response like wallet secret material. Do not log or expose it in client analytics.
+Treat the scan response like wallet secret material. The `eth_private_key` and `stealth_sk` fields can spend real funds. Don't log them or expose them in client analytics.
 </Warning>
+
+## What just happened?
+
+You ran the complete SPECTER protocol:
+
+1. **Key generation** - Created ML-KEM-768 keypairs
+2. **Payment creation** - Used ML-KEM encapsulation to derive a one-time stealth address
+3. **Announcement** - Published the encrypted breadcrumb
+4. **Scanning** - Used view tag filtering + ML-KEM decapsulation to find and recover the payment
+
+The stealth address from step 2 has no visible link to the meta-address from step 1. That's the privacy.
+
+<CardGroup cols={3}>
+  <Card title="Full protocol explanation" icon="sitemap" href="/how-it-works/protocol-flow">
+    Understand each step in depth.
+  </Card>
+  <Card title="API reference" icon="code" href="/api/introduction">
+    Full endpoint documentation.
+  </Card>
+  <Card title="Integration guide" icon="wrench" href="/build/integration-guide">
+    Build SPECTER into your app.
+  </Card>
+</CardGroup>

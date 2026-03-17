@@ -1,0 +1,82 @@
+---
+title: "Research Notes"
+description: "Design decisions, research context, and technical writing about SPECTER's architecture"
+---
+
+## Receiving is PQ-safe, spending is not (yet)
+
+*March 2026*
+
+SPECTER's security model has a deliberate split: the receiving/discovery layer uses ML-KEM-768 (post-quantum), while the spending path uses secp256k1 (classical). This isn't a bug. It's a pragmatic design choice.
+
+### Why the split exists
+
+Ethereum wallets only understand secp256k1 signatures. To make stealth addresses spendable in existing wallets, SPECTER derives a secp256k1 private key from the ML-KEM shared secret. The derivation path:
+
+```
+ML-KEM shared secret
+  → SHAKE-256("SPECTER_STEALTH_PK" || shared_secret)
+    → secp256k1 seed
+      → Ethereum private key + address
+```
+
+This gives you a wallet-compatible output today while protecting the discovery layer against future quantum attacks.
+
+### Why receiving matters more
+
+The receiving path's artifacts (ciphertexts, announcements) are **permanent and public**. Anyone can collect them. If they become breakable later, all historical privacy is retroactively lost.
+
+The spending path is different: by the time a quantum computer could attack the secp256k1 key, the funds are typically already moved. The exposure window is much smaller.
+
+### The closing path
+
+ERC-4337 smart accounts can use custom verification logic. A SPECTER smart account could verify ML-DSA signatures instead of ECDSA. That's the near-term path to fully post-quantum spending, without waiting for Ethereum consensus changes.
+
+See the [ERC Proposal](/deep-dive/erc-proposal) for the formal specification, and [Security Boundaries](/how-it-works/security-boundaries) for the full analysis.
+
+---
+
+## Design note: Why SHAKE-256 for key derivation
+
+SPECTER uses SHAKE-256 (a NIST-standardized extendable-output function) for all key derivations with domain separation:
+
+- `"SPECTER_VIEW_TAG"` for view tag computation
+- `"SPECTER_STEALTH_PK"` for stealth key derivation
+
+Domain separation prevents cross-protocol attacks where the same shared secret might produce colliding outputs in different contexts. SHAKE-256 provides 128-bit post-quantum security at 256-bit output length.
+
+---
+
+## Design note: Why deterministic rekeying, not additive offsets
+
+Classical stealth systems use additive key offsets: `sk_stealth = sk_spend + hash`. This works because secp256k1 keys are scalars in a cyclic group.
+
+Lattice-based keys (ML-DSA, ML-KEM) are structured polynomial matrices. Adding an arbitrary scalar doesn't preserve the keypair relationship. There's no lattice equivalent of the "add a scalar to the private key" trick.
+
+SPECTER instead uses **deterministic rekeying**:
+
+```
+seed = SHAKE-256(domain || PK_spend || shared_secret_hash)
+(sk_stealth, PK_stealth) = KeyGen(seed)
+```
+
+This produces a fresh, valid keypair that's:
+- Unlinkable to the original spending key
+- Deterministically reproducible by the recipient
+- Not derivable by the sender (who doesn't know `sk_spend`)
+
+---
+
+## Reference: Key research papers
+
+| Paper | Relevance |
+|-------|-----------|
+| [FIPS 203 (ML-KEM)](https://csrc.nist.gov/pubs/fips/203/final) | The NIST standard SPECTER implements |
+| [ERC-5564](https://eips.ethereum.org/EIPS/eip-5564) | The stealth address standard SPECTER extends |
+| [ERC-6538](https://eips.ethereum.org/EIPS/eip-6538) | Stealth meta-address registry |
+| [Stealth Addresses Research (2501.13733)](https://arxiv.org/pdf/2501.13733v1) | Post-quantum stealth address analysis |
+| [ERC-4337](https://eips.ethereum.org/EIPS/eip-4337) | Account abstraction for PQ spending path |
+
+<Card title="ERC Proposal" icon="scroll" href="/deep-dive/erc-proposal">
+  The formal specification for schemeId 2 (ML-KEM extension of ERC-5564).
+</Card>

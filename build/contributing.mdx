@@ -1,0 +1,46 @@
+---
+title: "Contributing"
+description: "How to contribute to SPECTER: PR workflow, code standards, and what we look for"
+---
+
+## Getting started
+
+1. Fork the [repository](https://github.com/pranshurastogi/SPECTER)
+2. Create a feature branch from `main`
+3. Make your changes
+4. Run `cargo fmt` and `cargo clippy -- -D warnings`
+5. Run `cargo test` and make sure everything passes
+6. Open a PR against `main`
+
+## Code standards
+
+- **No unsafe code.** Every crate enforces `#![forbid(unsafe_code)]`.
+- **Formatting.** Run `cargo fmt` before committing.
+- **Linting.** `cargo clippy -- -D warnings` must pass with zero warnings.
+- **Tests.** New functionality needs tests. Bug fixes need regression tests.
+- **Documentation.** Only document verified behavior. If a feature isn't implemented, don't document it as working.
+
+## What to work on
+
+Check the [roadmap](/roadmap/yet-to-implement) for planned features. Good first contributions:
+
+- Additional chain support (Arbitrum, Base, Optimism address derivation)
+- Performance improvements in the scanner
+- Frontend accessibility improvements
+- Test coverage for edge cases
+
+## PR review
+
+PRs are reviewed for:
+- Correctness (does it do what it claims?)
+- Security (no new timing channels, no secret key leaks)
+- Compatibility (does it break existing API contracts?)
+- Tests (is the new behavior tested?)
+
+## Documentation changes
+
+If you change API behavior or add features, update the corresponding docs in this folder. Run `npx mintlify dev` locally to preview.
+
+## Questions?
+
+Open an issue on [GitHub](https://github.com/pranshurastogi/SPECTER/issues) or reach out on [X @pranshurastogii](https://x.com/pranshurastogii).

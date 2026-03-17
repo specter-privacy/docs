@@ -1,0 +1,90 @@
+---
+title: "How SPECTER Works"
+description: "The plain-language version of stealth addresses, meta-addresses, and announcements"
+---
+
+<Info>
+Think of SPECTER as a private mailbox system. You put up a public sign that says "send mail here," but every letter gets routed to a different, secret mailbox that only you can open.
+</Info>
+
+## SPECTER is not a chain, a token, or a new wallet
+
+It's a **private receiving layer**. You publish one public profile, and each sender turns it into a different one-time address. To everyone else, the payment lands at an address that looks unrelated to you.
+
+## Three concepts, that's it
+
+### 1. Meta-address (your public profile)
+
+Your meta-address is what you share with the world. It contains two public keys:
+
+- **Spending public key** - used to derive where the money goes
+- **Viewing public key** - used to create a shared secret with the sender
+
+You can attach it to your ENS name (`alice.eth`) or SuiNS name (`alice.sui`) so senders just need to know your name.
+
+### 2. Stealth address (the one-time destination)
+
+When someone wants to pay you, they take your meta-address and mathematically derive a brand-new address. This address has never appeared on-chain before and can't be linked back to your meta-address without your private keys.
+
+The sender sends ETH or tokens to this address. Done.
+
+### 3. Announcement (the coded breadcrumb)
+
+After sending, the sender posts a small piece of data (an announcement) that contains an encrypted hint. You can scan all announcements using your private viewing key, quickly filter out the ones that aren't for you, and find your payments.
+
+## The full flow in one picture
+
+<Frame caption="The complete SPECTER user journey: from key setup to spending recovered funds">
+  ![SPECTER user journey](/images/specter/specter-user-jurney.png)
+</Frame>
+
+## Step by step
+
+<Steps>
+  <Step title="Set up your profile" icon="key">
+    Generate your ML-KEM key pairs (spending + viewing). Bundle the public keys into a meta-address. Optionally link it to your ENS or SuiNS name.
+
+    ![Setup flow](/images/specter/Setup-image.png)
+  </Step>
+  <Step title="Sender creates a payment" icon="paper-plane">
+    The sender fetches your meta-address, runs ML-KEM encapsulation to create a shared secret, and derives a fresh stealth address from it. They also compute a 1-byte view tag for fast filtering.
+
+    ![Send flow](/images/specter/Send-image.png)
+  </Step>
+  <Step title="Sender posts an announcement" icon="bell">
+    The sender publishes the encrypted ciphertext and view tag to the announcement registry. This is the breadcrumb you'll use to find the payment.
+  </Step>
+  <Step title="You scan and recover" icon="radar">
+    You scan the registry with your viewing key. The view tag filters out ~99.6% of irrelevant announcements instantly. For the matches, you decapsulate the shared secret and derive the private key for your stealth address.
+
+    ![Receive flow](/images/specter/Scan-image.png)
+  </Step>
+</Steps>
+
+## What makes this post-quantum?
+
+The shared secret between sender and recipient is created using **ML-KEM-768**, not classical ECDH. ML-KEM is based on lattice math that quantum computers can't efficiently crack (no known algorithm exists). The ciphertext sitting on-chain is safe even against future quantum attackers.
+
+<Frame caption="ML-KEM-768: How the sender and recipient derive a shared secret without classical key exchange">
+  ![ML-KEM-768 diagram](/images/specter/ml-kem-768-diagram.png)
+</Frame>
+
+## The honest picture
+
+<Warning>
+SPECTER today provides **post-quantum recipient privacy** with **classical spend security**. The receiving/discovery layer uses ML-KEM-768. The wallet-compatible spending key is still secp256k1 for Ethereum compatibility. Read more in [Security Boundaries](/how-it-works/security-boundaries).
+</Warning>
+
+## What you should read next
+
+<CardGroup cols={3}>
+  <Card title="Full protocol flow" icon="sitemap" href="/how-it-works/protocol-flow">
+    Every step with code references and diagrams.
+  </Card>
+  <Card title="Try it yourself" icon="play" href="/explore/playground">
+    Hit the live API and see it work.
+  </Card>
+  <Card title="SPECTER vs others" icon="scale-balanced" href="/why-specter/specter-vs-others">
+    How we compare to Umbra and Fluidkey.
+  </Card>
+</CardGroup>

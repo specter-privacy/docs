@@ -1,74 +1,151 @@
 ---
-title: "Yet to implement roadmap"
-description: "Roadmap items that are planned but not implemented in the current codebase"
+title: "Roadmap"
+sidebarTitle: "Roadmap"
+description: "Where SPECTER is headed: planned features, research tracks, and how you can contribute ideas"
 ---
 
-<Warning>
-These features are roadmap-only today. They are not implemented modules in the current Rust workspace.
-</Warning>
+## What's live today
 
-## Scope in this page
-
-<CardGroup cols={2}>
-  <Card title="OAPA" icon="flag">
-    One address per application identity derivation.
+<CardGroup cols={3}>
+  <Card title="ML-KEM-768 stealth addresses" icon="shield-check">
+    Post-quantum key generation, stealth payment creation, and announcement scanning.
   </Card>
-  <Card title="PQ account abstraction wallet" icon="shield-halved">
-    Post-quantum smart account wallet track.
+  <Card title="ENS + SuiNS integration" icon="link">
+    Name resolution for human-readable stealth payments on Ethereum and Sui.
   </Card>
-  <Card title="Privacy keystore" icon="box">
-    Encrypted privacy-preserving keystore system.
-  </Card>
-  <Card title="Migration contracts" icon="link">
-    Legacy-to-post-quantum migration contract flow.
+  <Card title="Yellow private channels" icon="chart-line">
+    Private channel creation and discovery with stealth-linked announcements.
   </Card>
 </CardGroup>
 
-## Verification status
+---
 
-| Feature | Implemented now | Status | Priority |
-| --- | --- | --- | --- |
-| OAPA | No | Planned | High |
-| PQ account abstraction wallet | No | Planned | High |
-| Privacy keystore | No | Planned | Medium |
-| Migration contracts | No | Planned | High |
-
-## Suggested implementation sequence
+## Near-term: In active development
 
 <Steps>
-  <Step title="Identity lane">
-    Add OAPA derivation primitives and deterministic app-scoped identity APIs.
+  <Step title="PQ smart account wallet (ERC-4337)" icon="wallet">
+    **Priority: High**
+
+    Smart accounts with ML-DSA-65 signature verification inside `validateUserOp`. This closes the classical spending gap by removing the secp256k1 dependency for the spend path.
+
+    The [ERC proposal](/deep-dive/erc-proposal) already specifies deterministic stealth key derivation compatible with ML-DSA-65.
   </Step>
-  <Step title="Wallet lane">
-    Introduce post-quantum account abstraction wallet contracts and validation flow.
+  <Step title="One Address Per Application (OAPA)" icon="fingerprint">
+    **Priority: High**
+
+    Deterministic, application-scoped identity derivation from a single master meta-address. Each dApp or service gets its own isolated stealth identity without requiring separate key management.
+
+    Use case: A user has one SPECTER profile but each DeFi protocol, exchange, or service sees a different address.
   </Step>
-  <Step title="Storage lane">
-    Add privacy keystore encryption and key rotation paths.
+  <Step title="L2 chain expansion" icon="layer-group">
+    **Priority: High**
+
+    Bring stealth addresses to Arbitrum, Base, and Optimism. The same meta-address already derives valid addresses for any EVM chain. The work is in registry support, frontend chain-switching, and gas optimization.
   </Step>
-  <Step title="Migration lane">
-    Ship legacy-to-PQ migration contracts and registry tooling.
+  <Step title="Privacy keystore" icon="lock">
+    **Priority: Medium**
+
+    Encrypted keystore system for managing multiple stealth identities with key rotation support. Hardware wallet integration for the master keys.
   </Step>
 </Steps>
 
-## Roadmap lanes
+---
 
-```mermaid
-flowchart LR
-    A["Identity lane"] --> A1["OAPA"]
-    B["Wallet lane"] --> B1["PQ account abstraction wallet"]
-    C["Storage lane"] --> C1["Privacy keystore"]
-    D["Migration lane"] --> D1["Migration contracts"]
-```
+## Mid-term: Research and design phase
 
 <AccordionGroup>
-  <Accordion title="Why these are marked not implemented">
-    The current workspace crate list does not include dedicated modules implementing OAPA, PQ account abstraction wallet contracts, privacy keystore, or migration contracts.
+  <Accordion title="Legacy-to-PQ migration contracts" icon="arrows-rotate">
+    Smart contracts that help existing ERC-5564 schemeId 1 users migrate to schemeId 2 (ML-KEM). The migration path needs to handle re-registration of meta-addresses in the ERC-6538 registry without breaking existing payment channels.
   </Accordion>
-  <Accordion title="When to move a feature out of this page">
-    Move a feature to standard docs only after code lands in the workspace with tests and API/CLI usage paths.
+  <Accordion title="Cross-chain stealth transfers" icon="bridge">
+    Send from Ethereum, receive privately on Sui (or any supported chain). The ML-KEM shared secret can derive addresses for multiple chains from a single encapsulation. The challenge is bridging the announcement data across chains.
+  </Accordion>
+  <Accordion title="Mobile SDK" icon="mobile">
+    Native iOS/Android SDK wrapping the Rust crypto core via FFI. Focus on key management (secure enclave integration), scanning efficiency on mobile networks, and push notifications for discovered payments.
+  </Accordion>
+  <Accordion title="Browser extension" icon="puzzle-piece">
+    Lightweight extension for stealth address creation and scanning without visiting the full app. Auto-detect ENS names on web pages and offer one-click stealth payments.
+  </Accordion>
+  <Accordion title="Batch announcement compression" icon="file-zipper">
+    Reduce on-chain costs by batching multiple announcements into Merkle trees. Recipients prove membership to discover their payment. Could reduce per-announcement gas by 60-80%.
   </Accordion>
 </AccordionGroup>
 
-<Info>
-This page is the canonical place for high-impact roadmap items that are planned but not shipped.
-</Info>
+---
+
+## Long-term vision
+
+```mermaid
+flowchart TD
+    subgraph Today["Live Now"]
+        A["ML-KEM-768\nstealth addresses"]
+        B["ENS + SuiNS"]
+        C["Yellow channels"]
+        D["View tag scanning"]
+    end
+
+    subgraph Near["Near-term"]
+        E["PQ smart account\nwallet (ERC-4337)"]
+        F["OAPA identity"]
+        G["L2 expansion"]
+        H["Privacy keystore"]
+    end
+
+    subgraph Mid["Mid-term"]
+        I["Migration contracts"]
+        J["Cross-chain stealth"]
+        K["Mobile SDK"]
+        L["Browser extension"]
+    end
+
+    subgraph Long["Long-term"]
+        M["Full PQ end-to-end\n(EIP-8141)"]
+        N["Private prediction\nmarkets"]
+        O["Private payroll\ninfrastructure"]
+        P["Stealth DeFi\ncomposability"]
+    end
+
+    Today --> Near --> Mid --> Long
+
+    style Today fill:#0F766E,color:#fff
+    style Near fill:#14B8A6,color:#fff
+    style Mid fill:#0d9488,color:#fff
+    style Long fill:#115E59,color:#fff
+```
+
+---
+
+## Feature status tracker
+
+| Feature | Status | Priority | Target |
+|---------|--------|----------|--------|
+| ML-KEM-768 receive/discover | **Live** | - | - |
+| ENS + SuiNS resolution | **Live** | - | - |
+| Yellow private channels | **Partial** (create/discover live) | - | - |
+| View tag scanning | **Live** | - | - |
+| PQ smart account wallet | Research | High | Q2 2026 |
+| OAPA identity | Design | High | Q2 2026 |
+| Arbitrum / Base / Optimism | Planned | High | Q2 2026 |
+| Privacy keystore | Design | Medium | Q3 2026 |
+| Migration contracts | Research | High | Q3 2026 |
+| Cross-chain stealth | Research | Medium | Q3 2026 |
+| Mobile SDK | Planned | Medium | Q4 2026 |
+| Browser extension | Planned | Medium | Q4 2026 |
+| Full PQ spending (EIP-8141) | Waiting on EIP | High | TBD |
+
+---
+
+## We want your ideas
+
+This roadmap isn't set in stone. If you have ideas for features, use cases, or integrations that would make SPECTER more useful, we'd love to hear from you.
+
+<CardGroup cols={2}>
+  <Card title="Suggest a feature" icon="lightbulb" href="https://github.com/pranshurastogi/SPECTER/issues">
+    Open a GitHub issue with the `feature-request` label. Describe the use case, not just the feature.
+  </Card>
+  <Card title="Get in touch" icon="envelope" href="mailto:pranshurastogi3196@gmail.com">
+    Email **pranshurastogi3196@gmail.com** for partnership ideas, research collaboration, or integration questions.
+  </Card>
+</CardGroup>
+
+Questions about the roadmap? Ideas for new use cases? Follow [@specter_PQ](https://x.com/specter_PQ) for updates, reach out to the creator [@pranshurastogii](https://x.com/pranshurastogii), or open an issue on [GitHub](https://github.com/pranshurastogi/SPECTER/issues).

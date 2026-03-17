@@ -2,7 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "SPECTER",
-  "description": "Private receiving with post-quantum stealth address discovery for Ethereum and Sui",
+  "description": "Post-quantum stealth addresses for private payments on Ethereum and Sui",
   "colors": {
     "primary": "#0F766E",
     "light": "#14B8A6",
@@ -13,57 +13,89 @@
     "light": "/images/specter/logo.png",
     "dark": "/images/specter/logo.png"
   },
+  "styling": {
+    "eyebrows": "section",
+    "codeblocks": {
+      "rounded": true
+    },
+    "anchors": {
+      "icon": {
+        "rounded": true
+      }
+    }
+  },
+  "feedback": {
+    "thumbsRating": true,
+    "suggestEdit": true,
+    "raiseIssue": true
+  },
+  "search": {
+    "prompt": "Search SPECTER docs..."
+  },
   "navigation": {
     "tabs": [
       {
         "tab": "Docs",
         "groups": [
           {
-            "group": "Start here",
+            "group": "Welcome",
             "pages": [
               "index",
-              "getting-started/first-time-overview",
-              "core-concepts/protocol-flow",
-              "core-concepts/cryptography",
-              "core-concepts/quantum-safety-boundaries",
-              "faq"
+              "why-specter/the-problem",
+              "why-specter/how-specter-works",
+              "why-specter/specter-vs-others"
             ]
           },
           {
-            "group": "Use the product",
+            "group": "Understand the tech",
             "pages": [
-              "getting-started/choose-your-path",
+              "how-it-works/protocol-flow",
+              "how-it-works/post-quantum-crypto",
+              "how-it-works/view-tags-and-scanning",
+              "how-it-works/security-boundaries",
+              "how-it-works/architecture"
+            ]
+          },
+          {
+            "group": "Try it",
+            "pages": [
+              "explore/playground",
               "getting-started/quickstart",
-              "getting-started/verify-integration",
-              "guides/private-payment-workflow",
-              "guides/use-cases-and-yellow-integration",
-              "guides/yellow-private-channels"
+              "getting-started/installation"
             ]
           },
           {
-            "group": "Names and discovery",
+            "group": "Use cases",
             "pages": [
-              "guides/ens-setup",
-              "guides/suins-setup",
-              "core-concepts/registry-and-scanning",
-              "core-concepts/terminology",
-              "core-concepts/architecture"
+              "use-cases/private-payments",
+              "use-cases/yellow-private-channels",
+              "use-cases/name-services",
+              "use-cases/whats-next"
             ]
           },
           {
-            "group": "Research",
+            "group": "Deep dive",
             "pages": [
-              "blog/index",
-              "blog/receiving-vs-spending",
-              "erc-proposal",
+              "deep-dive/post-quantum-explainer",
+              "deep-dive/erc-proposal",
+              "deep-dive/research-notes",
+              "deep-dive/terminology"
+            ]
+          },
+          {
+            "group": "Build with SPECTER",
+            "pages": [
+              "build/integration-guide",
+              "build/development-setup",
+              "build/contributing"
+            ]
+          },
+          {
+            "group": "Resources",
+            "pages": [
+              "faq",
+              "reference/changelog",
               "roadmap/yet-to-implement"
-            ]
-          },
-          {
-            "group": "Builder docs",
-            "pages": [
-              "development/index",
-              "reference/index"
             ]
           }
         ]
@@ -100,14 +132,9 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Official site",
+          "anchor": "Launch App",
           "href": "https://specterpq.com/",
-          "icon": "globe"
-        },
-        {
-          "anchor": "Backend API",
-          "href": "https://backend.specterpq.com/health",
-          "icon": "server"
+          "icon": "rocket"
         },
         {
           "anchor": "GitHub",
@@ -115,9 +142,9 @@
           "icon": "github"
         },
         {
-          "anchor": "Backend source",
-          "href": "https://github.com/pranshurastogi/SPECTER/tree/main/specter",
-          "icon": "book-open"
+          "anchor": "Live API",
+          "href": "https://backend.specterpq.com/health",
+          "icon": "server"
         }
       ]
     }
@@ -129,28 +156,24 @@
         "href": "https://specterpq.com/"
       },
       {
-        "label": "Backend API",
-        "href": "https://backend.specterpq.com/health"
-      },
-      {
         "label": "GitHub",
         "href": "https://github.com/pranshurastogi/SPECTER"
       },
       {
-        "label": "Research paper",
+        "label": "Research Paper",
         "href": "https://arxiv.org/pdf/2501.13733v1"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Launch app",
+      "label": "Launch App",
       "href": "https://specterpq.com/"
     }
   },
   "footer": {
     "socials": {
       "github": "https://github.com/pranshurastogi/SPECTER",
-      "x": "https://x.com/pranshurastogii"
+      "x": "https://x.com/specter_PQ"
     }
   }
 }

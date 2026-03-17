@@ -1,0 +1,52 @@
+---
+title: "Terminology"
+description: "Key terms used throughout the SPECTER documentation"
+---
+
+## Core concepts
+
+| Term | Definition |
+|------|-----------|
+| **Stealth address** | A one-time destination derived by the sender from the recipient's meta-address. Each payment creates a fresh one. |
+| **Meta-address** | The recipient's public profile containing `spending_pk` and `viewing_pk`. Published once, used by all senders. |
+| **Announcement** | A public record containing the encrypted shared secret (ciphertext) and view tag. Lets the recipient find their payment. |
+| **View tag** | A 1-byte value derived from the shared secret. Filters out ~99.6% of irrelevant announcements during scanning. |
+
+## Cryptography
+
+| Term | Definition |
+|------|-----------|
+| **ML-KEM-768** | Module Lattice-based Key Encapsulation Mechanism. NIST FIPS 203. The post-quantum algorithm SPECTER uses for sender-recipient shared secrets. |
+| **Encapsulation** | The sender's operation: takes a public key, produces a ciphertext and shared secret. |
+| **Decapsulation** | The recipient's operation: takes the ciphertext and secret key, recovers the shared secret. |
+| **SHAKE-256** | A NIST-standardized extendable-output hash function. Used in SPECTER for key derivation with domain separation. |
+| **MLWE** | Module Learning With Errors. The mathematical hard problem underlying ML-KEM's security. No quantum algorithm solves it efficiently. |
+| **secp256k1** | The elliptic curve used by Ethereum wallets. SPECTER's current spend path derives a secp256k1 key for compatibility. |
+| **ML-DSA-65** | A post-quantum digital signature algorithm (FIPS 204). Planned for future SPECTER spending via smart accounts. |
+
+## Keys
+
+| Term | Definition |
+|------|-----------|
+| **spending_pk / spending_sk** | The spending keypair. The public key is part of the meta-address. The shared secret + spending key determine the stealth address. |
+| **viewing_pk / viewing_sk** | The viewing keypair. The sender encapsulates to `viewing_pk`. The recipient decapsulates with `viewing_sk` to discover payments. |
+| **eth_private_key** | The derived secp256k1 private key returned by the scan endpoint. Used to spend from the stealth address in Ethereum wallets. |
+
+## Protocol
+
+| Term | Definition |
+|------|-----------|
+| **Registry** | The announcement storage system. Either in-memory (dev) or Turso/libSQL (production). |
+| **Scanning** | The process of checking announcements to find payments meant for you. Uses view tag filtering for efficiency. |
+| **Discovery** | A confirmed match during scanning: a payment addressed to you, with the stealth private key recovered. |
+
+## Ecosystem
+
+| Term | Definition |
+|------|-----------|
+| **ERC-5564** | Ethereum standard for stealth addresses (schemeId 1 = classical ECDH). SPECTER proposes schemeId 2 (ML-KEM). |
+| **ERC-6538** | Ethereum standard for stealth meta-address registries. |
+| **ENS** | Ethereum Name Service. Maps `.eth` names to meta-addresses via IPFS. |
+| **SuiNS** | Sui Name Service. Maps `.sui` names to meta-addresses. |
+| **Yellow Network** | State channel network for off-chain trading. SPECTER integrates to provide private channels. |
+| **ERC-4337** | Account abstraction standard. Enables custom signature verification, the path to PQ spending. |

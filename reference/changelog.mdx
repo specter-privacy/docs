@@ -1,8 +1,50 @@
 ---
-title: "Changelog and release notes"
-description: "Current status of formal changelog support"
+title: "Changelog"
+description: "Release history and notable changes in SPECTER"
 ---
 
-SPECTER does not currently include a structured in-repo changelog file for backend crates.
+## v0.1.0 - Initial Release
 
-Use Git history and release tags in GitHub until a dedicated changelog policy is added.
+*March 2026*
+
+The first public release of SPECTER, a post-quantum stealth address protocol for Ethereum and Sui.
+
+### Core
+
+- ML-KEM-768 key generation, encapsulation, and decapsulation
+- Stealth address derivation for Ethereum (secp256k1) and Sui (Ed25519)
+- View tag computation and verification (1-byte, ~99.6% filter rate)
+- SHAKE-256 key derivation with domain separation
+- Batch scanning engine with progress callbacks
+- In-memory and Turso (libSQL) announcement registry backends
+- Lock-free concurrent caching
+
+### API
+
+- REST API server (Axum) with 22 endpoints
+- Key generation, stealth create, stealth scan, announcement registry
+- ENS and SuiNS name resolution
+- IPFS meta-address upload/fetch via Pinata
+- Yellow Network channel create, discover, fund, close, status
+- Rate limiting, CORS, security headers, API key auth
+
+### Frontend
+
+- React + TypeScript web application
+- Generate keys, send payments, scan payments
+- Yellow Network channel management page
+- Encrypted browser vault for key storage (AES-GCM)
+- Wallet integration (Ethereum + Sui)
+
+### Infrastructure
+
+- Docker multi-stage builds
+- Google Cloud Run deployment with auto-scaling
+- GitHub Actions CI (fmt, clippy, test)
+- 195 tests across all crates
+
+---
+
+<Note>
+For detailed commit history, see the [GitHub repository](https://github.com/pranshurastogi/SPECTER/commits/main).
+</Note>

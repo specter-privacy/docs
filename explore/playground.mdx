@@ -1,100 +1,222 @@
 ---
 title: "Playground"
-description: "Try SPECTER flows quickly with hosted app links and copy-paste API commands"
+description: "Try SPECTER right now. Generate keys, create stealth payments, scan for discoveries."
 ---
 
+## Try it in 2 minutes
+
+No setup required. Hit the live API and see stealth addresses in action.
+
 <CardGroup cols={3}>
-  <Card title="Hosted app" icon="rocket" href="https://specterpq.com/">
-    Run Setup, Send, Scan, and Yellow flows in your browser.
+  <Card title="Open the app" icon="rocket" href="https://specterpq.com/">
+    Full UI experience in your browser.
   </Card>
-  <Card title="Use cases" icon="map" href="/guides/use-cases-and-yellow-integration">
-    Start from live use cases and then test endpoint contracts.
+  <Card title="API quickstart" icon="terminal" href="/getting-started/quickstart">
+    Step-by-step with copy-paste commands.
   </Card>
-  <Card title="Yellow API" icon="code" href="/api/yellow">
-    Use channel endpoints directly against the hosted backend.
+  <Card title="Yellow channels" icon="shield" href="https://specterpq.com/yellow">
+    Try private channel creation.
   </Card>
 </CardGroup>
 
-## Quick launch links
+---
 
-- App (primary): [https://specterpq.com](https://specterpq.com)
-- Yellow page: [https://specterpq.com/yellow](https://specterpq.com/yellow)
+## Interactive API playground
 
-## API playground
+Base URL: `https://backend.specterpq.com`
 
-Use `https://backend.specterpq.com` as the default base URL.
+Run these in order. Each step feeds into the next.
 
 <Tabs>
-  <Tab title="1) Generate keys">
+  <Tab title="Step 1: Generate keys">
+
+Generate a fresh ML-KEM-768 keypair. This gives you everything needed to receive private payments.
 
 ```bash
-curl -s -X POST https://backend.specterpq.com/api/v1/keys/generate | jq .
+curl -s -X POST https://backend.specterpq.com/api/v1/keys/generate \
+  | tee /tmp/specter-keys.json | jq '{meta_address: .meta_address[0:40], spending_pk: .spending_pk[0:40], viewing_pk: .viewing_pk[0:40]}' && echo "... (truncated, full keys saved to /tmp/specter-keys.json)"
+```
+
+Save the variables for the next steps:
+
+```bash
+META_ADDRESS=$(jq -r '.meta_address' /tmp/specter-keys.json)
+VIEWING_SK=$(jq -r '.viewing_sk' /tmp/specter-keys.json)
+SPENDING_PK=$(jq -r '.spending_pk' /tmp/specter-keys.json)
+SPENDING_SK=$(jq -r '.spending_sk' /tmp/specter-keys.json)
 ```
 
   </Tab>
-  <Tab title="2) Create stealth payment">
+  <Tab title="Step 2: Create stealth payment">
+
+Derive a one-time stealth address from the meta-address. This is what the sender does.
 
 ```bash
 curl -s -X POST https://backend.specterpq.com/api/v1/stealth/create \
   -H "Content-Type: application/json" \
-  -d '{
-    "meta_address":"<meta_address_hex>"
-  }' | jq .
+  -d "{\"meta_address\":\"$META_ADDRESS\"}" \
+  | tee /tmp/specter-create.json | jq .
+```
+
+Note the `stealth_address` in the response. That's where you'd send funds.
+
+```bash
+EPHEMERAL_KEY=$(jq -r '.ephemeral_ciphertext' /tmp/specter-create.json)
+VIEW_TAG=$(jq -r '.view_tag' /tmp/specter-create.json)
+STEALTH_ADDRESS=$(jq -r '.stealth_address' /tmp/specter-create.json)
+echo "Payment destination: $STEALTH_ADDRESS"
 ```
 
   </Tab>
-  <Tab title="3) Publish announcement">
+  <Tab title="Step 3: Publish announcement">
+
+Post the announcement so the recipient can find the payment later.
 
 ```bash
 curl -s -X POST https://backend.specterpq.com/api/v1/registry/announcements \
   -H "Content-Type: application/json" \
-  -d '{
-    "ephemeral_key":"<hex>",
-    "view_tag":123,
-    "tx_hash":"0x1111111111111111111111111111111111111111111111111111111111111111",
-    "amount":"0.01",
-    "chain":"ethereum"
-  }' | jq .
+  -d "{
+    \"ephemeral_key\":\"$EPHEMERAL_KEY\",
+    \"view_tag\":$VIEW_TAG,
+    \"tx_hash\":\"0x1111111111111111111111111111111111111111111111111111111111111111\",
+    \"amount\":\"0.01\",
+    \"chain\":\"ethereum\"
+  }" | jq .
 ```
 
   </Tab>
-  <Tab title="4) Scan announcements">
+  <Tab title="Step 4: Scan and discover">
+
+Now scan with the recipient's keys to find the payment.
 
 ```bash
 curl -s -X POST https://backend.specterpq.com/api/v1/stealth/scan \
   -H "Content-Type: application/json" \
-  -d '{
-    "viewing_sk":"<hex>",
-    "spending_pk":"<hex>",
-    "spending_sk":"<hex>"
-  }' | jq .
+  -d "{
+    \"viewing_sk\":\"$VIEWING_SK\",
+    \"spending_pk\":\"$SPENDING_PK\",
+    \"spending_sk\":\"$SPENDING_SK\"
+  }" | jq .
 ```
+
+You should see one discovery with the same `stealth_address` from step 2.
+
+<Warning>
+The scan response contains `eth_private_key`. This is real wallet secret material. Don't expose it in logs or analytics.
+</Warning>
 
   </Tab>
 </Tabs>
 
-## Yellow playground path
+---
+
+## Yellow channel playground
+
+Test the private channel flow:
 
 <Steps>
-  <Step title="Create private channel" icon="plus">
-    Call `POST /api/v1/yellow/channel/create` with recipient, token, and amount.
+  <Step title="Create a private channel" icon="plus">
+    ```bash
+    curl -s -X POST https://backend.specterpq.com/api/v1/yellow/channel/create \
+      -H "Content-Type: application/json" \
+      -d '{"recipient":"bob.eth","token":"USDC","amount":"1000"}' | jq .
+    ```
   </Step>
-  <Step title="Discover with recipient keys" icon="radar">
-    Call `POST /api/v1/yellow/channel/discover` and verify discovered channel rows.
+  <Step title="Discover incoming channels" icon="radar">
+    ```bash
+    curl -s -X POST https://backend.specterpq.com/api/v1/yellow/channel/discover \
+      -H "Content-Type: application/json" \
+      -d '{"viewing_sk":"<HEX>","spending_pk":"<HEX>","spending_sk":"<HEX>"}' | jq .
+    ```
   </Step>
-  <Step title="Inspect config and channel state" icon="gear">
-    Call `GET /api/v1/yellow/config` and `GET /api/v1/yellow/channel/:id/status`.
+  <Step title="Check channel config" icon="gear">
+    ```bash
+    curl -s https://backend.specterpq.com/api/v1/yellow/config | jq .
+    ```
   </Step>
 </Steps>
 
 ```mermaid
-flowchart TD
-    A["Create"] --> B["Publish announcement"]
-    B --> C["Discover"]
-    C --> D["Transfer/Fund"]
-    D --> E["Close"]
+flowchart LR
+    A["Create\nchannel"] --> B["Publish\nannouncement"]
+    B --> C["Discover\nchannel"]
+    C --> D["Fund /\nTransfer"]
+    D --> E["Close\nchannel"]
+
+    style A fill:#0F766E,color:#fff
+    style C fill:#0F766E,color:#fff
+    style E fill:#0F766E,color:#fff
 ```
 
 <Warning>
-`/yellow/channel/fund` and `/yellow/channel/close` currently return placeholder tx values from backend handlers.
+`/yellow/channel/fund` and `/yellow/channel/close` currently return placeholder values. They demonstrate the API shape but don't submit real L1 settlement transactions.
 </Warning>
+
+---
+
+## Multi-language examples
+
+Here's how the core flow looks in different languages:
+
+<Tabs>
+  <Tab title="cURL">
+```bash
+# Generate keys
+curl -s -X POST https://backend.specterpq.com/api/v1/keys/generate | jq .
+
+# Create stealth payment
+curl -s -X POST https://backend.specterpq.com/api/v1/stealth/create \
+  -H "Content-Type: application/json" \
+  -d '{"meta_address":"<META_ADDRESS_HEX>"}' | jq .
+```
+  </Tab>
+  <Tab title="JavaScript">
+```javascript
+// Generate keys
+const keys = await fetch("https://backend.specterpq.com/api/v1/keys/generate", {
+  method: "POST"
+}).then(r => r.json());
+
+// Create stealth payment
+const payment = await fetch("https://backend.specterpq.com/api/v1/stealth/create", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ meta_address: keys.meta_address })
+}).then(r => r.json());
+
+console.log("Stealth address:", payment.stealth_address);
+```
+  </Tab>
+  <Tab title="Python">
+```python
+import requests
+
+# Generate keys
+keys = requests.post("https://backend.specterpq.com/api/v1/keys/generate").json()
+
+# Create stealth payment
+payment = requests.post(
+    "https://backend.specterpq.com/api/v1/stealth/create",
+    json={"meta_address": keys["meta_address"]}
+).json()
+
+print(f"Stealth address: {payment['stealth_address']}")
+```
+  </Tab>
+</Tabs>
+
+---
+
+## Quick health check
+
+Make sure the backend is alive:
+
+```bash
+curl -s https://backend.specterpq.com/health | jq .
+```
+
+---
+
+<Callout icon="envelope" color="#0F766E">
+  **Questions?** Email pranshurastogi3196@gmail.com or reach out on [X @pranshurastogii](https://x.com/pranshurastogii).
+</Callout>

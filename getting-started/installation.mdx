@@ -1,70 +1,100 @@
 ---
-title: "Setup for Integration"
-description: "Set up only what you need to start integrating with SPECTER"
+title: "Installation"
+description: "Set up SPECTER locally: backend, frontend, or both"
 ---
 
-<CardGroup cols={2}>
-  <Card title="Frontend-first option" icon="rocket" href="https://specterpq.com/">
-    Start immediately in the hosted app, no local setup required.
-  </Card>
-  <Card title="Integration quickstart" icon="bolt" href="/getting-started/quickstart">
-    Use this setup to run API + CLI integration checks.
-  </Card>
-</CardGroup>
+## Choose your setup
 
-## Choose your integration setup mode
+| Approach | When to use |
+|----------|------------|
+| **API only** | You just want to call endpoints. Use the [hosted backend](https://backend.specterpq.com/health). |
+| **Frontend only** | You want to run the web app locally against the hosted API. |
+| **Full stack** | You want everything running on your machine. |
 
-<Tabs>
-  <Tab title="Frontend only">
-    No installation is needed. Use the Launch app button and follow `/explore/frontend-experience`.
-  </Tab>
-  <Tab title="API integration">
-    Prerequisites: Rust stable toolchain, `PINATA_GATEWAY_URL`, and `PINATA_GATEWAY_TOKEN`.
+## Prerequisites
+
+- **Rust 1.88+** (for backend)
+- **Node.js 18+** (for frontend)
+- **Docker** (optional, for containerized backend)
+
+## Backend setup
 
 ```bash
+# Clone the repo
 git clone https://github.com/pranshurastogi/SPECTER.git
 cd SPECTER/specter
+
+# Copy environment config
 cp .env.example .env
-# fill gateway variables
-cargo run --bin specter -- serve --port 3001
+# Edit .env with your values (Pinata, Turso, etc.)
+
+# Build and run
+cargo build --release
+cargo run --release --bin specter-cli -- serve
 ```
 
-  </Tab>
-  <Tab title="Frontend + local backend">
+The API server starts on `http://localhost:3001`.
+
+### Using Docker
+
+```bash
+cd SPECTER/specter
+docker build -t specter .
+docker run -p 3001:8080 --env-file .env specter
+```
+
+## Frontend setup
 
 ```bash
 cd SPECTER/SPECTER-web
-cp .env.example .env
 npm install
 npm run dev
 ```
 
-    Use this mode when you are iterating on UX while validating local API behavior.
-  </Tab>
-</Tabs>
+The frontend starts on `http://localhost:5173` and connects to the configured backend URL.
 
-## Verify setup quickly
+## CLI usage
 
-<Steps>
-  <Step title="Health check">
+The `specter-cli` binary supports standalone operations:
+
+```bash
+# Generate keys
+cargo run --bin specter-cli -- generate
+
+# Create a stealth payment
+cargo run --bin specter-cli -- create --meta-address <META_ADDRESS>
+
+# Scan for payments
+cargo run --bin specter-cli -- scan --viewing-sk <HEX> --spending-pk <HEX> --spending-sk <HEX>
+
+# Run benchmarks
+cargo run --bin specter-cli -- bench
+
+# Start API server
+cargo run --bin specter-cli -- serve
+```
+
+## Environment variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `REGISTRY_BACKEND` | No | `memory` (default) or `turso` |
+| `TURSO_DATABASE_URL` | For turso | libSQL connection string |
+| `TURSO_AUTH_TOKEN` | For turso | Auth token |
+| `PINATA_JWT` | For IPFS | Pinata upload credentials |
+| `PINATA_GATEWAY_URL` | For IPFS | Your Pinata gateway |
+| `PINATA_GATEWAY_TOKEN` | For IPFS | Gateway access token |
+| `ETH_RPC_URL` | For ENS | Ethereum RPC endpoint |
+| `SUI_RPC_URL` | For SuiNS | Sui RPC endpoint |
+| `API_KEY` | No | Enables auth for write endpoints |
+| `ALLOWED_ORIGINS` | No | CORS origins (default: `*`) |
+| `RATE_LIMIT_RPS` | No | Requests per second (default: 10) |
+
+## Verify it's working
 
 ```bash
 curl -s http://localhost:3001/health | jq .
+# Should return: {"status":"ok","version":"..."}
 ```
 
-  </Step>
-  <Step title="Key generation check">
-
-```bash
-curl -s -X POST http://localhost:3001/api/v1/keys/generate | jq .
-```
-
-  </Step>
-  <Step title="Move to full integration loop">
-    Continue to `/getting-started/quickstart`.
-  </Step>
-</Steps>
-
-<Info>
-This page focuses on integration setup. For a full product tour without any local setup, visit the [Explore product](/explore/frontend-experience) page.
-</Info>
+Then run the [quickstart](/getting-started/quickstart) flow against `http://localhost:3001` instead of the hosted backend.
