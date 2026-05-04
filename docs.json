@@ -38,39 +38,48 @@
         "tab": "Docs",
         "groups": [
           {
-            "group": "Welcome",
+            "group": "Start here",
             "pages": [
               "index",
               "why-specter/the-problem",
               "why-specter/how-specter-works",
+              "getting-started/quickstart"
+            ]
+          },
+          {
+            "group": "Understand SPECTER",
+            "pages": [
+              "how-it-works/protocol-flow",
+              "how-it-works/view-tags-and-scanning",
+              "how-it-works/security-boundaries",
+              "how-it-works/architecture",
+              "how-it-works/post-quantum-crypto",
               "why-specter/specter-vs-others"
             ]
           },
           {
-            "group": "Understand the tech",
-            "pages": [
-              "how-it-works/protocol-flow",
-              "how-it-works/post-quantum-crypto",
-              "how-it-works/view-tags-and-scanning",
-              "how-it-works/security-boundaries",
-              "how-it-works/architecture"
-            ]
-          },
-          {
-            "group": "Try it",
+            "group": "Build and try",
             "pages": [
               "explore/playground",
-              "getting-started/quickstart",
-              "getting-started/installation"
+              "getting-started/installation",
+              "build/integration-guide"
             ]
           },
           {
             "group": "Use cases",
             "pages": [
               "use-cases/private-payments",
-              "use-cases/yellow-private-channels",
               "use-cases/name-services",
+              "use-cases/yellow-private-channels",
               "use-cases/whats-next"
+            ]
+          },
+          {
+            "group": "Contribute",
+            "pages": [
+              "build/contributing",
+              "build/contribution-opportunities",
+              "build/development-setup"
             ]
           },
           {
@@ -83,17 +92,10 @@
             ]
           },
           {
-            "group": "Build with SPECTER",
-            "pages": [
-              "build/integration-guide",
-              "build/development-setup",
-              "build/contributing"
-            ]
-          },
-          {
             "group": "Resources",
             "pages": [
               "faq",
+              "reference/verification-matrix",
               "reference/changelog",
               "roadmap/yet-to-implement"
             ]
@@ -154,6 +156,10 @@
       {
         "label": "Website",
         "href": "https://specterpq.com/"
+      },
+      {
+        "label": "Contribute",
+        "href": "/build/contribution-opportunities"
       },
       {
         "label": "GitHub",

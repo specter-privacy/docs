@@ -1,46 +1,110 @@
 ---
 title: "Contributing"
-description: "How to contribute to SPECTER: PR workflow, code standards, and what we look for"
+description: "How to contribute to SPECTER with a clear workflow, repo boundaries, and source-backed documentation standards"
 ---
 
-## Getting started
+## Start with the right repo
 
-1. Fork the [repository](https://github.com/pranshurastogi/SPECTER)
-2. Create a feature branch from `main`
-3. Make your changes
-4. Run `cargo fmt` and `cargo clippy -- -D warnings`
-5. Run `cargo test` and make sure everything passes
-6. Open a PR against `main`
+SPECTER work currently spans two codebases:
 
-## Code standards
+| Repo | What belongs there |
+|---|---|
+| [Product repo](https://github.com/pranshurastogi/SPECTER) | Rust backend, frontend app, GitHub issues, CI, and product implementation work |
+| This Mintlify docs repo | Public documentation structure, copy, charts, and source-backed explanation pages |
 
-- **No unsafe code.** Every crate enforces `#![forbid(unsafe_code)]`.
+If your change affects product behavior, you will usually need updates in both places.
+
+## Start with an issue
+
+Use **[Contribution Opportunities](/build/contribution-opportunities)** to review the current GitHub backlog before you start coding.
+
+If no issue matches your work:
+
+1. Open or comment on a GitHub issue.
+2. Describe the exact scope you plan to take.
+3. Keep the PR focused on one problem or one tightly related set of changes.
+
+## Contribution flow
+
+<Steps>
+  <Step title="Choose a scoped problem" icon="git-branch">
+    Pick an existing GitHub issue or open a new one with a clear acceptance target.
+  </Step>
+  <Step title="Set up the workspace" icon="wrench">
+    Follow **[Development Setup](/build/development-setup)** for the product repo and run the docs site locally if your change affects documentation.
+  </Step>
+  <Step title="Implement and verify" icon="code">
+    Add tests, run local checks, and avoid mixing unrelated refactors into the same PR.
+  </Step>
+  <Step title="Update the docs" icon="book-open">
+    If behavior changed, update the relevant guide, reference page, and **[Verification Matrix](/reference/verification-matrix)**.
+  </Step>
+  <Step title="Open the PR" icon="git-pull-request">
+    Explain what changed, what you verified, and which issue it resolves.
+  </Step>
+</Steps>
+
+## Quality bar
+
+- **No unsafe code.** The Rust crates enforce `#![forbid(unsafe_code)]`.
 - **Formatting.** Run `cargo fmt` before committing.
-- **Linting.** `cargo clippy -- -D warnings` must pass with zero warnings.
-- **Tests.** New functionality needs tests. Bug fixes need regression tests.
-- **Documentation.** Only document verified behavior. If a feature isn't implemented, don't document it as working.
+- **Linting.** Run `cargo clippy -- -D warnings`.
+- **Tests.** New behavior needs tests. Bug fixes need regression coverage.
+- **Documentation.** Document only verified behavior. Move aspirational items to **[Roadmap](/roadmap/yet-to-implement)**.
+- **Small PRs.** Prefer reviewable changes over broad cleanup sweeps.
 
-## What to work on
+## What to verify locally
 
-Check the [roadmap](/roadmap/yet-to-implement) for planned features. Good first contributions:
+For product repo changes:
 
-- Additional chain support (Arbitrum, Base, Optimism address derivation)
-- Performance improvements in the scanner
-- Frontend accessibility improvements
-- Test coverage for edge cases
+```bash
+cargo fmt
+cargo clippy -- -D warnings
+cargo test
+```
 
-## PR review
+For docs repo changes:
 
-PRs are reviewed for:
-- Correctness (does it do what it claims?)
-- Security (no new timing channels, no secret key leaks)
-- Compatibility (does it break existing API contracts?)
-- Tests (is the new behavior tested?)
+```bash
+mint dev
+mint broken-links
+```
 
-## Documentation changes
+If the Mintlify CLI is not installed yet, install it first in your local environment before running the docs checks.
 
-If you change API behavior or add features, update the corresponding docs in this folder. Run `npx mintlify dev` locally to preview.
+## Repo map
 
-## Questions?
+| Area | Primary paths | Typical work |
+|---|---|---|
+| Backend API | `specter/specter-api/` | Routes, DTOs, middleware, handlers |
+| Protocol core | `specter/specter-crypto/`, `specter/specter-stealth/`, `specter/specter-scanner/` | Cryptography, discovery, scanning |
+| Persistence | `specter/specter-registry/` | Announcement storage, scan state, registry backends |
+| Name services and IPFS | `specter/specter-ens/`, `specter/specter-suins/`, `specter/specter-ipfs/` | ENS, SuiNS, meta-address retrieval |
+| Yellow integration | `specter/specter-yellow/` | Channel-related integration work |
+| Frontend | `SPECTER-web/src/` | UI, browser key handling, API client, wallet flows |
+| Docs | This Mintlify repo | Information architecture, guides, reference pages, diagrams |
 
-Open an issue on [GitHub](https://github.com/pranshurastogi/SPECTER/issues) or reach out on [X @pranshurastogii](https://x.com/pranshurastogii).
+## Documentation update rules
+
+If you change a feature, update the docs in the same pass.
+
+| Change type | Minimum docs follow-up |
+|---|---|
+| API route or payload change | Update the affected API page, quickstart/integration guide if needed, and the verification matrix |
+| Security or status change | Update **Security Boundaries**, **FAQ**, and roadmap/status notes |
+| Yellow integration behavior | Update **Yellow endpoints** and the related use-case page |
+| Contributor workflow or repo layout | Update this page and **Contribution Opportunities** |
+
+## Review criteria
+
+Reviewers will look for:
+
+- Correctness
+- Security and secret-handling hygiene
+- API compatibility
+- Test coverage
+- Clear docs for behavior changes
+
+## Need a place to start?
+
+Go to **[Contribution Opportunities](/build/contribution-opportunities)** for the live GitHub issue snapshot and direct links into the open backlog.

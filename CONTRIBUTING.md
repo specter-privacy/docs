@@ -2,6 +2,12 @@
 
 Thanks for contributing.
 
+## Where to start
+
+- Review `build/contribution-opportunities.mdx` for the current product issue backlog.
+- Use `build/contributing.mdx` for workflow and repo-boundary guidance.
+- Use `reference/verification-matrix.mdx` when you need source-backed references.
+
 ## Local workflow
 
 1. Open this `docs` directory.

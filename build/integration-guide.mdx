@@ -3,6 +3,13 @@ title: "Integration Guide"
 description: "How to build SPECTER into your application: patterns, endpoints, and best practices"
 ---
 
+<Info>
+Current implementation boundaries matter for integrators:
+
+- The hosted API currently exposes backend key generation through `POST /api/v1/keys/generate`. Client-side key generation is tracked in [issue #18](https://github.com/pranshurastogi/SPECTER/issues/18).
+- Payment discovery currently depends on the backend-managed announcement registry. Backend-independent recovery from on-chain announcements is tracked in [issue #16](https://github.com/pranshurastogi/SPECTER/issues/16).
+</Info>
+
 ## Three integration patterns
 
 Pick the one that fits your app:
@@ -36,11 +43,11 @@ Pick the one that fits your app:
 
     **Best for:** Teams building privacy-focused UIs who want a working reference.
 
-    The frontend source is at `SPECTER-web/` in the repo. Key patterns:
-    - Type-safe API client: `lib/api.ts`
-    - Key encryption for browser storage: `lib/crypto/`
-    - Chain configuration: `lib/blockchain/chainConfig.ts`
-    - Wallet integration: `components/features/wallet/`
+    The frontend source is at `SPECTER-web/src/` in the repo. Key patterns:
+    - Type-safe API client: `SPECTER-web/src/lib/api.ts`
+    - Key encryption for browser storage: `SPECTER-web/src/lib/crypto/`
+    - Chain configuration: `SPECTER-web/src/lib/blockchain/chainConfig.ts`
+    - Wallet and page flows: `SPECTER-web/src/pages/`
   </Tab>
   <Tab title="Self-hosted">
     Run the full SPECTER backend in your infrastructure.

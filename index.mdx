@@ -7,79 +7,117 @@ description: "Private payments on Ethereum and Sui, built for a post-quantum wor
   ![SPECTER cover](/images/specter/cover-specter.png)
 </Frame>
 
-## Your wallet address shouldn't be your identity
+## Private receiving without a public recipient trail
 
-Every time someone pays you on Ethereum, your address becomes a little less private. Employers, clients, strangers on Etherscan... they can all follow the money back to you.
+SPECTER lets you publish one public **meta-address** and receive each payment at a different one-time **stealth address**.
 
-SPECTER fixes the receiving side. You publish one public profile. Every sender derives a **fresh, one-time address** from it. To the rest of the world, those payments look completely unrelated to you.
+The discovery path uses **ML-KEM-768**, so the announcement data that helps you recover payments is designed to remain private even under future quantum attacks.
 
-And the privacy layer is built with **ML-KEM-768**, a NIST-standardized post-quantum algorithm. So even if quantum computers arrive in 10 years, the payments you receive today stay private.
-
-<CardGroup cols={3}>
-  <Card title="Try it right now" icon="play" href="/explore/playground">
-    Hit the API, generate keys, create a stealth payment. Takes 2 minutes.
+<CardGroup cols={2}>
+  <Card title="Understand the model" icon="sitemap" href="/why-specter/how-specter-works">
+    Learn the core ideas: meta-addresses, announcements, view tags, and stealth addresses.
   </Card>
-  <Card title="How does this work?" icon="sitemap" href="/how-it-works/protocol-flow">
-    The full payment flow, step by step. No PhD required.
+  <Card title="Run the quickstart" icon="play" href="/getting-started/quickstart">
+    Execute the current API flow end to end against the hosted backend.
   </Card>
-  <Card title="Launch the app" icon="rocket" href="https://specterpq.com/">
-    Use SPECTER in your browser.
+  <Card title="Build with SPECTER" icon="code" href="/build/integration-guide">
+    Choose an integration pattern and review the current API and security model.
+  </Card>
+  <Card title="Contribute" icon="git-alt" href="/build/contribution-opportunities">
+    Review the open GitHub issues and find the highest-value work.
   </Card>
 </CardGroup>
 
 ---
 
-## Pick your starting point
+## Use the docs by goal
 
-Not everyone reads docs the same way. Here's where to go based on what you care about.
+These docs are organized around reader intent. Start with the path that matches your job.
 
 <Tabs>
-  <Tab title="New to this">
-    Start with **[The Problem](/why-specter/the-problem)** to understand why blockchain privacy matters, then read **[How SPECTER Works](/why-specter/how-specter-works)** for the plain-language version.
+  <Tab title="Evaluating SPECTER">
+    Read **[The Problem](/why-specter/the-problem)** for the privacy and quantum context, then **[How SPECTER Works](/why-specter/how-specter-works)** for the plain-language model.
 
-    If you're curious about post-quantum stuff, **[PQ Crypto for Humans](/deep-dive/post-quantum-explainer)** breaks it down without the jargon.
+    Use **[SPECTER vs Others](/why-specter/specter-vs-others)** and **[Security Boundaries](/how-it-works/security-boundaries)** to evaluate tradeoffs honestly.
   </Tab>
   <Tab title="Builder">
-    Jump to the **[Playground](/explore/playground)** and hit some endpoints. Then read the **[API Quickstart](/getting-started/quickstart)** and **[Integration Guide](/build/integration-guide)**.
+    Start with the **[API Quickstart](/getting-started/quickstart)**, then move to the **[Integration Guide](/build/integration-guide)** and the **[API Overview](/api/introduction)**.
 
-    The full API reference lives in the **API reference** tab up top.
+    If you need to run the stack locally, go to **[Installation](/getting-started/installation)** and **[Development Setup](/build/development-setup)**.
   </Tab>
-  <Tab title="Evaluating / Investing">
-    Read **[The Problem](/why-specter/the-problem)** and **[SPECTER vs Others](/why-specter/specter-vs-others)** for positioning. Check **[Security Boundaries](/how-it-works/security-boundaries)** for honest limitations. The **[ERC Proposal](/deep-dive/erc-proposal)** shows the standardization path.
+  <Tab title="Contributor">
+    Review **[Contribution Opportunities](/build/contribution-opportunities)** first. It maps the current GitHub backlog to repo areas and contributor skill sets.
+
+    Then use **[Contributing](/build/contributing)** for the workflow and **[Verification Matrix](/reference/verification-matrix)** to keep changes source-backed.
   </Tab>
-  <Tab title="PQ crypto expert">
-    Go straight to **[Post-Quantum Crypto](/how-it-works/post-quantum-crypto)** for ML-KEM-768 implementation details, **[Security Boundaries](/how-it-works/security-boundaries)** for the receiving-vs-spending split, and the **[ERC Proposal](/deep-dive/erc-proposal)** for the formal specification.
+  <Tab title="Deep technical review">
+    Go straight to **[Protocol Flow](/how-it-works/protocol-flow)**, **[Architecture](/how-it-works/architecture)**, and **[Post-Quantum Cryptography](/how-it-works/post-quantum-crypto)**.
+
+    For source-backed validation, use **[Verification Matrix](/reference/verification-matrix)** and the product repo on [GitHub](https://github.com/pranshurastogi/SPECTER).
   </Tab>
 </Tabs>
 
 ---
 
-## The 30-second version
+## Protocol in 30 seconds
 
 ```mermaid
 flowchart LR
-    A["Bob publishes\nmeta-address"] --> B["Alice derives\nstealth address"]
-    B --> C["Alice sends payment\nto stealth address"]
-    C --> D["Alice posts\nannouncement"]
-    D --> E["Bob scans &\nrecovers funds"]
+    subgraph Recipient["Recipient setup"]
+        A["Generate spending and viewing keys"]
+        B["Publish meta-address"]
+        A --> B
+    end
+
+    subgraph Sender["Sender flow"]
+        C["Resolve meta-address"]
+        D["Derive one-time stealth address"]
+        E["Send funds"]
+        F["Publish announcement"]
+        C --> D --> E --> F
+    end
+
+    subgraph Recovery["Recipient recovery"]
+        G["Scan announcements with viewing key"]
+        H["Recover stealth key and spend"]
+        G --> H
+    end
+
+    B --> C
+    F --> G
 
     style A fill:#0F766E,color:#fff
-    style B fill:#14B8A6,color:#fff
-    style C fill:#0F766E,color:#fff
+    style B fill:#0F766E,color:#fff
     style D fill:#14B8A6,color:#fff
-    style E fill:#0F766E,color:#fff
+    style F fill:#14B8A6,color:#fff
+    style G fill:#115E59,color:#fff
+    style H fill:#115E59,color:#fff
 ```
 
-1. **Bob** generates ML-KEM keys and publishes a meta-address (like a public profile)
-2. **Alice** uses that meta-address to derive a fresh one-time stealth address
-3. **Alice** sends ETH/tokens to that address and posts a coded announcement
-4. **Bob** scans announcements with his private key, finds the payment, and spends it
+1. The recipient creates a `meta-address` from public spending and viewing keys.
+2. The sender derives a one-time stealth address from that `meta-address`.
+3. The sender transfers funds and publishes an **announcement** with an `ephemeral_key` and `view_tag`.
+4. The recipient scans announcements, recovers the matching stealth key, and spends normally.
 
-Nobody watching the chain can link the stealth address back to Bob.
+Observers can see the transfer and the announcement. They should not be able to link the stealth address back to the recipient without the private keys.
 
 ---
 
-## What makes SPECTER different
+## Current implementation status
+
+<Warning>
+The docs describe the current shipped behavior, not the end-state vision.
+</Warning>
+
+| Area | Current status |
+|---|---|
+| **Key generation** | The hosted API currently exposes `POST /api/v1/keys/generate`, which returns long-term keys from the backend flow. Client-side key generation is tracked in [issue #18](https://github.com/pranshurastogi/SPECTER/issues/18). |
+| **Announcement recovery** | Discovery currently depends on the backend-managed registry. Backend-independent recovery from on-chain announcements is tracked in [issue #16](https://github.com/pranshurastogi/SPECTER/issues/16). |
+| **Yellow integration** | Channel creation and discovery are documented as implemented. Funding and close flows still include integration scaffolding and placeholder-style behavior. |
+
+---
+
+## What makes SPECTER different today
 
 | | SPECTER | Classical stealth (Umbra/Fluidkey) |
 |---|---|---|
@@ -91,25 +129,21 @@ Nobody watching the chain can link the stealth address back to Bob.
 | **NIST standard** | FIPS 203 | N/A |
 
 <Tip>
-If you only read three pages, make them **[The Problem](/why-specter/the-problem)**, **[Protocol Flow](/how-it-works/protocol-flow)**, and **[Security Boundaries](/how-it-works/security-boundaries)**.
+If you only read three pages, start with **[How SPECTER Works](/why-specter/how-specter-works)**, **[Protocol Flow](/how-it-works/protocol-flow)**, and **[Security Boundaries](/how-it-works/security-boundaries)**.
 </Tip>
 
 ---
 
-## Get in touch
+## Keep going
 
 <CardGroup cols={3}>
-  <Card title="GitHub" icon="github" href="https://github.com/pranshurastogi/SPECTER">
-    Source code, issues, and feature requests.
+  <Card title="API reference" icon="code" href="/api/introduction">
+    Browse the full REST surface and endpoint groups.
   </Card>
-  <Card title="Email" icon="envelope" href="mailto:pranshurastogi3196@gmail.com">
-    pranshurastogi3196@gmail.com for questions, partnerships, or support.
+  <Card title="Verification matrix" icon="flask-2" href="/reference/verification-matrix">
+    Validate docs claims against the current source and issue backlog.
   </Card>
-  <Card title="SPECTER on X" icon="message-circle" href="https://x.com/specter_PQ">
-    Follow @specter_PQ for protocol updates.
+  <Card title="Contribution opportunities" icon="git-alt" href="/build/contribution-opportunities">
+    Review the current GitHub issues and contributor paths.
   </Card>
 </CardGroup>
-
-<Tip>
-  Built by [Pranshu Rastogi](https://x.com/pranshurastogii) ([@pranshurastogii](https://x.com/pranshurastogii)). Questions, ideas, or collab? Reach out anytime.
-</Tip>

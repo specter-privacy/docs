@@ -21,6 +21,7 @@ The docs are source-verified against backend code under `../SPECTER/specter`.
 
 - Implemented behavior is documented as active functionality.
 - Roadmap or unverified claims are explicitly flagged in `roadmap/yet-to-implement.mdx`.
+- Contributor-facing issue tracking is documented in `build/contribution-opportunities.mdx`.
 
 ## Main config
 

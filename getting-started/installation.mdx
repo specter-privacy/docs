@@ -30,7 +30,7 @@ cp .env.example .env
 
 # Build and run
 cargo build --release
-cargo run --release --bin specter-cli -- serve
+cargo run --release --bin specter -- serve
 ```
 
 The API server starts on `http://localhost:3001`.
@@ -55,23 +55,23 @@ The frontend starts on `http://localhost:5173` and connects to the configured ba
 
 ## CLI usage
 
-The `specter-cli` binary supports standalone operations:
+The `specter` binary supports standalone operations:
 
 ```bash
 # Generate keys
-cargo run --bin specter-cli -- generate
+cargo run --bin specter -- generate
 
 # Create a stealth payment
-cargo run --bin specter-cli -- create --meta-address <META_ADDRESS>
+cargo run --bin specter -- create --meta-address <META_ADDRESS>
 
 # Scan for payments
-cargo run --bin specter-cli -- scan --viewing-sk <HEX> --spending-pk <HEX> --spending-sk <HEX>
+cargo run --bin specter -- scan --viewing-sk <HEX> --spending-pk <HEX> --spending-sk <HEX>
 
 # Run benchmarks
-cargo run --bin specter-cli -- bench
+cargo run --bin specter -- bench
 
 # Start API server
-cargo run --bin specter-cli -- serve
+cargo run --bin specter -- serve
 ```
 
 ## Environment variables

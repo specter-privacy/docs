@@ -1,0 +1,76 @@
+---
+title: "Contribution Opportunities"
+description: "Current GitHub issues, contributor entry points, and the best places to help SPECTER right now"
+---
+
+<Info>
+GitHub issue snapshot date: **May 5, 2026**.
+
+At that point, the product repo had **4 open issues** and **no `good first issue` or `help wanted` labels**. Use the live issue filters below for the latest state.
+</Info>
+
+## Start with the live queue
+
+<CardGroup cols={2}>
+  <Card title="All open issues" icon="github" href="https://github.com/pranshurastogi/SPECTER/issues?q=is%3Aissue%20is%3Aopen">
+    Review the full current backlog in the product repo.
+  </Card>
+  <Card title="Recently updated issues" icon="clock" href="https://github.com/pranshurastogi/SPECTER/issues?q=is%3Aissue%20is%3Aopen%20sort%3Aupdated-desc">
+    See what changed most recently before you pick work.
+  </Card>
+  <Card title="Product repository" icon="code" href="https://github.com/pranshurastogi/SPECTER">
+    Backend, frontend, issue tracker, and CI live here.
+  </Card>
+  <Card title="Contribution workflow" icon="git-alt" href="/build/contributing">
+    Read the repo and docs workflow before opening a PR.
+  </Card>
+</CardGroup>
+
+## Current open issues
+
+These are the open product issues visible on May 5, 2026:
+
+<CardGroup cols={2}>
+  <Card title="#19 DevOps and release hardening" icon="settings" href="https://github.com/pranshurastogi/SPECTER/issues/19">
+    Branch strategy, environment separation, CI gates, release runbooks, and deployment safety checks.
+  </Card>
+  <Card title="#17 Core hardening epic" icon="shield-lock" href="https://github.com/pranshurastogi/SPECTER/issues/17">
+    Protocol correctness, view tag semantics, workspace cleanup, and production-readiness refactors.
+  </Card>
+  <Card title="#18 Client-side key generation" icon="cpu-2" href="https://github.com/pranshurastogi/SPECTER/issues/18">
+    Move long-term key generation out of the backend and into a client-side WASM flow.
+  </Card>
+  <Card title="#16 On-chain announcement recovery" icon="database" href="https://github.com/pranshurastogi/SPECTER/issues/16">
+    Remove backend dependence from recovery by making chain data the authoritative announcement source.
+  </Card>
+</CardGroup>
+
+## Pick work by skill set
+
+| If you want to help with... | Best issue | Primary repo areas |
+|---|---|---|
+| Release process, CI, environments | [#19](https://github.com/pranshurastogi/SPECTER/issues/19) | `.github/workflows/`, deploy/config docs, environment templates |
+| Protocol correctness and crate boundaries | [#17](https://github.com/pranshurastogi/SPECTER/issues/17) | `specter/specter-api/`, `specter/specter-stealth/`, `specter/specter-crypto/`, `specter/specter-registry/` |
+| Browser-side cryptography and secure key ownership | [#18](https://github.com/pranshurastogi/SPECTER/issues/18) | `SPECTER-web/src/`, WASM bindings, hosted API flow docs |
+| Recovery guarantees and decentralization | [#16](https://github.com/pranshurastogi/SPECTER/issues/16) | contracts/indexing work, scanner fallback logic, recovery documentation |
+| Docs clarity and docs IA | Start with a small docs PR or pair your docs work with one of the issues above | This Mintlify docs repo, especially `index.mdx`, `build/`, `reference/`, and API pages |
+
+## How contribution works across repos
+
+| You are changing... | You will usually touch... |
+|---|---|
+| Product behavior | The product repo first, then this docs repo if public behavior changed |
+| Public docs, guides, diagrams, or structure | This Mintlify docs repo |
+| Issue triage and roadmap scope | The product repo issue tracker, then roadmap/docs if the public status changed |
+
+## Good contribution habits
+
+- Claim or comment on an issue before you start large work.
+- Keep each PR aligned to one issue or one tightly scoped change.
+- Update docs in the same change set when public behavior changes.
+- Add tests for behavior changes and regression fixes.
+- Call out partial or placeholder behavior explicitly instead of smoothing it over.
+
+## If you are maintaining the backlog
+
+The current repo does not yet expose onboarding labels such as `good first issue`, `help wanted`, or area labels. Adding those labels would make contribution discovery much easier for new contributors.

@@ -8,55 +8,61 @@ description: "How SPECTER is built: crates, frontend, deployment, and data flow"
 SPECTER is a Rust backend + React frontend with a clean separation between cryptographic operations, API surface, and storage.
 
 ```mermaid
-flowchart TD
-    subgraph Frontend["Frontend (React + TypeScript)"]
-        UI["SPECTER Web App"]
+flowchart LR
+    subgraph Client["Client surfaces"]
+        UI["SPECTER Web app"]
+        CLI["specter CLI"]
     end
 
-    subgraph API["API Layer (Axum)"]
-        Routes["REST Endpoints"]
-        MW["Middleware\n(Rate limit, CORS, Auth)"]
+    subgraph API["API boundary"]
+        Routes["specter-api routes"]
+        MW["Auth, CORS,\nrate limiting, headers"]
     end
 
-    subgraph Core["Core Crates"]
-        Crypto["specter-crypto\n(ML-KEM-768)"]
-        Stealth["specter-stealth\n(Payment + Discovery)"]
-        Scanner["specter-scanner\n(Batch processing)"]
+    subgraph Core["Protocol core"]
+        CoreTypes["specter-core"]
+        Crypto["specter-crypto"]
+        Stealth["specter-stealth"]
+        Scanner["specter-scanner"]
     end
 
-    subgraph Storage["Storage & Services"]
-        Registry["specter-registry\n(Turso / Memory)"]
-        Cache["specter-cache\n(Lock-free)"]
-        IPFS["specter-ipfs\n(Pinata)"]
-    end
-
-    subgraph Names["Name Services"]
+    subgraph Services["State and integrations"]
+        Registry["specter-registry"]
+        Cache["specter-cache"]
         ENS["specter-ens"]
         SuiNS["specter-suins"]
-    end
-
-    subgraph Integration["Integrations"]
-        Yellow["specter-yellow\n(Private channels)"]
+        IPFS["specter-ipfs"]
+        Yellow["specter-yellow"]
     end
 
     UI --> Routes
+    CLI --> Stealth
+    CLI --> Scanner
+
     Routes --> MW
     MW --> Stealth
-    Stealth --> Crypto
     MW --> Scanner
-    Scanner --> Registry
-    Scanner --> Crypto
     MW --> ENS
     MW --> SuiNS
+    MW --> Yellow
+
+    Stealth --> Crypto
+    Scanner --> Registry
+    Scanner --> Crypto
     ENS --> IPFS
     SuiNS --> IPFS
-    MW --> Yellow
     Yellow --> Stealth
+    Yellow --> Registry
     Stealth --> Registry
     Registry --> Cache
+    Stealth --> CoreTypes
+    Scanner --> CoreTypes
+    Registry --> CoreTypes
 
     style Crypto fill:#0F766E,color:#fff
     style Stealth fill:#0F766E,color:#fff
+    style Scanner fill:#14B8A6,color:#fff
+    style Registry fill:#115E59,color:#fff
 ```
 
 ## The Rust workspace
