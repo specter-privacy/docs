@@ -1,15 +1,17 @@
 ---
 title: "Playground"
-description: "Try SPECTER right now. Generate keys, create stealth payments, scan for discoveries."
+description: "Use the SPECTER SDK playground directly in the docs."
 ---
 
-## Try it in 2 minutes
-
-No setup required. Hit the live API and see stealth addresses in action.
-
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card title="Open the app" icon="rocket" href="https://specterpq.com/">
     Full UI experience in your browser.
+  </Card>
+  <Card title="Open playground in a new tab" icon="rocket" href="/playground/index.html">
+    Launch the standalone static page.
+  </Card>
+  <Card title="SDK package" icon="code" href="https://www.npmjs.com/package/@specterpq/sdk">
+    Review package details and releases.
   </Card>
   <Card title="API quickstart" icon="terminal" href="/getting-started/quickstart">
     Step-by-step with copy-paste commands.
@@ -19,11 +21,39 @@ No setup required. Hit the live API and see stealth addresses in action.
   </Card>
 </CardGroup>
 
+<Note>
+This playground runs [`@specterpq/sdk`](https://www.npmjs.com/package/@specterpq/sdk) in WebAssembly in your browser. Secret keys stay in your local session.
+</Note>
+
+## SDK Playground
+
+Use this interactive playground to test the core stealth flow in your browser.
+
+- Generate recipient spending and viewing keys
+- Build a publishable meta-address
+- Create a stealth payment announcement
+- Scan announcements and verify matches
+- Run editable SDK snippets in the code editor
+
+<iframe
+  src="/playground/index.html"
+  title="SPECTER SDK Playground"
+  width="100%"
+  height="1200"
+  style={{ border: '1px solid #22262d', borderRadius: '12px', background: '#0a0c0f' }}
+/>
+
+<Warning>
+If the embedded frame is blocked in your browser, use **Open playground in a new tab**.
+</Warning>
+
 ---
 
 ## Interactive API playground
 
 Base URL: `https://backend.specterpq.com`
+
+> No setup required. Hit the live API and see stealth addresses in action.
 
 Run these in order. Each step feeds into the next.
 

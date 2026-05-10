@@ -129,6 +129,17 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "Playground",
+        "groups": [
+          {
+            "group": "Try playground",
+            "pages": [
+              "explore/playground"
+            ]
+          }
+        ]
       }
     ],
     "global": {
