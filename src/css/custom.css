@@ -106,6 +106,19 @@ body {
   border-radius: 16px;
 }
 
+.markdown .theme-mermaid {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0 2rem;
+}
+
+.markdown .theme-mermaid svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
 .markdown iframe {
   max-width: 100%;
 }
@@ -142,6 +155,35 @@ table,
 .pagination-nav__link {
   border-color: rgba(255, 255, 255, 0.08);
   background: #090b0c;
+}
+
+.alert {
+  box-shadow: none;
+}
+
+.alert--warning {
+  --ifm-alert-background-color: rgba(255, 204, 72, 0.08);
+  --ifm-alert-background-color-highlight: rgba(255, 204, 72, 0.14);
+  --ifm-alert-border-color: rgba(255, 204, 72, 0.35);
+  --ifm-alert-color: #fff7df;
+  border: 1px solid rgba(255, 204, 72, 0.22);
+  border-left: 4px solid #f4c44c;
+  background: linear-gradient(180deg, rgba(255, 204, 72, 0.08), rgba(255, 204, 72, 0.04));
+}
+
+.alert--warning .alert__heading,
+.alert--warning .alert__icon,
+.alert--warning strong {
+  color: #ffe8a8;
+}
+
+.alert--warning a {
+  color: #ffd66b;
+  text-decoration-color: rgba(255, 214, 107, 0.7);
+}
+
+.alert--warning a:hover {
+  color: #ffea9b;
 }
 
 table thead tr {

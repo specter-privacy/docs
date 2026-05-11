@@ -3,6 +3,8 @@ title: "How SPECTER Works"
 description: "The plain-language version of stealth addresses, meta-addresses, and announcements"
 ---
 
+import mlKemDiagram from '@site/static/images/specter/ml-kem-768-diagram.png';
+
 <Info>
 Think of SPECTER as a private mailbox system. You put up a public sign that says "send mail here," but every letter gets routed to a different, secret mailbox that only you can open.
 </Info>
@@ -66,7 +68,7 @@ After sending, the sender posts a small piece of data (an announcement) that con
 The shared secret between sender and recipient is created using **ML-KEM-768**, not classical ECDH. ML-KEM is based on lattice math that quantum computers can't efficiently crack (no known algorithm exists). The ciphertext sitting on-chain is safe even against future quantum attackers.
 
 <Frame caption="ML-KEM-768: How the sender and recipient derive a shared secret without classical key exchange">
-  ![ML-KEM-768 diagram](/images/specter/ml-kem-768-diagram.png)
+  <img src={mlKemDiagram} alt="ML-KEM-768 diagram" />
 </Frame>
 
 ## The honest picture

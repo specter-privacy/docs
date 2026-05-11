@@ -3,12 +3,14 @@ title: "Post-Quantum Cryptography in SPECTER"
 description: "How ML-KEM-768 works, why SPECTER uses it, and what it protects"
 ---
 
+import mlKemDiagram from '@site/static/images/specter/ml-kem-768-diagram.png';
+
 ## ML-KEM-768: the crypto behind SPECTER
 
 SPECTER replaces the classical ECDH key exchange with **ML-KEM-768** (Module Lattice-based Key Encapsulation Mechanism). It's standardized by NIST as [FIPS 203](https://csrc.nist.gov/pubs/fips/203/final) and is the recommended post-quantum KEM for general use.
 
 <Frame caption="ML-KEM-768 encapsulation and decapsulation flow in SPECTER">
-  ![ML-KEM-768 cryptographic flow](/images/specter/ml-kem-768-diagram.png)
+  <img src={mlKemDiagram} alt="ML-KEM-768 cryptographic flow" />
 </Frame>
 
 ## What ML-KEM does in one paragraph
