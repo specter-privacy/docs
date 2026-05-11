@@ -1,8 +1,8 @@
 .cardGrid {
   display: grid;
   grid-template-columns: repeat(var(--card-cols, 2), minmax(0, 1fr));
-  gap: 1.25rem;
-  margin: 1.5rem 0;
+  gap: 1rem;
+  margin: 1.25rem 0;
 }
 
 .card {
@@ -10,10 +10,10 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-height: 14.25rem;
-  padding: 1.5rem;
+  min-height: 8rem;
+  padding: 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 28px;
+  border-radius: 24px;
   background: #060809;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.025),
@@ -42,7 +42,7 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  border-radius: 28px;
+  border-radius: 24px;
 }
 
 .cardLinkOverlay:focus-visible {
@@ -52,9 +52,9 @@
 
 .cardHeader {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 1rem;
-  margin-bottom: 1.1rem;
+  margin-bottom: 1.5rem;
   position: relative;
   z-index: 2;
   pointer-events: none;
@@ -65,8 +65,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 3rem;
-  height: 3rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 999px;
   background: rgba(20, 184, 166, 0.1);
   color: #16d3c0;
@@ -79,8 +79,8 @@
 }
 
 .cardIcon img {
-  width: 1.3rem;
-  height: 1.3rem;
+  width: 1.15rem;
+  height: 1.15rem;
 }
 
 .calloutIcon img {
@@ -97,10 +97,10 @@
 
 .cardTitle {
   margin: 0;
-  font-size: clamp(1.05rem, 1.4vw, 1.45rem);
-  line-height: 1.2;
+  font-size: clamp(0.98rem, 1.15vw, 1.2rem);
+  line-height: 1.15;
   letter-spacing: -0.03em;
-  max-width: 15ch;
+  max-width: 16ch;
 }
 
 .card:hover .cardTitle,
@@ -113,8 +113,8 @@
   z-index: 2;
   flex: 1 1 auto;
   color: rgba(232, 240, 237, 0.82);
-  font-size: clamp(0.96rem, 1.1vw, 1.02rem);
-  line-height: 1.64;
+  font-size: clamp(0.88rem, 0.98vw, 0.95rem);
+  line-height: 1.5;
   pointer-events: none;
 }
 
