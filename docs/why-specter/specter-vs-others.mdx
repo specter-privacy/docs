@@ -33,6 +33,7 @@ The biggest difference is in the cryptographic primitive used for the sender-rec
 
 This means the announcement ciphertexts stored on-chain are protected against quantum attacks. A future attacker with a quantum computer can't retroactively break the privacy of old payments.
 
+<div className="diagramCenter">
 ```mermaid
 flowchart LR
     subgraph Classical["Classical (Umbra/Fluidkey)"]
@@ -45,6 +46,7 @@ flowchart LR
     style B1 fill:#dc2626,color:#fff
     style B2 fill:#0F766E,color:#fff
 ```
+</div>
 
 ### Faster scanning
 

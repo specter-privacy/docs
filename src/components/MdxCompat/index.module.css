@@ -285,17 +285,43 @@
 
 .callout {
   display: flex;
+  align-items: center;
   gap: 0.9rem;
   margin: 1.5rem 0;
-  padding: 1rem 1.05rem;
-  border: 1px solid color-mix(in srgb, var(--callout-color) 30%, transparent);
+  padding: 1rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--callout-color) 28%, transparent);
   border-left-width: 4px;
   border-radius: 16px;
-  background: color-mix(in srgb, var(--callout-color) 10%, white);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--callout-color) 12%, #09110f),
+    color-mix(in srgb, var(--callout-color) 7%, #060809)
+  );
+  color: #e9f5f2;
 }
 
 .calloutIcon {
-  background: color-mix(in srgb, var(--callout-color) 16%, white);
+  background: color-mix(in srgb, var(--callout-color) 14%, #08100f);
+  color: color-mix(in srgb, var(--callout-color) 76%, white);
+}
+
+.calloutBody {
+  color: rgba(232, 240, 237, 0.86);
+  line-height: 1.62;
+  flex: 1 1 auto;
+}
+
+.calloutBody strong {
+  color: #f3faf8;
+}
+
+.calloutBody a {
+  color: color-mix(in srgb, var(--callout-color) 82%, white);
+  text-decoration-color: color-mix(in srgb, var(--callout-color) 55%, transparent);
+}
+
+.calloutBody a:hover {
+  color: color-mix(in srgb, var(--callout-color) 92%, white);
 }
 
 .playgroundFrame {
