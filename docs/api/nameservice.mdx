@@ -1,0 +1,97 @@
+---
+title: "Name service endpoints"
+description: "Resolve ENS and SuiNS names to SPECTER meta-address payloads"
+---
+
+<CardGroup cols={2}>
+  <Card title="Resolve ENS" icon="at-sign">
+    `GET /api/v1/ens/resolve/:name` returns ENS + meta-address details.
+  </Card>
+  <Card title="Resolve SuiNS" icon="globe">
+    `GET /api/v1/suins/resolve/:name` returns SuiNS + meta-address details.
+  </Card>
+</CardGroup>
+
+## Endpoints
+
+- `GET /api/v1/ens/resolve/:name`
+- `GET /api/v1/suins/resolve/:name`
+
+## Resolution behavior
+
+<Steps>
+  <Step title="Read name service record">
+    ENS checks `specter` text record first and falls back to ENS content hash when needed. SuiNS reads content hash.
+  </Step>
+  <Step title="Extract CID and fetch from IPFS">
+    Resolver parses CID formats (`ipfs://`, `/ipfs/`, raw CID) and downloads raw bytes from configured gateway.
+  </Step>
+  <Step title="Decode and validate">
+    Backend decodes bytes into `MetaAddress` and validates key structure before responding.
+  </Step>
+</Steps>
+
+## Request params
+
+<ParamField path="name" type="string" required>
+ENS name like `alice.eth` or SuiNS name like `alice.sui`.
+</ParamField>
+<ParamField query="no_cache" type="string">
+Supported on SuiNS resolve endpoint. If present, clears resolver cache before lookup.
+</ParamField>
+
+## Response schema
+
+<ParamField body="meta_address" type="string" required>
+Hex-encoded SPECTER meta-address.
+</ParamField>
+<ParamField body="spending_pk" type="string" required>
+Hex-encoded spending public key.
+</ParamField>
+<ParamField body="viewing_pk" type="string" required>
+Hex-encoded viewing public key.
+</ParamField>
+<ParamField body="ipfs_cid" type="string">
+CID where meta-address bytes were fetched.
+</ParamField>
+
+<AccordionGroup>
+  <Accordion title="ENS-specific response field">
+    ENS responses include `ens_name`.
+  </Accordion>
+  <Accordion title="SuiNS-specific response field">
+    SuiNS responses include `suins_name`.
+  </Accordion>
+</AccordionGroup>
+
+## Example calls
+
+<Tabs>
+  <Tab title="ENS">
+
+```bash
+curl -s "https://backend.specterpq.com/api/v1/ens/resolve/alice.eth" | jq .
+```
+
+  </Tab>
+  <Tab title="SuiNS">
+
+```bash
+curl -s "https://backend.specterpq.com/api/v1/suins/resolve/alice.sui?no_cache=1" | jq .
+```
+
+  </Tab>
+  <Tab title="JavaScript">
+
+```javascript
+const ensRes = await fetch("https://backend.specterpq.com/api/v1/ens/resolve/alice.eth");
+const ensData = await ensRes.json();
+console.log(ensData.meta_address);
+```
+
+  </Tab>
+</Tabs>
+
+<Info>
+Name-service lookups are always fresh. IPFS downloads can be cached by CID in resolver clients.
+</Info>

@@ -1,0 +1,125 @@
+<svg width="1400" height="740" viewBox="0 0 1400 740" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="740" fill="#262626"/>
+  <text x="700" y="90" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="34" font-weight="700">Achieving Private Channel Communication</text>
+
+  <rect x="90" y="150" width="230" height="470" rx="28" stroke="#FF5A52" stroke-width="3"/>
+  <rect x="335" y="150" width="230" height="470" rx="28" stroke="#FF9A2F" stroke-width="3"/>
+  <rect x="580" y="150" width="230" height="470" rx="28" stroke="#FFF000" stroke-width="3"/>
+  <rect x="825" y="150" width="230" height="470" rx="28" stroke="#37F5A5" stroke-width="3"/>
+  <rect x="1070" y="150" width="230" height="470" rx="28" stroke="#4C8DFF" stroke-width="3"/>
+
+  <text x="205" y="235" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="23" font-weight="700">Public Channel</text>
+  <text x="205" y="268" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="23" font-weight="700">Relationship</text>
+  <text x="205" y="335" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600">Counterparty</text>
+  <text x="205" y="363" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600">connection is obvious</text>
+
+  <text x="450" y="235" text-anchor="middle" fill="#FF9A2F" font-family="Helvetica, Arial, sans-serif" font-size="23" font-weight="700">Stealth</text>
+  <text x="450" y="268" text-anchor="middle" fill="#FF9A2F" font-family="Helvetica, Arial, sans-serif" font-size="23" font-weight="700">Destination</text>
+  <text x="450" y="301" text-anchor="middle" fill="#FF9A2F" font-family="Helvetica, Arial, sans-serif" font-size="23" font-weight="700">Derivation</text>
+  <text x="450" y="370" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600">Generate one-time</text>
+  <text x="450" y="398" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600">stealth address</text>
+
+  <text x="695" y="240" text-anchor="middle" fill="#FFF000" font-family="Helvetica, Arial, sans-serif" font-size="23" font-weight="700">Channel Binding</text>
+  <text x="695" y="313" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600">Link channel to stealth</text>
+  <text x="695" y="341" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600">destination</text>
+
+  <text x="940" y="240" text-anchor="middle" fill="#37F5A5" font-family="Helvetica, Arial, sans-serif" font-size="23" font-weight="700">Announcement</text>
+  <text x="940" y="273" text-anchor="middle" fill="#37F5A5" font-family="Helvetica, Arial, sans-serif" font-size="23" font-weight="700">Discovery</text>
+  <text x="940" y="340" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600">Bob discovers channel</text>
+  <text x="940" y="368" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600">via announcement</text>
+
+  <text x="1185" y="235" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="23" font-weight="700">Private Channel</text>
+  <text x="1185" y="268" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="23" font-weight="700">Relationship</text>
+  <text x="1185" y="335" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600">Counterparty</text>
+  <text x="1185" y="363" text-anchor="middle" fill="#F5F5F4" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="600">connection is hidden</text>
+
+  <path d="M40 560H1360" stroke="#E5E7EB" stroke-width="3"/>
+
+  <path d="M56 536V560" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M56 548L42 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M56 548L70 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M108 498V560" stroke="#E5E7EB" stroke-width="3"/>
+  <path d="M108 510L94 520" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M108 522L94 532" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M108 534L94 544" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M108 510L122 520" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M108 522L122 532" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M108 534L122 544" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M150 455V560" stroke="#E5E7EB" stroke-width="3"/>
+  <path d="M150 472L128 490" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M150 492L128 510" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M150 512L128 530" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M150 472L172 490" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M150 492L172 510" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M150 512L172 530" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M230 456V560" stroke="#E5E7EB" stroke-width="3"/>
+  <path d="M230 474L208 492" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M230 494L208 512" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M230 514L208 532" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M230 474L252 492" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M230 494L252 512" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M230 514L252 532" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M286 520C298 506 311 504 320 520" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M320 520C334 500 349 497 366 514" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M293 495C316 490 324 472 336 462C348 452 364 454 378 468C392 482 403 513 446 532" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M420 438C436 430 446 430 456 440" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="414" cy="442" r="5" fill="#E5E7EB"/>
+  <circle cx="430" cy="428" r="5" fill="#E5E7EB"/>
+  <path d="M432 448C442 460 444 476 438 492" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M428 497L446 512" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M430 495L414 510" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M204 470C240 465 258 470 285 490C320 516 364 497 412 498C460 499 500 498 548 499C596 500 644 499 692 499C740 499 788 500 836 498C884 496 930 498 982 495C1028 493 1056 480 1068 452" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round" stroke-dasharray="10 12"/>
+
+  <path d="M1000 548C1018 518 1036 501 1050 498C1062 476 1072 464 1086 450C1100 436 1110 434 1120 450C1136 451 1144 465 1150 476C1160 496 1176 512 1196 509" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1044 526L1064 508" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1068 500L1088 488" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1100 454V390" stroke="#E5E7EB" stroke-width="3"/>
+  <path d="M1100 410H1124" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1100 430H1120" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M1120 454C1140 444 1148 428 1160 426C1174 424 1180 432 1190 440C1204 452 1216 442 1230 432" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1130 472C1150 462 1160 452 1178 454C1194 456 1204 470 1220 478" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1138 502C1152 490 1166 486 1182 490C1194 494 1202 504 1210 510" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M1210 455V560" stroke="#E5E7EB" stroke-width="3"/>
+  <path d="M1210 472L1188 490" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1210 492L1188 510" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1210 512L1188 530" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1210 472L1232 490" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1210 492L1232 510" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1210 512L1232 530" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M1260 497V560" stroke="#E5E7EB" stroke-width="3"/>
+  <path d="M1260 509L1246 519" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1260 521L1246 531" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1260 533L1246 543" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1260 509L1274 519" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1260 521L1274 531" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1260 533L1274 543" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M1178 538V560" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1178 548L1166 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1178 548L1190 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M298 538V560" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M298 548L286 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M298 548L310 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M392 538V560" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M392 548L380 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M392 548L404 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M424 538V560" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M424 548L412 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M424 548L436 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M456 538V560" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M456 548L444 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M456 548L468 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1342 538V560" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1342 548L1330 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1342 548L1354 536" stroke="#E5E7EB" stroke-width="3" stroke-linecap="round"/>
+</svg>

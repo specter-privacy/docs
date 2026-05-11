@@ -1,0 +1,169 @@
+:root {
+  --ifm-color-primary: #14b8a6;
+  --ifm-color-primary-dark: #12a394;
+  --ifm-color-primary-darker: #119988;
+  --ifm-color-primary-darkest: #0d7d6f;
+  --ifm-color-primary-light: #17cdb8;
+  --ifm-color-primary-lighter: #1dd7c1;
+  --ifm-color-primary-lightest: #49dfcf;
+  --ifm-background-color: #020303;
+  --ifm-background-surface-color: #090b0c;
+  --ifm-navbar-background-color: rgba(2, 3, 3, 0.92);
+  --ifm-footer-background-color: #020303;
+  --ifm-code-font-size: 92%;
+  --ifm-heading-color: #f5f7f8;
+  --ifm-font-color-base: rgba(226, 232, 240, 0.84);
+  --ifm-font-color-secondary: rgba(226, 232, 240, 0.64);
+  --ifm-toc-border-color: rgba(255, 255, 255, 0.08);
+  --ifm-menu-color: rgba(226, 232, 240, 0.72);
+  --ifm-menu-color-active: #f8fafc;
+  --ifm-menu-color-background-active: rgba(20, 184, 166, 0.12);
+  --ifm-breadcrumb-color-active: #f8fafc;
+  --ifm-link-color: #32d8c7;
+  --ifm-link-hover-color: #6be8da;
+  --ifm-heading-font-weight: 650;
+  --ifm-line-height-base: 1.72;
+  --ifm-global-radius: 14px;
+  --ifm-font-family-base:
+    "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+  --ifm-font-family-monospace:
+    "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace;
+  --docusaurus-highlighted-code-line-bg: rgba(20, 184, 166, 0.14);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #020303;
+  color: var(--ifm-font-color-base);
+}
+
+.navbar {
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}
+
+.navbar__brand {
+  font-weight: 650;
+}
+
+.navbar__link,
+.menu__link,
+.pagination-nav__label,
+.breadcrumbs__link,
+.footer__link-item {
+  font-size: 0.96rem;
+}
+
+.navbar__link:hover,
+.menu__link:hover,
+.breadcrumbs__link:hover,
+.footer__link-item:hover {
+  color: #f8fafc;
+}
+
+.main-wrapper {
+  background: #020303;
+}
+
+.markdown {
+  font-size: 1rem;
+}
+
+.markdown > h1:first-child {
+  font-size: clamp(2.15rem, 4vw, 3.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  margin-bottom: 1.25rem;
+}
+
+.markdown h2 {
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+}
+
+.markdown h3 {
+  font-size: clamp(1.15rem, 1.4vw, 1.35rem);
+  line-height: 1.28;
+}
+
+.markdown p,
+.markdown li,
+.markdown td {
+  color: rgba(226, 232, 240, 0.78);
+}
+
+.markdown strong,
+.markdown th {
+  color: #f8fafc;
+}
+
+.markdown img {
+  border-radius: 16px;
+}
+
+.markdown iframe {
+  max-width: 100%;
+}
+
+.theme-doc-markdown header + * {
+  margin-top: 1rem;
+}
+
+.theme-doc-sidebar-container {
+  background: #050607;
+  border-right-color: rgba(255, 255, 255, 0.06);
+}
+
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible {
+  font-weight: 650;
+}
+
+.theme-doc-footer-edit-meta-row {
+  margin-top: 2rem;
+}
+
+.table-of-contents {
+  font-size: 0.92rem;
+}
+
+.table-of-contents__link:hover,
+.table-of-contents__link--active {
+  color: #f8fafc;
+}
+
+.theme-code-block,
+table,
+.alert,
+.pagination-nav__link {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: #090b0c;
+}
+
+table thead tr {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+table tr:nth-child(2n) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: #020303;
+}
+
+[data-theme='dark'] {
+  --ifm-background-color: #020303;
+  --ifm-background-surface-color: #090b0c;
+  --ifm-navbar-background-color: rgba(2, 3, 3, 0.92);
+  --ifm-footer-background-color: #020303;
+  --ifm-heading-color: #f5f7f8;
+  --ifm-font-color-base: rgba(226, 232, 240, 0.84);
+  --ifm-font-color-secondary: rgba(226, 232, 240, 0.64);
+  --docusaurus-highlighted-code-line-bg: rgba(20, 184, 166, 0.14);
+}

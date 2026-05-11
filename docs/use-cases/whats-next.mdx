@@ -1,0 +1,61 @@
+---
+title: "What's Next"
+description: "Use cases on the SPECTER roadmap: prediction markets, payroll, multi-chain expansion, and more"
+---
+
+## Where stealth addresses go next
+
+Private receiving is the foundation. Here's what it enables beyond basic payments.
+
+## Upcoming use cases
+
+### Private prediction markets
+
+Bet on outcomes without broadcasting your positions. Stealth addresses keep your participation invisible to other market participants and on-chain observers.
+
+### Private payroll
+
+Organizations pay contributors to stealth addresses. No employee can see what others earn. HR or finance holds the meta-addresses; the actual pay destinations are unique per period.
+
+### Multi-chain expansion
+
+SPECTER already supports Ethereum and Sui. Coming next:
+
+- **Arbitrum** - L2 stealth payments with lower gas costs
+- **Base** - Same privacy guarantees on Coinbase's L2
+- **Optimism** - Expanding the rollup support
+
+The same meta-address works across all chains. One key setup, receive privately everywhere.
+
+### Cross-chain stealth transfers
+
+Send from Ethereum, receive privately on Sui (or vice versa). The ML-KEM shared secret can derive valid addresses for any chain, making cross-chain private receiving possible.
+
+### Private subscriptions
+
+Recurring stealth payments where each period goes to a new address. The service provider can verify payment through the announcement system without revealing the subscriber's identity on-chain.
+
+## Technical roadmap
+
+| Feature | Status |
+|---------|--------|
+| ML-KEM-768 receive/discover | Live |
+| ENS + SuiNS integration | Live |
+| Yellow private channels | Live (partial) |
+| View tag scanning optimization | Live |
+| ERC-4337 PQ smart account spending | Research |
+| ML-DSA-65 signature verification | Research |
+| Arbitrum / Base / Optimism support | Planned |
+| Mobile SDK | Planned |
+| Browser extension | Planned |
+
+For the detailed technical roadmap, see [Yet to Implement](/roadmap/yet-to-implement).
+
+<CardGroup cols={2}>
+  <Card title="ERC Proposal" icon="scroll" href="/deep-dive/erc-proposal">
+    The standards track proposal for post-quantum stealth on Ethereum.
+  </Card>
+  <Card title="Security boundaries" icon="shield" href="/how-it-works/security-boundaries">
+    The path to full PQ spending.
+  </Card>
+</CardGroup>

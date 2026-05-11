@@ -1,0 +1,102 @@
+---
+title: "FAQ"
+description: "Quick answers about SPECTER, stealth addresses, and post-quantum cryptography"
+---
+
+## The basics
+
+<AccordionGroup>
+  <Accordion title="What is SPECTER in one sentence?">
+    A private receiving system that gives you a fresh stealth address for every payment, using post-quantum cryptography so the privacy holds up even against future quantum computers.
+  </Accordion>
+  <Accordion title="Is it a blockchain? A token?">
+    Neither. SPECTER is a privacy layer that works on top of existing chains (Ethereum, Sui). No new chain, no token.
+  </Accordion>
+  <Accordion title="What is a stealth address?">
+    A one-time destination that the sender derives from your public profile. It's never been used before and can't be linked back to you without your private keys.
+  </Accordion>
+  <Accordion title="What is a meta-address?">
+    Your public SPECTER profile. It contains your spending and viewing public keys. Share it (or link it to your ENS name) so people can pay you privately.
+  </Accordion>
+  <Accordion title="Do I need to understand cryptography to use this?">
+    No. The product flow is: generate keys, share your profile, receive payments, scan to find them. The crypto runs in the background.
+  </Accordion>
+</AccordionGroup>
+
+## Post-quantum stuff
+
+<AccordionGroup>
+  <Accordion title="What does post-quantum mean?">
+    It means the cryptography is designed to resist attacks from quantum computers. SPECTER uses ML-KEM-768, a NIST-standardized algorithm based on lattice math that no known quantum algorithm can break.
+  </Accordion>
+  <Accordion title="Is SPECTER fully post-quantum?">
+    The receiving/discovery layer is. The spending path still uses secp256k1 for Ethereum wallet compatibility. Read [Security Boundaries](/how-it-works/security-boundaries) for the full picture.
+  </Accordion>
+  <Accordion title="When will quantum computers actually be a threat?">
+    Estimates vary from 10-15 years for cryptographically relevant quantum computers. But the data SPECTER protects is permanent and public on-chain. An adversary can collect it now and attack it later. That's why using PQ crypto today matters.
+  </Accordion>
+  <Accordion title="Why not just wait until quantum computers exist?">
+    Because blockchain data can't be deleted. Every payment made with classical crypto today is permanently vulnerable to future quantum attacks. Migrating later doesn't protect historical data.
+  </Accordion>
+</AccordionGroup>
+
+## Security
+
+<AccordionGroup>
+  <Accordion title="Can someone still see that a transaction happened?">
+    Yes. SPECTER improves recipient privacy and unlinkability. It doesn't make the blockchain itself private. Observers can see a transaction to a stealth address, but they can't determine who the recipient is.
+  </Accordion>
+  <Accordion title="Why is receiving called 'stronger' than spending?">
+    The receiving path uses ML-KEM-768 (post-quantum). The spending path uses secp256k1 (classical) for wallet compatibility. The receiving data lives on-chain permanently and needs stronger protection.
+  </Accordion>
+  <Accordion title="Does the API return sensitive material?">
+    Yes. The scan endpoint returns `eth_private_key` and `stealth_sk` for discovered payments. Treat these like seed phrases. Never log them.
+  </Accordion>
+</AccordionGroup>
+
+## Product
+
+<AccordionGroup>
+  <Accordion title="Where is the live app?">
+    [specterpq.com](https://specterpq.com/)
+  </Accordion>
+  <Accordion title="Where is the live API?">
+    `https://backend.specterpq.com` - check [health endpoint](https://backend.specterpq.com/health)
+  </Accordion>
+  <Accordion title="What chains does SPECTER support?">
+    Ethereum and Sui today. Arbitrum, Base, and Optimism are on the roadmap.
+  </Accordion>
+  <Accordion title="What is Yellow in this project?">
+    Yellow Network integration for private trading channels. SPECTER stealth addresses hide the counterparty relationship in state channels. Read [Yellow Private Channels](/use-cases/yellow-private-channels).
+  </Accordion>
+  <Accordion title="Is Yellow settlement fully working?">
+    The create and discover flows are live. Fund and close endpoints exist as scaffolding but don't submit real L1 settlement transactions yet.
+  </Accordion>
+  <Accordion title="Is SPECTER open source?">
+    Yes. [github.com/pranshurastogi/SPECTER](https://github.com/pranshurastogi/SPECTER)
+  </Accordion>
+</AccordionGroup>
+
+## Still confused?
+
+Start with these three pages:
+
+1. **[How SPECTER Works](/why-specter/how-specter-works)** - Plain-language explanation
+2. **[Protocol Flow](/how-it-works/protocol-flow)** - Step-by-step technical walkthrough
+3. **[Security Boundaries](/how-it-works/security-boundaries)** - What's protected and what isn't
+
+---
+
+## Need help?
+
+<CardGroup cols={3}>
+  <Card title="Email us" icon="envelope" href="mailto:pranshurastogi3196@gmail.com">
+    pranshurastogi3196@gmail.com
+  </Card>
+  <Card title="GitHub Issues" icon="github" href="https://github.com/pranshurastogi/SPECTER/issues">
+    Bug reports and feature requests.
+  </Card>
+  <Card title="SPECTER on X" icon="message-circle" href="https://x.com/specter_PQ">
+    Follow @specter_PQ for updates. Creator: [@pranshurastogii](https://x.com/pranshurastogii).
+  </Card>
+</CardGroup>

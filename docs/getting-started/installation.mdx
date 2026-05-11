@@ -1,0 +1,100 @@
+---
+title: "Installation"
+description: "Set up SPECTER locally: backend, frontend, or both"
+---
+
+## Choose your setup
+
+| Approach | When to use |
+|----------|------------|
+| **API only** | You just want to call endpoints. Use the [hosted backend](https://backend.specterpq.com/health). |
+| **Frontend only** | You want to run the web app locally against the hosted API. |
+| **Full stack** | You want everything running on your machine. |
+
+## Prerequisites
+
+- **Rust 1.88+** (for backend)
+- **Node.js 18+** (for frontend)
+- **Docker** (optional, for containerized backend)
+
+## Backend setup
+
+```bash
+# Clone the repo
+git clone https://github.com/pranshurastogi/SPECTER.git
+cd SPECTER/specter
+
+# Copy environment config
+cp .env.example .env
+# Edit .env with your values (Pinata, Turso, etc.)
+
+# Build and run
+cargo build --release
+cargo run --release --bin specter -- serve
+```
+
+The API server starts on `http://localhost:3001`.
+
+### Using Docker
+
+```bash
+cd SPECTER/specter
+docker build -t specter .
+docker run -p 3001:8080 --env-file .env specter
+```
+
+## Frontend setup
+
+```bash
+cd SPECTER/SPECTER-web
+npm install
+npm run dev
+```
+
+The frontend starts on `http://localhost:5173` and connects to the configured backend URL.
+
+## CLI usage
+
+The `specter` binary supports standalone operations:
+
+```bash
+# Generate keys
+cargo run --bin specter -- generate
+
+# Create a stealth payment
+cargo run --bin specter -- create --meta-address <META_ADDRESS>
+
+# Scan for payments
+cargo run --bin specter -- scan --viewing-sk <HEX> --spending-pk <HEX> --spending-sk <HEX>
+
+# Run benchmarks
+cargo run --bin specter -- bench
+
+# Start API server
+cargo run --bin specter -- serve
+```
+
+## Environment variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `REGISTRY_BACKEND` | No | `memory` (default) or `turso` |
+| `TURSO_DATABASE_URL` | For turso | libSQL connection string |
+| `TURSO_AUTH_TOKEN` | For turso | Auth token |
+| `PINATA_JWT` | For IPFS | Pinata upload credentials |
+| `PINATA_GATEWAY_URL` | For IPFS | Your Pinata gateway |
+| `PINATA_GATEWAY_TOKEN` | For IPFS | Gateway access token |
+| `ETH_RPC_URL` | For ENS | Ethereum RPC endpoint |
+| `SUI_RPC_URL` | For SuiNS | Sui RPC endpoint |
+| `API_KEY` | No | Enables auth for write endpoints |
+| `ALLOWED_ORIGINS` | No | CORS origins (default: `*`) |
+| `RATE_LIMIT_RPS` | No | Requests per second (default: 10) |
+
+## Verify it's working
+
+```bash
+curl -s http://localhost:3001/health | jq .
+# Should return: {"status":"ok","version":"..."}
+```
+
+Then run the [quickstart](/getting-started/quickstart) flow against `http://localhost:3001` instead of the hosted backend.

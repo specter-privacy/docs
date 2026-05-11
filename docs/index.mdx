@@ -1,0 +1,150 @@
+---
+title: "SPECTER"
+description: "Private payments on Ethereum and Sui, built for a post-quantum world"
+slug: /
+---
+
+<Frame>
+  ![SPECTER cover](/images/specter/cover-specter.png)
+</Frame>
+
+## Private receiving without a public recipient trail
+
+SPECTER lets you publish one public **meta-address** and receive each payment at a different one-time **stealth address**.
+
+The discovery path uses **ML-KEM-768**, so the announcement data that helps you recover payments is designed to remain private even under future quantum attacks.
+
+<CardGroup cols={2}>
+  <Card title="Understand the model" icon="sitemap" href="/why-specter/how-specter-works">
+    Learn the core ideas: meta-addresses, announcements, view tags, and stealth addresses.
+  </Card>
+  <Card title="Run the quickstart" icon="play" href="/getting-started/quickstart">
+    Execute the current API flow end to end against the hosted backend.
+  </Card>
+  <Card title="Build with SPECTER" icon="code" href="/build/integration-guide">
+    Choose an integration pattern and review the current API and security model.
+  </Card>
+  <Card title="Contribute" icon="git-alt" href="/build/contribution-opportunities">
+    Review the open GitHub issues and find the highest-value work.
+  </Card>
+</CardGroup>
+
+---
+
+## Use the docs by goal
+
+These docs are organized around reader intent. Start with the path that matches your job.
+
+<Tabs>
+  <Tab title="Evaluating SPECTER">
+    Read **[The Problem](/why-specter/the-problem)** for the privacy and quantum context, then **[How SPECTER Works](/why-specter/how-specter-works)** for the plain-language model.
+
+    Use **[SPECTER vs Others](/why-specter/specter-vs-others)** and **[Security Boundaries](/how-it-works/security-boundaries)** to evaluate tradeoffs honestly.
+  </Tab>
+  <Tab title="Builder">
+    Start with the **[API Quickstart](/getting-started/quickstart)**, then move to the **[Integration Guide](/build/integration-guide)** and the **[API Overview](/api/introduction)**.
+
+    If you need to run the stack locally, go to **[Installation](/getting-started/installation)** and **[Development Setup](/build/development-setup)**.
+  </Tab>
+  <Tab title="Contributor">
+    Review **[Contribution Opportunities](/build/contribution-opportunities)** first. It maps the current GitHub backlog to repo areas and contributor skill sets.
+
+    Then use **[Contributing](/build/contributing)** for the workflow and **[Verification Matrix](/reference/verification-matrix)** to keep changes source-backed.
+  </Tab>
+  <Tab title="Deep technical review">
+    Go straight to **[Protocol Flow](/how-it-works/protocol-flow)**, **[Architecture](/how-it-works/architecture)**, and **[Post-Quantum Cryptography](/how-it-works/post-quantum-crypto)**.
+
+    For source-backed validation, use **[Verification Matrix](/reference/verification-matrix)** and the product repo on [GitHub](https://github.com/pranshurastogi/SPECTER).
+  </Tab>
+</Tabs>
+
+---
+
+## Protocol in 30 seconds
+
+```mermaid
+flowchart LR
+    subgraph Recipient["Recipient setup"]
+        A["Generate spending and viewing keys"]
+        B["Publish meta-address"]
+        A --> B
+    end
+
+    subgraph Sender["Sender flow"]
+        C["Resolve meta-address"]
+        D["Derive one-time stealth address"]
+        E["Send funds"]
+        F["Publish announcement"]
+        C --> D --> E --> F
+    end
+
+    subgraph Recovery["Recipient recovery"]
+        G["Scan announcements with viewing key"]
+        H["Recover stealth key and spend"]
+        G --> H
+    end
+
+    B --> C
+    F --> G
+
+    style A fill:#0F766E,color:#fff
+    style B fill:#0F766E,color:#fff
+    style D fill:#14B8A6,color:#fff
+    style F fill:#14B8A6,color:#fff
+    style G fill:#115E59,color:#fff
+    style H fill:#115E59,color:#fff
+```
+
+1. The recipient creates a `meta-address` from public spending and viewing keys.
+2. The sender derives a one-time stealth address from that `meta-address`.
+3. The sender transfers funds and publishes an **announcement** with an `ephemeral_key` and `view_tag`.
+4. The recipient scans announcements, recovers the matching stealth key, and spends normally.
+
+Observers can see the transfer and the announcement. They should not be able to link the stealth address back to the recipient without the private keys.
+
+---
+
+## Current implementation status
+
+<Warning>
+The docs describe the current shipped behavior, not the end-state vision.
+</Warning>
+
+| Area | Current status |
+|---|---|
+| **Key generation** | The hosted API currently exposes `POST /api/v1/keys/generate`, which returns long-term keys from the backend flow. Client-side key generation is tracked in [issue #18](https://github.com/pranshurastogi/SPECTER/issues/18). |
+| **Announcement recovery** | Discovery currently depends on the backend-managed registry. Backend-independent recovery from on-chain announcements is tracked in [issue #16](https://github.com/pranshurastogi/SPECTER/issues/16). |
+| **Yellow integration** | Channel creation and discovery are documented as implemented. Funding and close flows still include integration scaffolding and placeholder-style behavior. |
+
+---
+
+## What makes SPECTER different today
+
+| | SPECTER | Classical stealth (Umbra/Fluidkey) |
+|---|---|---|
+| **Discovery crypto** | ML-KEM-768 (post-quantum) | ECDH (broken by quantum) |
+| **Harvest-now-decrypt-later safe** | Yes | No |
+| **View tag scanning** | ~1-2s for 100k announcements | 10-15s |
+| **Multi-chain** | Ethereum + Sui | Ethereum only |
+| **Name service integration** | ENS + SuiNS | ENS |
+| **NIST standard** | FIPS 203 | N/A |
+
+<Tip>
+If you only read three pages, start with **[How SPECTER Works](/why-specter/how-specter-works)**, **[Protocol Flow](/how-it-works/protocol-flow)**, and **[Security Boundaries](/how-it-works/security-boundaries)**.
+</Tip>
+
+---
+
+## Keep going
+
+<CardGroup cols={3}>
+  <Card title="API reference" icon="code" href="/api/introduction">
+    Browse the full REST surface and endpoint groups.
+  </Card>
+  <Card title="Verification matrix" icon="flask-2" href="/reference/verification-matrix">
+    Validate docs claims against the current source and issue backlog.
+  </Card>
+  <Card title="Contribution opportunities" icon="git-alt" href="/build/contribution-opportunities">
+    Review the current GitHub issues and contributor paths.
+  </Card>
+</CardGroup>
