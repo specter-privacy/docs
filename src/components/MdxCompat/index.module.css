@@ -57,6 +57,7 @@
   margin-bottom: 1.1rem;
   position: relative;
   z-index: 2;
+  pointer-events: none;
 }
 
 .cardIcon,
@@ -114,6 +115,7 @@
   color: rgba(232, 240, 237, 0.82);
   font-size: clamp(0.96rem, 1.1vw, 1.02rem);
   line-height: 1.64;
+  pointer-events: none;
 }
 
 .cardBody a {
@@ -121,6 +123,7 @@
   z-index: 3;
   color: #18d1be;
   text-decoration: none;
+  pointer-events: auto;
 }
 
 .card:hover .cardBody a,
