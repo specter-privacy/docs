@@ -105,6 +105,6 @@ async function loadScopedStyles() {
 
   return rawCss
     .replace(/:root/g, ':host')
-    .replace(/body::before/g, ':host::before')
-    .replace(/body/g, ':host');
+    .replace(/(^|[\s}])body::before(?=\s*\{)/gm, '$1:host::before')
+    .replace(/(^|[\s}])body(?=\s*\{)/gm, '$1:host');
 }

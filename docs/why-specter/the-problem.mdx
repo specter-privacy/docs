@@ -23,6 +23,7 @@ But stealth systems leave cryptographic data on-chain permanently: ciphertexts, 
 
 This is the harvest-now-decrypt-later attack:
 
+<div className="diagramCenter">
 ```mermaid
 flowchart TD
     A["Adversary records on-chain\nciphertexts today"] --> B["Stores them\nfor years"]
@@ -36,6 +37,7 @@ flowchart TD
     style D fill:#dc2626,color:#fff
     style E fill:#dc2626,color:#fff
 ```
+</div>
 
 An attacker doesn't need a quantum computer today. They just need to save the data. When quantum computers are powerful enough (NIST estimates 10-15 years), they can retroactively break the privacy of every classical stealth payment ever made.
 

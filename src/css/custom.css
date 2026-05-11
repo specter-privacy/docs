@@ -119,6 +119,17 @@ body {
   margin: 0 auto;
 }
 
+.diagramCenter {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.diagramCenter .theme-mermaid {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .markdown iframe {
   max-width: 100%;
 }
@@ -159,6 +170,31 @@ table,
 
 .alert {
   box-shadow: none;
+}
+
+.alert--secondary {
+  --ifm-alert-background-color: rgba(77, 168, 255, 0.08);
+  --ifm-alert-background-color-highlight: rgba(77, 168, 255, 0.14);
+  --ifm-alert-border-color: rgba(77, 168, 255, 0.34);
+  --ifm-alert-color: #e6f2ff;
+  border: 1px solid rgba(77, 168, 255, 0.2);
+  border-left: 4px solid #4da8ff;
+  background: linear-gradient(180deg, rgba(77, 168, 255, 0.08), rgba(77, 168, 255, 0.04));
+}
+
+.alert--secondary .alert__heading,
+.alert--secondary .alert__icon,
+.alert--secondary strong {
+  color: #a9d2ff;
+}
+
+.alert--secondary a {
+  color: #7cc0ff;
+  text-decoration-color: rgba(124, 192, 255, 0.7);
+}
+
+.alert--secondary a:hover {
+  color: #aed7ff;
 }
 
 .alert--warning {
