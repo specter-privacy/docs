@@ -1,0 +1,24 @@
+.page {
+  min-height: calc(100vh - var(--ifm-navbar-height));
+  padding: 1.5rem 0 2.5rem;
+}
+
+.mountShell {
+  width: min(100%, 1024px);
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.mountPoint {
+  width: 100%;
+}
+
+@media (max-width: 996px) {
+  .page {
+    padding-top: 1rem;
+  }
+
+  .mountShell {
+    padding: 0 20px;
+  }
+}

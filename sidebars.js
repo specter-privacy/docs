@@ -1,0 +1,101 @@
+const sidebars = {
+  docsSidebar: [
+    'index',
+    {
+      type: 'category',
+      label: 'Start here',
+      collapsed: false,
+      items: [
+        'why-specter/the-problem',
+        'why-specter/how-specter-works',
+        'getting-started/quickstart',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Understand SPECTER',
+      items: [
+        'how-it-works/protocol-flow',
+        'how-it-works/view-tags-and-scanning',
+        'how-it-works/security-boundaries',
+        'how-it-works/architecture',
+        'how-it-works/post-quantum-crypto',
+        'why-specter/specter-vs-others',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Build and try',
+      items: [
+        'explore/playground',
+        'getting-started/installation',
+        'build/integration-guide',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Use cases',
+      items: [
+        'use-cases/private-payments',
+        'use-cases/name-services',
+        'use-cases/yellow-private-channels',
+        'use-cases/whats-next',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Contribute',
+      items: [
+        'build/contributing',
+        'build/contribution-opportunities',
+        'build/development-setup',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Deep dive',
+      items: [
+        'deep-dive/post-quantum-explainer',
+        'deep-dive/erc-proposal',
+        'deep-dive/research-notes',
+        'deep-dive/terminology',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Resources',
+      items: [
+        'faq',
+        'reference/verification-matrix',
+        'reference/changelog',
+        'roadmap/yet-to-implement',
+      ],
+    },
+  ],
+  apiSidebar: [
+    {
+      type: 'category',
+      label: 'Overview',
+      collapsed: false,
+      items: ['api/introduction', 'api/auth-and-errors'],
+    },
+    {
+      type: 'category',
+      label: 'Core endpoints',
+      items: [
+        'api/keys',
+        'api/stealth',
+        'api/nameservice',
+        'api/ipfs',
+        'api/registry',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Yellow endpoints',
+      items: ['api/yellow'],
+    },
+  ],
+};
+
+export default sidebars;
