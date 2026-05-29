@@ -333,8 +333,14 @@ export const PLAYGROUND_TEMPLATE = `
         <span class="global-pill">createStealthPayment</span>
         <span class="global-pill">scanAnnouncement</span>
         <span class="global-pill">scanAnnouncements</span>
+        <span class="global-pill">createSpecterApiClient</span>
+        <span class="global-pill">specterKeysViewingPk</span>
         <span class="global-pill constant">KYBER_PUBLIC_KEY_SIZE</span>
+        <span class="global-pill constant">KYBER_SECRET_KEY_SIZE</span>
         <span class="global-pill constant">KYBER_CIPHERTEXT_SIZE</span>
+        <span class="global-pill constant">KYBER_SHARED_SECRET_SIZE</span>
+        <span class="global-pill constant">STEALTH_ETH_PRIVATE_KEY_SIZE</span>
+        <span class="global-pill constant">STEALTH_SECP256K1_PUBLIC_SIZE</span>
         <span class="global-pill constant">PROTOCOL_VERSION</span>
       </div>
     </div>
@@ -344,7 +350,7 @@ export const PLAYGROUND_TEMPLATE = `
     <p>
       <a href="https://github.com/specter-privacy/specter-sdk" target="_blank" rel="noreferrer">github.com/specter-privacy/specter-sdk</a>
       <span class="tag green">Apache-2.0</span>
-      <span class="tag">@specterpq/sdk@0.1.0</span>
+      <span class="tag">@specterpq/sdk@0.2.0</span>
     </p>
     <p>All cryptography runs client-side · No telemetry · No network calls</p>
   </footer>
