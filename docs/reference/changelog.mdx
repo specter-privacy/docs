@@ -3,6 +3,29 @@ title: "Changelog"
 description: "Release history and notable changes in SPECTER"
 ---
 
+## @specterpq/sdk v0.2.0
+
+*June 2026*
+
+The TypeScript SDK reaches the same protocol as the hosted API, with all cryptography running locally in WebAssembly. See the [SDK section](/sdk/overview).
+
+### Added
+
+- ML-KEM-768 key generation, encapsulation, and decapsulation in browser and Node WebAssembly builds.
+- High-level flow: `createStealthPayment` and `scanAnnouncement` / `scanAnnouncements`.
+- Meta-address build and parse: `metaAddressFromPublicKeys`, `parseMetaAddress`.
+- Stealth derivation for Ethereum and Sui: `deriveStealthAddress`, `deriveStealthSuiAddress`, `deriveStealthKeys`.
+- View tag helpers: `computeViewTag`, `verifyViewTag`.
+- Opt-in trusted HTTP client: `createSpecterApiClient`.
+- Exported size constants and a typed `SpecterSdkError` with stable error codes.
+
+### Security
+
+- Secret-bearing fields (`secretKey`, `sharedSecret`, `ethPrivateKey`) are non-enumerable and redacted from JSON and console output.
+- Local crypto helpers make no network calls. Network access is limited to the trusted client you construct.
+
+---
+
 ## v0.1.0 - Initial Release
 
 *March 2026*

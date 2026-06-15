@@ -47,7 +47,7 @@ flowchart LR
         C --> D["Ethereum\ntransaction"]
     end
 
-    style PQ fill:#0F766E,color:#fff
+    style PQ fill:#7c3aed,color:#fff
     style Classical fill:#d97706,color:#fff
 ```
 
@@ -112,19 +112,19 @@ flowchart TD
     B --> C["Future:\nEIP-8141 native PQ\ntransaction support"]
 
     style A fill:#d97706,color:#fff
-    style B fill:#14B8A6,color:#fff
-    style C fill:#0F766E,color:#fff
+    style B fill:#a855f7,color:#fff
+    style C fill:#7c3aed,color:#fff
 ```
 
-<Frame caption="Green: post-quantum protected. Amber: classical execution compatibility.">
-  ![Quantum defense visual](/images/specter/quantum-shield.png)
+<Frame caption="The viewing path is post-quantum protected by ML-KEM-768. Classical execution stays compatible with today's chains.">
+  ![Diagram of where ML-KEM-768 protects the SPECTER viewing path against future quantum decryption](/images/specter/specter-ml-kem-full.png)
 </Frame>
 
 <CardGroup cols={2}>
-  <Card title="ERC Proposal" icon="scroll" href="/deep-dive/erc-proposal">
+  <Card title="ERC Proposal" icon="code" href="/deep-dive/erc-proposal">
     The formal specification for post-quantum stealth addresses on Ethereum.
   </Card>
-  <Card title="PQ crypto explainer" icon="atom" href="/deep-dive/post-quantum-explainer">
+  <Card title="PQ crypto explainer" icon="circuit-resistor" href="/deep-dive/post-quantum-explainer">
     What post-quantum cryptography actually means and why it matters.
   </Card>
 </CardGroup>

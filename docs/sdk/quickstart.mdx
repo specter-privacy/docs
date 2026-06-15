@@ -1,0 +1,138 @@
+---
+title: "SDK Quickstart"
+description: "Install @specterpq/sdk and run the full SPECTER stealth payment flow in TypeScript, with all cryptography running locally."
+---
+
+By the end of this page you will have generated recipient keys, sent a stealth payment, and recovered it, all in TypeScript with no server involved.
+
+## Prerequisites
+
+- Node.js 20 or newer, or a browser with WebAssembly support.
+- A package manager: npm, pnpm, or yarn.
+
+## Install
+
+```bash
+npm install @specterpq/sdk
+# or: pnpm add @specterpq/sdk
+# or: yarn add @specterpq/sdk
+```
+
+The package ships both browser and Node WebAssembly builds and picks the right one at runtime.
+
+## The full flow
+
+<Steps>
+  <Step title="Initialize the WASM module" icon="cpu-2">
+    Call this once before any crypto. It loads and caches the WebAssembly module, and it is safe to call again.
+
+    ```typescript
+    import { initSpecterSdk } from '@specterpq/sdk';
+
+    await initSpecterSdk();
+    ```
+
+    **Verify:** the call resolves without throwing. If you host the WASM yourself in a browser, pass `{ wasmUrl: '...' }`.
+  </Step>
+
+  <Step title="Generate recipient keys" icon="lock">
+    A recipient identity is a spending keypair and a viewing keypair.
+
+    ```typescript
+    import { generateSpecterKeys } from '@specterpq/sdk';
+
+    const recipient = generateSpecterKeys();
+    // recipient.spending.publicKey  controls funds
+    // recipient.viewing.publicKey   detects payments
+    ```
+
+    **Verify:** `recipient.spending.publicKey` and `recipient.viewing.publicKey` are present. The matching secret keys exist too, but they are redacted from logs and JSON.
+  </Step>
+
+  <Step title="Publish a meta-address" icon="mail-share">
+    Bundle the two public keys into one address. This is the only thing the recipient shares.
+
+    ```typescript
+    import { metaAddressFromPublicKeys } from '@specterpq/sdk';
+
+    const meta = metaAddressFromPublicKeys(
+      recipient.spending.publicKey,
+      recipient.viewing.publicKey,
+      { description: 'Alice main receive profile' },
+    );
+
+    // Publish meta.hex to your registry or profile page.
+    ```
+
+    **Verify:** `meta.bytes.length` is `2369` and `meta.address.version` is `1`.
+  </Step>
+
+  <Step title="Create a stealth payment (sender)" icon="route-2">
+    The sender needs only the recipient's `meta.hex`. One call parses it, encapsulates to the viewing key, derives the stealth addresses, and computes the view tag.
+
+    ```typescript
+    import { createStealthPayment } from '@specterpq/sdk';
+
+    const payment = createStealthPayment(meta.hex);
+    // payment.ethAddress           where to send on Ethereum
+    // payment.suiAddress           where to send on Sui
+    // payment.ephemeralCiphertext  announce publicly
+    // payment.viewTag              one byte, announce publicly
+    ```
+
+    **Verify:** `payment.ethAddress` starts with `0x` and is 42 characters long. Send funds to it, then publish `ephemeralCiphertext` and `viewTag` to your transport.
+  </Step>
+
+  <Step title="Scan and recover (recipient)" icon="dashboard">
+    The recipient checks an announcement against their viewing key. The view tag rejects almost all non-matches before any heavy work.
+
+    ```typescript
+    import { scanAnnouncement } from '@specterpq/sdk';
+
+    const scan = scanAnnouncement(
+      {
+        ephemeralCiphertext: payment.ephemeralCiphertext,
+        viewTag: payment.viewTag,
+      },
+      recipient.viewing,
+      recipient.spending.publicKey,
+    );
+
+    if (scan.isMatch) {
+      const ethAddress = scan.stealthKeys.ethAddress;
+      const privateKey = scan.stealthKeys.ethPrivateKey; // secret
+    }
+    ```
+
+    **Verify:** `scan.isMatch` is `true`, and `scan.stealthKeys.ethAddress` equals `payment.ethAddress` from the previous step.
+  </Step>
+</Steps>
+
+## What you just did
+
+You ran the complete protocol without a server:
+
+1. Created two ML-KEM-768 keypairs and a meta-address.
+2. Encapsulated to the viewing key to derive a one-time stealth address.
+3. Filtered by view tag, decapsulated the match, and recovered the spendable key.
+
+The stealth address has no public link to the meta-address. That gap is the privacy.
+
+<Warning>
+The recovered `ethPrivateKey` can spend real funds. Treat it like any wallet secret: keep it out of logs, analytics, and error reports. The SDK already redacts it from `JSON.stringify` and console output, but your own code must not copy it into places that get shipped off the device.
+</Warning>
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `NOT_INITIALIZED` error | Crypto called before `initSpecterSdk()` | Await `initSpecterSdk()` once at startup |
+| `scan.isMatch` is `false` | View tag or address did not match | Check `scan.reason`: `view_tag_mismatch` or `address_mismatch` |
+| `WASM_LOAD_FAILED` in a browser | WASM file not served from the expected path | Pass `{ wasmUrl }` to `initSpecterSdk()` |
+| `INVALID_META_ADDRESS` | Wrong or truncated `meta.hex` | Re-fetch the full hex string from your registry |
+
+## Next steps
+
+- [API reference](/sdk/api-reference) for every function and its sizes.
+- [Integration patterns](/sdk/integration) for wallets, senders, and scanners.
+- [Security model](/sdk/security) for what stays local and what does not.

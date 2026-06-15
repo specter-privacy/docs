@@ -3,6 +3,10 @@ title: "View Tags and Scanning"
 description: "How SPECTER filters announcements fast and what the scanning process looks like"
 ---
 
+<div style={{display: 'flex', justifyContent: 'center', margin: '0.5rem 0 1rem'}}>
+  <LottiePlayer src="/lottie/scan-pulse.json" size={120} />
+</div>
+
 ## The scanning problem
 
 Every time someone sends a stealth payment, an announcement gets published. To find payments meant for you, you need to check announcements. But trying to fully process every announcement is expensive: each one requires an ML-KEM decapsulation plus address derivation.
@@ -40,8 +44,8 @@ flowchart TD
     F -->|"No"| G["False positive\n(~399)"]
     F -->|"Yes"| H["Your payment!\n(~1)"]
 
-    style D fill:#14B8A6,color:#fff
-    style H fill:#0F766E,color:#fff
+    style D fill:#a855f7,color:#fff
+    style H fill:#7c3aed,color:#fff
 ```
 
 For 100,000 announcements with one real payment:
@@ -83,10 +87,10 @@ The response returns an array of discovered payments, each with:
 A view tag doesn't hide anything. It's an optimization, not a security feature. Anyone can see the view tag in the announcement. In the preferred encrypted metadata format, byte 0 remains plaintext for filtering while the remaining 76-byte metadata payload is encrypted. But knowing the view tag without the viewing secret key tells you nothing about who the recipient is.
 
 <CardGroup cols={2}>
-  <Card title="Protocol flow" icon="sitemap" href="/how-it-works/protocol-flow">
+  <Card title="Protocol flow" icon="route-2" href="/how-it-works/protocol-flow">
     See where scanning fits in the full payment process.
   </Card>
-  <Card title="Security boundaries" icon="shield" href="/how-it-works/security-boundaries">
+  <Card title="Security boundaries" icon="shield-lock" href="/how-it-works/security-boundaries">
     What SPECTER protects and what it doesn't.
   </Card>
 </CardGroup>

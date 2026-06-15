@@ -34,6 +34,28 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Under the hood',
+      items: [
+        'under-the-hood/overview',
+        'under-the-hood/key-generation',
+        'under-the-hood/shared-secret',
+        'under-the-hood/stealth-derivation',
+        'under-the-hood/scanning-and-spending',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'TypeScript SDK',
+      items: [
+        'sdk/overview',
+        'sdk/quickstart',
+        'sdk/api-reference',
+        'sdk/integration',
+        'sdk/security',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Use cases',
       items: [
         'use-cases/private-payments',

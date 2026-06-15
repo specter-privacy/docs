@@ -7,9 +7,9 @@ description: "Why privacy on public blockchains is broken, and why quantum compu
 
 When you share your address to receive a payment, you're handing over your entire financial history. Your employer pays you? Now they know every token you hold, every DeFi position, every NFT purchase. A friend sends you ETH? They can see your whole balance sheet.
 
-This isn't a theoretical problem. On-chain tracking tools make it trivial. And $3.8 billion was stolen in 2023 partly because attackers could trace and profile wallets.
+This is not theoretical. Block explorers and off-the-shelf analytics tools resolve an address to its full balance, token holdings, and counterparties in seconds. Share an address once and that profile follows it.
 
-The core issue: **on public blockchains, your address is your identity.** Once it's known, everything connected to it is visible forever.
+The core issue: **on a public blockchain, your address is your identity.** Once it is known, everything connected to it is visible to anyone, forever.
 
 ## The two problems SPECTER solves
 
@@ -63,11 +63,13 @@ A stealth address system that:
 
 That's what SPECTER builds.
 
+<Reveal>
 <CardGroup cols={2}>
-  <Card title="How SPECTER solves this" icon="shield" href="/why-specter/how-specter-works">
+  <Card title="How SPECTER solves this" icon="shield-lock" href="/why-specter/how-specter-works">
     The plain-language explanation of what SPECTER does.
   </Card>
-  <Card title="SPECTER vs others" icon="scale-balanced" href="/why-specter/specter-vs-others">
+  <Card title="SPECTER vs others" icon="network" href="/why-specter/specter-vs-others">
     Side-by-side comparison with Umbra and Fluidkey.
   </Card>
 </CardGroup>
+</Reveal>

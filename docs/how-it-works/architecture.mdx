@@ -53,10 +53,10 @@ flowchart LR
     Scanner --> CoreTypes
     Registry --> CoreTypes
 
-    style Crypto fill:#0F766E,color:#fff
-    style Stealth fill:#0F766E,color:#fff
-    style Scanner fill:#14B8A6,color:#fff
-    style Registry fill:#115E59,color:#fff
+    style Crypto fill:#7c3aed,color:#fff
+    style Stealth fill:#7c3aed,color:#fff
+    style Scanner fill:#a855f7,color:#fff
+    style Registry fill:#6b21a8,color:#fff
 ```
 
 ## The Rust workspace
@@ -163,7 +163,7 @@ The backend runs on Google Cloud Run:
 The registry interface is pluggable. Both backends implement the same `AnnouncementRegistry` trait, so the rest of the system doesn't care which one is active.
 
 <CardGroup cols={2}>
-  <Card title="Development setup" icon="wrench" href="/build/development-setup">
+  <Card title="Development setup" icon="tools" href="/build/development-setup">
     Set up the backend and frontend locally.
   </Card>
   <Card title="API reference" icon="code" href="/api/introduction">

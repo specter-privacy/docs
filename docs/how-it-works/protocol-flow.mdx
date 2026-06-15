@@ -27,12 +27,12 @@ flowchart LR
     S2 --> S3
     S4 --> S5
 
-    style S1 fill:#0F766E,color:#fff
-    style S2 fill:#0F766E,color:#fff
-    style S3 fill:#14B8A6,color:#fff
-    style S4 fill:#14B8A6,color:#fff
-    style S5 fill:#115E59,color:#fff
-    style S6 fill:#115E59,color:#fff
+    style S1 fill:#7c3aed,color:#fff
+    style S2 fill:#7c3aed,color:#fff
+    style S3 fill:#a855f7,color:#fff
+    style S4 fill:#a855f7,color:#fff
+    style S5 fill:#6b21a8,color:#fff
+    style S6 fill:#6b21a8,color:#fff
 ```
 
 ---
@@ -52,8 +52,8 @@ curl -s -X POST https://backend.specterpq.com/api/v1/keys/generate | jq .
 
 Response includes `meta_address`, `spending_pk`, `spending_sk`, `viewing_pk`, `viewing_sk`.
 
-<Frame caption="Key generation produces ML-KEM-768 spending and viewing keypairs">
-  ![Setup flow](/images/specter/setup.png)
+<Frame caption="Setup: key generation produces ML-KEM-768 spending and viewing keypairs, bundled into one meta-address">
+  ![Setup flow: the recipient generates a spending keypair and a viewing keypair, then publishes a single meta-address](/images/specter/How-setup-works.png)
 </Frame>
 
 ---
@@ -89,8 +89,8 @@ curl -s -X POST https://backend.specterpq.com/api/v1/stealth/create \
 
 The sender then sends ETH/tokens to the returned `stealth_address`.
 
-<Frame caption="ML-KEM encapsulation creates the shared secret and one-time stealth address">
-  ![Send flow](/images/specter/send.png)
+<Frame caption="Send: ML-KEM-768 encapsulation creates the shared secret, a one-time stealth address, and a view tag">
+  ![Send flow: the sender encapsulates to the viewing key, derives a one-time stealth address, and publishes an announcement with a view tag](/images/specter/How-send-works.png)
 </Frame>
 
 ---
@@ -144,8 +144,8 @@ curl -s -X POST https://backend.specterpq.com/api/v1/stealth/scan \
   }' | jq .
 ```
 
-<Frame caption="Scanning: view tags filter 99.6% of announcements, then decapsulation recovers the stealth key">
-  ![Receive flow](/images/specter/receive.png)
+<Frame caption="Scanning: view tags filter roughly 99.6% of announcements, then decapsulation recovers the stealth key">
+  ![Recipient scan flow: filter announcements by view tag, decapsulate the matches, and recover the stealth private key](/images/specter/How-scan-works.png)
 </Frame>
 
 ---
@@ -209,10 +209,10 @@ The spending path (stage 6) produces a secp256k1 key for Ethereum wallet compati
 Read **[Security Boundaries](/how-it-works/security-boundaries)** for why this split exists and how it could be resolved.
 
 <CardGroup cols={2}>
-  <Card title="Post-quantum crypto details" icon="atom" href="/how-it-works/post-quantum-crypto">
+  <Card title="Post-quantum crypto details" icon="circuit-resistor" href="/how-it-works/post-quantum-crypto">
     What ML-KEM-768 actually does under the hood.
   </Card>
-  <Card title="Try the full flow" icon="play" href="/explore/playground">
+  <Card title="Try the full flow" icon="rocket" href="/explore/playground">
     Run every stage against the live API.
   </Card>
 </CardGroup>

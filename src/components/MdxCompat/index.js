@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import {motion} from 'framer-motion';
 import Link from '@docusaurus/Link';
 import Admonition from '@theme/Admonition';
 import TabItem from '@theme/TabItem';
@@ -54,13 +55,22 @@ function renderIcon(icon) {
   );
 }
 
+// Reveal timing shared by the auto-animated block components below.
+const REVEAL = {
+  initial: {opacity: 0, y: 20},
+  whileInView: {opacity: 1, y: 0},
+  viewport: {once: true, margin: '-60px'},
+  transition: {duration: 0.5, ease: [0.22, 1, 0.36, 1]},
+};
+
 export function CardGroup({cols = 2, children}) {
   return (
-    <div
+    <motion.div
       className={styles.cardGrid}
-      style={{'--card-cols': cols}}>
+      style={{'--card-cols': cols}}
+      {...REVEAL}>
       {children}
-    </div>
+    </motion.div>
   );
 }
 
@@ -113,10 +123,10 @@ export function Step({title, icon, children, stepNumber}) {
 
 export function Frame({caption, children}) {
   return (
-    <figure className={styles.frame}>
+    <motion.figure className={styles.frame} {...REVEAL}>
       {children}
       {caption ? <figcaption>{caption}</figcaption> : null}
-    </figure>
+    </motion.figure>
   );
 }
 

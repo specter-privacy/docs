@@ -3,12 +3,20 @@ import {themes as prismThemes} from 'prism-react-renderer';
 const config = {
   title: 'SPECTER',
   tagline: 'Post-quantum stealth addresses for private payments on Ethereum and Sui',
-  favicon: 'favicon.svg',
+  favicon: 'img/favicon-64.png',
   url: process.env.DOCS_SITE_URL || 'https://docs.specterpq.com',
   baseUrl: process.env.DOCS_BASE_URL || '/',
   trailingSlash: true,
   onBrokenLinks: 'throw',
   headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: '/img/apple-touch-icon.png',
+      },
+    },
     {
       tagName: 'script',
       attributes: {
@@ -55,14 +63,38 @@ const config = {
   themeConfig: {
     image: 'images/specter/cover-specter-full.png',
     colorMode: {
-      defaultMode: 'light',
-      respectPrefersColorScheme: true,
+      defaultMode: 'dark',
+      disableSwitch: true,
+      respectPrefersColorScheme: false,
+    },
+    mermaid: {
+      theme: {light: 'dark', dark: 'dark'},
+      options: {
+        themeVariables: {
+          darkMode: true,
+          background: '#0b0a12',
+          primaryColor: '#1c1730',
+          primaryBorderColor: '#7c3aed',
+          primaryTextColor: '#f4f1ff',
+          secondaryColor: '#2a2140',
+          secondaryBorderColor: '#a855f7',
+          tertiaryColor: '#1a1612',
+          tertiaryBorderColor: '#f5c518',
+          lineColor: '#8b7bb8',
+          textColor: '#e7e2f5',
+          fontFamily: '"IBM Plex Sans", "Segoe UI", sans-serif',
+          clusterBkg: 'rgba(124, 58, 237, 0.06)',
+          clusterBorder: 'rgba(168, 85, 247, 0.35)',
+          nodeBorder: '#a855f7',
+          edgeLabelBackground: '#15121d',
+        },
+      },
     },
     navbar: {
       title: 'SPECTER',
       logo: {
         alt: 'SPECTER logo',
-        src: 'images/specter/logo.png',
+        src: 'img/specter-logo.png',
       },
       items: [
         {

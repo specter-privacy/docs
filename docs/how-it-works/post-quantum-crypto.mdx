@@ -3,7 +3,7 @@ title: "Post-Quantum Cryptography in SPECTER"
 description: "How ML-KEM-768 works, why SPECTER uses it, and what it protects"
 ---
 
-import mlKemDiagram from '@site/static/images/specter/ml-kem-768-diagram.png';
+import mlKemDiagram from '@site/static/images/specter/specter-ml-kem-full.png';
 
 ## ML-KEM-768: the crypto behind SPECTER
 
@@ -35,8 +35,8 @@ flowchart TD
     J --> K["Verify view tag"]
     J --> L["Recover stealth\nprivate key"]
 
-    style B fill:#0F766E,color:#fff
-    style I fill:#0F766E,color:#fff
+    style B fill:#7c3aed,color:#fff
+    style I fill:#7c3aed,color:#fff
 ```
 
 Two jobs happen with the shared secret:
@@ -102,10 +102,10 @@ SPECTER's crypto layer uses the `subtle` crate for constant-time comparisons, pr
 Every crate in the workspace enforces `#![forbid(unsafe_code)]`.
 
 <CardGroup cols={2}>
-  <Card title="View tags and scanning" icon="filter" href="/how-it-works/view-tags-and-scanning">
+  <Card title="View tags and scanning" icon="dashboard" href="/how-it-works/view-tags-and-scanning">
     How SPECTER filters announcements efficiently.
   </Card>
-  <Card title="Security boundaries" icon="shield" href="/how-it-works/security-boundaries">
+  <Card title="Security boundaries" icon="shield-lock" href="/how-it-works/security-boundaries">
     What's quantum-safe today and what isn't.
   </Card>
 </CardGroup>

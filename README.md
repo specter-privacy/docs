@@ -56,7 +56,7 @@ The dev server starts at `http://localhost:3000` with hot reload.
 │   ├── use-cases/               # Private payments, name services, roadmap
 │   └── why-specter/             # The problem, how it works, vs others
 ├── src/
-│   ├── components/MdxCompat/    # Mintlify-compatibility component shims (Frame, Card, etc.)
+│   ├── components/MdxCompat/    # MDX layout components (Card, Frame, Tabs, Steps, etc.)
 │   ├── css/custom.css           # Global CSS overrides
 │   ├── pages/playground-app/    # Standalone playground React page
 │   ├── theme/MDXComponents.js   # MDX component registry
@@ -94,9 +94,20 @@ All content lives under `docs/` as `.mdx` files. Docusaurus hot-reloads on save 
 - **Sidebar order / categories** — edit `sidebars.js`.
 - **Top navbar / footer links** — edit the `themeConfig.navbar` and `themeConfig.footer` sections in `docusaurus.config.js`.
 
-### Mintlify compatibility components
+### MDX layout components
 
-The content was migrated from Mintlify. The `src/components/MdxCompat/` shims let the original `<Card>`, `<CardGroup>`, `<Frame>`, `<Tabs>`, `<Tab>`, `<Steps>`, `<Step>`, `<Warning>`, and `<Tip>` JSX work unchanged in Docusaurus. Import from there if you need to add new compatibility wrappers.
+The `src/components/MdxCompat/` module provides `<Card>`, `<CardGroup>`, `<Frame>`, `<Tabs>`, `<Tab>`, `<Steps>`, `<Step>`, `<Warning>`, `<Tip>`, and related JSX for docs pages. Components are registered globally in `src/theme/MDXComponents.js`.
+
+### AI documentation skill
+
+Claude and Cursor agents should use the **documentation-writer** skill when editing docs in this repo:
+
+- `.agents/skills/documentation-writer/SKILL.md` — main guide (Diátaxis, Web3, post-quantum privacy, Docusaurus)
+- `.agents/skills/documentation-writer/web3-pq-reference.md` — extended domain reference
+- `.agents/skills/documentation-writer/page-templates.md` — page skeletons
+- `.agents/skills/documentation-writer/examples.md` — good vs bad writing examples
+
+Symlinks: `.claude/skills/documentation-writer` and `.cursor/skills/documentation-writer`.
 
 ### Diagrams
 

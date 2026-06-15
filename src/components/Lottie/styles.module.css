@@ -1,0 +1,9 @@
+.placeholder {
+  display: inline-block;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(245, 197, 24, 0.18),
+    rgba(245, 197, 24, 0) 70%
+  );
+}

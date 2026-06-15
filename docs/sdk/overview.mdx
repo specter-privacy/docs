@@ -1,0 +1,76 @@
+---
+title: "TypeScript SDK"
+description: "The @specterpq/sdk runs SPECTER post-quantum stealth address crypto locally in WebAssembly, with an opt-in client for trusted SPECTER API deployments."
+---
+
+The **`@specterpq/sdk`** package gives you the full SPECTER protocol in TypeScript. Key generation, encapsulation, scanning, and stealth address derivation all run on the device through Rust compiled to WebAssembly. Nothing secret leaves the machine unless you explicitly ask it to.
+
+If you have used the [hosted API](/api/introduction), this is the other way in. The API is a service you call. The SDK is a library you embed, and it does the cryptography itself.
+
+<Reveal>
+<CardGroup cols={2}>
+  <Card title="Install and run the flow" icon="rocket" href="/sdk/quickstart">
+    Send and recover a stealth payment end to end in a few minutes of TypeScript.
+  </Card>
+  <Card title="API reference" icon="code" href="/sdk/api-reference">
+    Every exported function, with sizes, return shapes, and error codes.
+  </Card>
+  <Card title="Integration patterns" icon="tools" href="/sdk/integration">
+    Receive profiles, payment composers, and scanners for real apps.
+  </Card>
+  <Card title="Security model" icon="shield-lock" href="/sdk/security">
+    What stays local, what secret-bearing fields look like, and when network calls happen.
+  </Card>
+</CardGroup>
+</Reveal>
+
+## What the SDK does
+
+It packages the same protocol the rest of these docs describe, exposed as plain functions:
+
+- Generate ML-KEM-768 spending and viewing keypairs.
+- Build and parse a recipient meta-address.
+- Encapsulate to a viewing key and derive a one-time stealth address on Ethereum and Sui.
+- Compute and check the one-byte view tag that makes scanning cheap.
+- Decapsulate a match and recover the spendable private key.
+
+The three phases below are the whole story. Switch between them to see who acts and what moves on each step.
+
+<FlowExplainer />
+
+## Where the cryptography runs
+
+The SDK ships two WebAssembly builds, one for browsers and one for Node, and loads the right one at runtime. The crypto is compiled from pinned Rust crates, so the same primitives back the SDK, the CLI, and the hosted backend.
+
+<Frame caption="The SPECTER Rust core compiled to WebAssembly is what the SDK calls for every cryptographic step.">
+  ![SPECTER Rust crate compiled to WebAssembly, exposing key generation, encapsulation, decapsulation, and stealth derivation to TypeScript](/images/specter/Rust-crate-explained.png)
+</Frame>
+
+Calls that handle secrets stay offline. The only code that touches the network is the [trusted API client](/sdk/integration#server-assisted-flows), and you have to construct it on purpose.
+
+## SDK or hosted API
+
+Both reach the same protocol. They differ in where keys live and who you trust.
+
+| | TypeScript SDK | Hosted API |
+|---|----------------|------------|
+| Cryptography runs | On the user's device (WASM) | On the SPECTER backend |
+| Secret keys are seen by | Only the local app | The backend, for remote helpers |
+| Network calls | None, unless you opt in | Every request |
+| Best for | Wallets and apps that keep keys client side | Quick prototypes, server orchestration |
+| Language | TypeScript / JavaScript | Any HTTP client |
+
+<Note>
+Mixing is fine. A common shape is local key generation and scanning with the SDK, and a trusted API only for tasks you choose to delegate. See [integration patterns](/sdk/integration).
+</Note>
+
+## Requirements
+
+- Node.js 20 or newer for server-side use and tests.
+- A browser with WebAssembly support for frontend use.
+
+## Next steps
+
+- New to the protocol? Read [How SPECTER works](/why-specter/how-specter-works) first, then come back.
+- Ready to write code? Go to the [SDK quickstart](/sdk/quickstart).
+- Reviewing trust assumptions? Read the [security model](/sdk/security) and [security boundaries](/how-it-works/security-boundaries).

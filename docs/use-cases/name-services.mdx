@@ -13,8 +13,8 @@ flowchart LR
     B --> C["IPFS returns\nmeta-address"]
     C --> D["SPECTER derives\nstealth address"]
 
-    style A fill:#0F766E,color:#fff
-    style D fill:#0F766E,color:#fff
+    style A fill:#7c3aed,color:#fff
+    style D fill:#7c3aed,color:#fff
 ```
 
 ## How it works
@@ -40,7 +40,7 @@ curl -s -X POST https://backend.specterpq.com/api/v1/suins/resolve \
 ## ENS setup
 
 <Steps>
-  <Step title="Upload meta-address to IPFS" icon="upload">
+  <Step title="Upload meta-address to IPFS" icon="network">
     ```bash
     curl -s -X POST https://backend.specterpq.com/api/v1/ipfs/upload \
       -H "Content-Type: application/json" \
@@ -48,12 +48,12 @@ curl -s -X POST https://backend.specterpq.com/api/v1/suins/resolve \
     ```
     Save the returned IPFS CID.
   </Step>
-  <Step title="Set ENS text record" icon="pen">
+  <Step title="Set ENS text record" icon="tools">
     Go to the [ENS Manager App](https://app.ens.domains) and set a text record on your name:
     - Key: `specter.meta-address`
     - Value: the IPFS CID from step 1
   </Step>
-  <Step title="Verify resolution" icon="check">
+  <Step title="Verify resolution" icon="flask-2">
     ```bash
     curl -s -X POST https://backend.specterpq.com/api/v1/ens/resolve \
       -H "Content-Type: application/json" \
@@ -67,13 +67,13 @@ curl -s -X POST https://backend.specterpq.com/api/v1/suins/resolve \
 Same pattern, different name service:
 
 <Steps>
-  <Step title="Upload meta-address to IPFS" icon="upload">
+  <Step title="Upload meta-address to IPFS" icon="network">
     Same as ENS: upload via the IPFS endpoint and save the CID.
   </Step>
-  <Step title="Set SuiNS record" icon="pen">
+  <Step title="Set SuiNS record" icon="tools">
     Configure your SuiNS name to include the IPFS CID pointing to your meta-address.
   </Step>
-  <Step title="Verify resolution" icon="check">
+  <Step title="Verify resolution" icon="flask-2">
     ```bash
     curl -s -X POST https://backend.specterpq.com/api/v1/suins/resolve \
       -H "Content-Type: application/json" \
@@ -96,7 +96,7 @@ SPECTER uses Pinata as the IPFS gateway. The backend needs `PINATA_JWT`, `PINATA
 Meta-addresses are ~2.4 KB (two ML-KEM public keys). Storing that directly in ENS text records works but is gas-expensive. IPFS stores the full payload off-chain with a small CID on-chain, keeping costs reasonable.
 
 <CardGroup cols={2}>
-  <Card title="Private payments" icon="shield" href="/use-cases/private-payments">
+  <Card title="Private payments" icon="shield-lock" href="/use-cases/private-payments">
     How the full payment flow works with name resolution.
   </Card>
   <Card title="API reference" icon="code" href="/api/nameservice">

@@ -1,0 +1,73 @@
+---
+title: "SDK Security Model"
+description: "What stays on the device, how secret-bearing fields are protected, and exactly when @specterpq/sdk makes network calls."
+---
+
+The SDK is built so that the safe path is also the default path. Cryptography runs locally, secrets are hard to leak by accident, and the only code that talks to the network is code you construct yourself.
+
+This page covers the SDK boundary. For the protocol's broader threat model, including the quantum adversary and what SPECTER does not hide, read [security boundaries](/how-it-works/security-boundaries).
+
+## Local by default
+
+Key generation, encapsulation, decapsulation, and stealth derivation all run on the device through WebAssembly. The local functions never send secrets over the network.
+
+The cryptography is compiled from pinned Rust crates, the same core that backs the CLI and the hosted backend. There is no separate JavaScript reimplementation of the primitives to audit.
+
+## Secret-bearing fields
+
+Some return values carry material that can spend funds or detect payments: `secretKey`, `sharedSecret`, and `ethPrivateKey`. The SDK protects these against the most common leak, which is logging.
+
+These fields are:
+
+- non-enumerable, so they do not show up in a plain object spread or iteration,
+- redacted from `JSON.stringify`,
+- redacted from Node's inspect and console output.
+
+```typescript
+const enc = encapsulate(recipient.viewing.publicKey);
+console.log(enc);
+// sharedSecret prints as a redacted placeholder, not the bytes
+```
+
+<Warning>
+Redaction protects against accidental logging. It does not stop your own code from reading the value and copying it somewhere unsafe. If you assign `ethPrivateKey` to a new variable and log that, it leaks. Keep secrets inside the signing path.
+</Warning>
+
+## Input and output validation
+
+The SDK validates inputs and checks output lengths against the [known sizes](/sdk/api-reference#sizes-and-constants). A wrong key length, a malformed ciphertext, or bad hex fails fast with a typed `SpecterSdkError` rather than producing silent garbage.
+
+## When the SDK uses the network
+
+Local crypto helpers are offline. Network calls happen in exactly one place: the trusted API client you create with `createSpecterApiClient`. If you never call that constructor, the SDK never opens a connection.
+
+| Function | Network | Secret exposure |
+|----------|---------|-----------------|
+| `generateSpecterKeys`, `generateKeysLocal` | None | None |
+| `encapsulate`, `decapsulate` | None | None |
+| `createStealthPayment` | None | None |
+| `scanAnnouncement`, `scanAnnouncements` | None | None |
+| `generateKeysRemote` | Yes | Server generates and sees the keys |
+| `createStealthPaymentRemote` | Yes | Meta-address only |
+| `publishAnnouncement` | Yes | Announcement data only |
+| `scanRemote` | Yes | Sends the viewing secret key |
+
+### Using the remote helpers safely
+
+`generateKeysRemote` and `scanRemote` are useful when a backend owns the whole flow, but they move secret material off the device. If you use them:
+
+- Point them only at infrastructure you control.
+- Require TLS.
+- Put your own authorization boundary in front of the API.
+
+For wallets and anything holding user funds, prefer the local equivalents. They never leave the machine.
+
+## Disclosure
+
+Report vulnerabilities privately to `hello@specterpq.com`, not through public issues. The full policy lives in `SECURITY.md` in the SDK repository.
+
+## Related
+
+- [Integration patterns](/sdk/integration)
+- [Security boundaries](/how-it-works/security-boundaries)
+- [Post-quantum cryptography](/how-it-works/post-quantum-crypto)

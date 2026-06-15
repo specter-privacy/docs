@@ -1,0 +1,84 @@
+---
+title: "Stealth Derivation"
+description: "How SPECTER turns a 32-byte shared secret and the recipient spending key into a one-time Ethereum or Sui address, and how the recipient recovers the key that spends it."
+---
+
+The shared secret is not used as a key directly. It is expanded into the material for a fresh, one-time address, bound to the recipient's spending identity so that only the right recipient can recover the key that spends it. This page follows that expansion to a usable Ethereum and Sui address.
+
+## The expansion step
+
+The derivation starts from two inputs the sender already has: the 32-byte shared secret and the recipient's spending public key. It runs them through SHAKE-256 under a fixed domain string:
+
+```
+material = SHAKE-256("SPECTER_STEALTH_PK" || shared_secret)   bound to spending_pk
+```
+
+The `"SPECTER_STEALTH_PK"` prefix is the domain separator. It guarantees this output is independent of the [view tag](/under-the-hood/scanning-and-spending), which is derived from the same shared secret under a different prefix. The spending public key is mixed in so the resulting address is tied to one recipient.
+
+The exact construction lives in the SPECTER Rust core. What matters for integration is the inputs, the outputs, and their sizes.
+
+## Ethereum: a secp256k1 address
+
+For Ethereum, the derived material becomes a secp256k1 keypair, and the address is taken from its public key with keccak256, the same hash Ethereum uses everywhere.
+
+| Output | Size | Notes |
+|--------|------|-------|
+| Stealth private key | 32 B | secp256k1 scalar, recovered by the recipient |
+| Stealth public key | 65 B | secp256k1 uncompressed point |
+| Stealth address | 20 B | last 20 bytes of `keccak256(public_key)`, shown as `0x...` |
+
+Because the address comes from a standard secp256k1 key, any existing Ethereum wallet, signer, or library can spend from it once the private key is imported. SPECTER does not need a new signature scheme on the spend path. That compatibility is deliberate, and its quantum tradeoff is covered in [security boundaries](/how-it-works/security-boundaries).
+
+## Sui: an Ed25519 address
+
+For Sui, the same shared secret derives an Ed25519 keypair, and the Sui address is a 32-byte value derived from that key. One encapsulation therefore yields a destination on both chains:
+
+```typescript
+import { deriveStealthAddress, deriveStealthSuiAddress } from '@specterpq/sdk';
+
+const eth = deriveStealthAddress(recipient.spending.publicKey, sharedSecret); // 0x + 20 bytes
+const sui = deriveStealthSuiAddress(recipient.spending.publicKey, sharedSecret); // 0x + 32 bytes
+```
+
+## Two sides, two outputs
+
+The sender and the recipient run derivations from the same inputs, but they need different things from it.
+
+```mermaid
+flowchart TD
+    SS["shared secret (32 B)"] --> SHAKE["SHAKE-256 + spending_pk"]
+    SHAKE --> ETH["secp256k1 keypair"]
+    SHAKE --> SUI["Ed25519 keypair"]
+    ETH --> ADDR["stealth address (sender needs this)"]
+    ETH --> PRIV["stealth private key (recipient needs this)"]
+
+    style SHAKE fill:#7c3aed,color:#fff
+    style ADDR fill:#a855f7,color:#fff
+    style PRIV fill:#6b21a8,color:#fff
+```
+
+- The **sender** uses `deriveStealthAddress` to get the destination, sends funds there, and is done.
+- The **recipient** uses `deriveStealthKeys` to recover the full key material, including the private key that signs.
+
+```typescript
+import { deriveStealthKeys } from '@specterpq/sdk';
+
+const keys = deriveStealthKeys(recipient.spending.publicKey, sharedSecret);
+keys.ethAddress;
+keys.suiAddress;
+keys.publicKey;      // secp256k1 uncompressed
+keys.ethPrivateKey;  // secret-bearing, spends the funds
+```
+
+<Warning>
+`ethPrivateKey` spends real funds. Import it straight into your signing path. Do not log it or copy it into analytics or error reports. The SDK redacts it from JSON and console output, but it cannot stop your own code from leaking a copy.
+</Warning>
+
+## Why the address has no public link to the recipient
+
+A sender resolves one meta-address but produces a different stealth address for every payment, because every payment has a different shared secret, and the address is derived from that secret. An observer sees a normal-looking address receive funds. Without the viewing secret key, there is no value they can compute that ties that address back to the meta-address. That gap is the privacy SPECTER provides.
+
+## Next
+
+- [Scanning and spending](/under-the-hood/scanning-and-spending): how the recipient finds which announcements to derive from, and how the spend completes.
+- [The shared secret](/under-the-hood/shared-secret): where the 32 bytes came from.

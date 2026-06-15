@@ -7,10 +7,10 @@ description: "Where SPECTER is headed: planned features, research tracks, and ho
 ## What's live today
 
 <CardGroup cols={3}>
-  <Card title="ML-KEM-768 stealth addresses" icon="shield-check">
+  <Card title="ML-KEM-768 stealth addresses" icon="shield-lock">
     Post-quantum key generation, stealth payment creation, and announcement scanning.
   </Card>
-  <Card title="ENS + SuiNS integration" icon="link">
+  <Card title="ENS + SuiNS integration" icon="network">
     Name resolution for human-readable stealth payments on Ethereum and Sui.
   </Card>
 </CardGroup>
@@ -20,21 +20,21 @@ description: "Where SPECTER is headed: planned features, research tracks, and ho
 ## Near-term: In active development
 
 <Steps>
-  <Step title="PQ smart account wallet (ERC-4337)" icon="wallet">
+  <Step title="PQ smart account wallet (ERC-4337)" icon="lock">
     **Priority: High**
 
     Smart accounts with ML-DSA-65 signature verification inside `validateUserOp`. This closes the classical spending gap by removing the secp256k1 dependency for the spend path.
 
     The [ERC proposal](/deep-dive/erc-proposal) already specifies deterministic stealth key derivation compatible with ML-DSA-65.
   </Step>
-  <Step title="One Address Per Application (OAPA)" icon="fingerprint">
+  <Step title="One Address Per Application (OAPA)" icon="shield-lock">
     **Priority: High**
 
     Deterministic, application-scoped identity derivation from a single master meta-address. Each dApp or service gets its own isolated stealth identity without requiring separate key management.
 
     Use case: A user has one SPECTER profile but each DeFi protocol, exchange, or service sees a different address.
   </Step>
-  <Step title="L2 chain expansion" icon="layer-group">
+  <Step title="L2 chain expansion" icon="network">
     **Priority: High**
 
     Bring stealth addresses to Arbitrum, Base, and Optimism. The same meta-address already derives valid addresses for any EVM chain. The work is in registry support, frontend chain-switching, and gas optimization.
@@ -51,19 +51,19 @@ description: "Where SPECTER is headed: planned features, research tracks, and ho
 ## Mid-term: Research and design phase
 
 <AccordionGroup>
-  <Accordion title="Legacy-to-PQ migration contracts" icon="arrows-rotate">
+  <Accordion title="Legacy-to-PQ migration contracts" icon="route-2">
     Smart contracts that help existing ERC-5564 schemeId 1 users migrate to schemeId 2 (ML-KEM). The migration path needs to handle re-registration of meta-addresses in the ERC-6538 registry without breaking existing payment channels.
   </Accordion>
-  <Accordion title="Cross-chain stealth transfers" icon="bridge">
+  <Accordion title="Cross-chain stealth transfers" icon="network">
     Send from Ethereum, receive privately on Sui (or any supported chain). The ML-KEM shared secret can derive addresses for multiple chains from a single encapsulation. The challenge is bridging the announcement data across chains.
   </Accordion>
-  <Accordion title="Mobile SDK" icon="mobile">
+  <Accordion title="Mobile SDK" icon="cpu-2">
     Native iOS/Android SDK wrapping the Rust crypto core via FFI. Focus on key management (secure enclave integration), scanning efficiency on mobile networks, and push notifications for discovered payments.
   </Accordion>
-  <Accordion title="Browser extension" icon="puzzle-piece">
+  <Accordion title="Browser extension" icon="tools">
     Lightweight extension for stealth address creation and scanning without visiting the full app. Auto-detect ENS names on web pages and offer one-click stealth payments.
   </Accordion>
-  <Accordion title="Batch announcement compression" icon="file-zipper">
+  <Accordion title="Batch announcement compression" icon="code">
     Reduce on-chain costs by batching multiple announcements into Merkle trees. Recipients prove membership to discover their payment. Could reduce per-announcement gas by 60-80%.
   </Accordion>
 </AccordionGroup>
@@ -104,10 +104,10 @@ flowchart TD
 
     Today --> Near --> Mid --> Long
 
-    style Today fill:#0F766E,color:#fff
-    style Near fill:#14B8A6,color:#fff
+    style Today fill:#7c3aed,color:#fff
+    style Near fill:#a855f7,color:#fff
     style Mid fill:#0d9488,color:#fff
-    style Long fill:#115E59,color:#fff
+    style Long fill:#6b21a8,color:#fff
 ```
 </div>
 
@@ -137,10 +137,10 @@ flowchart TD
 This roadmap isn't set in stone. If you have ideas for features, use cases, or integrations that would make SPECTER more useful, we'd love to hear from you.
 
 <CardGroup cols={2}>
-  <Card title="Suggest a feature" icon="lightbulb" href="https://github.com/pranshurastogi/SPECTER/issues">
+  <Card title="Suggest a feature" icon="tools" href="https://github.com/pranshurastogi/SPECTER/issues">
     Open a GitHub issue with the `feature-request` label. Describe the use case, not just the feature.
   </Card>
-  <Card title="Get in touch" icon="envelope" href="mailto:pranshurastogi3196@gmail.com">
+  <Card title="Get in touch" icon="mail-share" href="mailto:pranshurastogi3196@gmail.com">
     Email **pranshurastogi3196@gmail.com** for partnership ideas, research collaboration, or integration questions.
   </Card>
 </CardGroup>

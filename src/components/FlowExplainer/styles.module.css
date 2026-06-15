@@ -1,0 +1,150 @@
+.wrap {
+  margin: 1.75rem 0 2.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(168, 85, 247, 0.05), rgba(9, 11, 12, 0.6));
+  overflow: hidden;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem 1.1rem;
+  background: transparent;
+  border: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  text-align: left;
+  color: rgba(226, 232, 240, 0.6);
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.tab:last-child {
+  border-right: 0;
+}
+
+.tab:hover {
+  color: rgba(226, 232, 240, 0.92);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tabActive {
+  color: #f8fafc;
+  background: rgba(168, 85, 247, 0.08);
+}
+
+.tabIndex {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.78rem;
+  color: var(--ifm-color-primary);
+  opacity: 0.8;
+}
+
+.tabText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.tabLabel {
+  font-weight: 650;
+  font-size: 1rem;
+}
+
+.tabActor {
+  font-size: 0.74rem;
+  color: rgba(226, 232, 240, 0.5);
+}
+
+.underline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ifm-color-primary);
+}
+
+.panel {
+  padding: 1.5rem;
+}
+
+.panelInner {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.figure {
+  margin: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #050607;
+}
+
+.figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0;
+}
+
+.summary {
+  font-size: 1.02rem;
+  color: rgba(226, 232, 240, 0.9);
+  margin-bottom: 1rem;
+}
+
+.points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.points li {
+  position: relative;
+  padding-left: 1.4rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.92rem;
+  color: rgba(226, 232, 240, 0.74);
+}
+
+.points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ifm-color-primary);
+  box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.14);
+}
+
+@media (max-width: 768px) {
+  .panelInner {
+    grid-template-columns: 1fr;
+  }
+
+  .tab {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    padding: 0.75rem;
+  }
+
+  .tabActor {
+    display: none;
+  }
+}

@@ -1,0 +1,157 @@
+---
+title: "SDK Integration Patterns"
+description: "Concrete patterns for building with @specterpq/sdk: a wallet receive profile, a sender payment composer, a recipient scanner, and server-assisted flows."
+---
+
+This page maps the SDK onto the jobs real apps actually do. Pick the pattern that matches your role in a payment, then wire the pieces.
+
+| Pattern | You are the | Keys live | Network |
+|---------|-------------|-----------|---------|
+| [Receive profile](#pattern-a-receive-profile) | Recipient's wallet | Client | None |
+| [Payment composer](#pattern-b-payment-composer) | Sender's app | Client | None |
+| [Scanner](#pattern-c-scanner) | Recipient's wallet | Client | None |
+| [Server-assisted](#server-assisted-flows) | A service you run | Server | Yes |
+
+All four assume you have called `initSpecterSdk()` once at startup.
+
+## Pattern A: receive profile
+
+A wallet sets up a recipient identity and publishes one reusable meta-address.
+
+<Steps>
+  <Step title="Generate the identity" icon="lock">
+    ```typescript
+    const recipient = generateSpecterKeys();
+    ```
+  </Step>
+  <Step title="Publish the meta-address" icon="mail-share">
+    ```typescript
+    const meta = metaAddressFromPublicKeys(
+      recipient.spending.publicKey,
+      recipient.viewing.publicKey,
+      { description: 'Receive profile' },
+    );
+    // Publish meta.hex to your profile registry or name service record.
+    ```
+  </Step>
+  <Step title="Store the secret keys safely" icon="shield-lock">
+    Keep `recipient.spending.secretKey` and `recipient.viewing.secretKey` in your secure storage or hardware boundary. The spending secret key spends funds. The viewing secret key detects them.
+  </Step>
+</Steps>
+
+<Warning>
+Losing the viewing secret key means the wallet can no longer detect incoming payments. Losing the spending secret key means the funds at every stealth address are unrecoverable. Back both up the way you would back up a seed phrase.
+</Warning>
+
+## Pattern B: payment composer
+
+A sender's app resolves a recipient meta-address and builds a payment.
+
+```typescript
+// 1. Resolve the recipient's meta hex from your registry or name service.
+const metaHex = await resolveRecipient('alice.eth');
+
+// 2. Build the payment. One call covers parse, encapsulate, derive, and tag.
+const payment = createStealthPayment(metaHex);
+
+// 3. Send funds to the stealth address for the chain you are on.
+await wallet.send({ to: payment.ethAddress, value });
+
+// 4. Publish the announcement so the recipient can find the payment.
+await transport.publish({
+  ephemeralCiphertext: payment.ephemeralCiphertext,
+  viewTag: payment.viewTag,
+});
+```
+
+The SDK does not move funds and does not sign transactions. Step 3 uses your existing wallet stack, such as ethers or viem.
+
+## Pattern C: scanner
+
+A recipient's wallet pulls announcements and recovers the ones that belong to it.
+
+```typescript
+// Pull a batch of announcements from your transport or indexer.
+const announcements = await transport.fetchSince(cursor);
+
+const results = scanAnnouncements(
+  announcements,
+  recipient.viewing,
+  recipient.spending.publicKey,
+);
+
+for (const result of results) {
+  if (!result.isMatch) continue;
+  // Import the recovered key into your signing path.
+  const privateKey = result.stealthKeys.ethPrivateKey;
+  await wallet.import(privateKey);
+}
+```
+
+The view tag does the cheap filtering first, so most non-matching announcements never reach full decapsulation. For the cost model, see [view tags and scanning](/how-it-works/view-tags-and-scanning).
+
+<Warning>
+`result.stealthKeys.ethPrivateKey` spends real funds. Import it directly into your signing path. Do not log it, send it to analytics, or include it in error reports.
+</Warning>
+
+## Server-assisted flows
+
+Sometimes you want a service to orchestrate payments, hold announcements, or scan on a schedule. The SDK supports that through an explicit client. You build it on purpose, against an endpoint you trust.
+
+```typescript
+const api = createSpecterApiClient({
+  baseUrl: 'https://api.example.com',
+  headers: { authorization: `Bearer ${token}` },
+});
+```
+
+### Server-authoritative sender
+
+Let the server build and track the payment, then publish its stored announcement after the funds land.
+
+```typescript
+const payment = await api.createStealthPaymentRemote(metaHex);
+// payment.paymentId is the server's handle for this payment.
+
+await wallet.send({ to: payment.ethAddress, value });
+
+await api.publishAnnouncement({
+  paymentId: payment.paymentId,
+  txHash: '0x...',
+  chain: 'ethereum',
+});
+```
+
+Publishing by `paymentId` lets the server announce its own stored data rather than trusting client-supplied view tags.
+
+### Remote key generation and scanning
+
+`generateKeysRemote()` and `scanRemote()` exist for backends that own the full flow. Both can expose secret material to the server.
+
+```typescript
+const remoteScan = await api.scanRemote({
+  announcements,
+  viewingSk: recipient.viewing.secretKey,
+  spendingPk: recipient.spending.publicKey,
+});
+```
+
+<Warning>
+`scanRemote` sends the viewing secret key to your backend, and `generateKeysRemote` means the server generates and sees the keys. For anything holding user funds, prefer the local functions. Reach for these only when the server is yours and the trust is intentional. See the [security model](/sdk/security).
+</Warning>
+
+## What the SDK does not do
+
+- It does not sign transactions.
+- It does not provide chain indexers or RPC.
+- It does not resolve ENS, SuiNS, or IPFS for you.
+- It makes no network calls unless you build the trusted client.
+
+These are deliberate boundaries. The SDK handles the cryptography; your app keeps control of funds, transport, and naming.
+
+## Related
+
+- [API reference](/sdk/api-reference)
+- [Security model](/sdk/security)
+- [Hosted API integration guide](/build/integration-guide)
+- [Name services](/use-cases/name-services)

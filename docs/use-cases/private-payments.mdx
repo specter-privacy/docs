@@ -15,10 +15,10 @@ flowchart LR
     B --> C["Sender pays\nstealth address"]
     C --> D["Recipient scans\nand recovers funds"]
 
-    style A fill:#0F766E,color:#fff
-    style B fill:#14B8A6,color:#fff
-    style C fill:#0F766E,color:#fff
-    style D fill:#14B8A6,color:#fff
+    style A fill:#7c3aed,color:#fff
+    style B fill:#a855f7,color:#fff
+    style C fill:#7c3aed,color:#fff
+    style D fill:#a855f7,color:#fff
 ```
 
 ## Real-world scenarios
@@ -44,16 +44,16 @@ Two parties want to settle an over-the-counter trade without broadcasting their 
 ## The payment flow
 
 <Steps>
-  <Step title="Recipient sets up" icon="key">
+  <Step title="Recipient sets up" icon="lock">
     Generate ML-KEM keys and publish your meta-address. Link it to your ENS name for easy discovery.
   </Step>
-  <Step title="Sender resolves and pays" icon="paper-plane">
+  <Step title="Sender resolves and pays" icon="mail-share">
     The sender resolves your name (or uses your meta-address directly), derives a stealth address, sends payment, and posts an announcement.
   </Step>
-  <Step title="Recipient scans" icon="radar">
+  <Step title="Recipient scans" icon="dashboard">
     You periodically scan the announcement registry. View tags filter out 99.6% of irrelevant announcements. When you find a match, you recover the private key for the stealth address.
   </Step>
-  <Step title="Recipient spends" icon="wallet">
+  <Step title="Recipient spends" icon="lock">
     Import the derived private key into any Ethereum wallet. The funds are yours to spend like any normal transaction.
   </Step>
 </Steps>
@@ -84,10 +84,10 @@ Senders don't need to handle raw hex meta-addresses. SPECTER integrates with:
 Read [Name Services](/use-cases/name-services) for setup details.
 
 <CardGroup cols={2}>
-  <Card title="Try it now" icon="play" href="/explore/playground">
+  <Card title="Try it now" icon="rocket" href="/explore/playground">
     Run the full payment flow against the live API.
   </Card>
-  <Card title="Name services" icon="link" href="/use-cases/name-services">
+  <Card title="Name services" icon="network" href="/use-cases/name-services">
     Send privately with ENS and SuiNS names.
   </Card>
 </CardGroup>

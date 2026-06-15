@@ -1,0 +1,298 @@
+---
+title: "SDK API Reference"
+description: "Every exported function in @specterpq/sdk: initialization, key generation, meta-addresses, KEM, view tags, stealth derivation, the high-level flow, and the trusted HTTP client."
+---
+
+Every public function is exported at the top level:
+
+```typescript
+import * as Specter from '@specterpq/sdk';
+```
+
+This page is reference material. For a guided walkthrough, start with the [quickstart](/sdk/quickstart). For patterns, see [integration](/sdk/integration).
+
+<Note>
+Two layers exist on purpose. The **high-level flow** functions (`createStealthPayment`, `scanAnnouncement`) cover most apps. The **low-level** functions (`encapsulate`, `decapsulate`, `deriveStealthKeys`) are there when you need to control each step yourself.
+</Note>
+
+## Initialization
+
+### `initSpecterSdk(opts?)`
+
+Loads and caches the WebAssembly module. Call it once before any other crypto. Safe to call repeatedly.
+
+```typescript
+await initSpecterSdk();
+
+// Browser override when you host the WASM yourself:
+await initSpecterSdk({ wasmUrl: 'https://cdn.example.com/specter_wasm_bg.wasm' });
+```
+
+## Key generation
+
+### `generateKeysLocal()`
+
+Generates one ML-KEM-768 keypair. The public key is safe to log. The secret key is redacted from JSON and console output.
+
+```typescript
+const kp = generateKeysLocal();
+kp.publicKey;  // safe to share
+kp.secretKey;  // secret-bearing, redacted
+```
+
+### `generateSpecterKeys()`
+
+Generates a recipient identity: a spending keypair and a viewing keypair.
+
+```typescript
+const keys = generateSpecterKeys();
+keys.spending.publicKey; // controls funds
+keys.viewing.publicKey;  // detects payments
+```
+
+### `specterKeysViewingPk(keys)`
+
+Reads the viewing public key from a full identity object.
+
+```typescript
+const viewingPk = specterKeysViewingPk(keys);
+```
+
+## Meta-address
+
+### `metaAddressFromPublicKeys(spendingPk, viewingPk, metadata?)`
+
+Builds the canonical recipient meta-address from the two public keys, plus optional metadata.
+
+```typescript
+const meta = metaAddressFromPublicKeys(
+  spending.publicKey,
+  viewing.publicKey,
+  { description: 'Alice', avatar: 'ipfs://Qm...', createdAt: 1700000000 },
+);
+
+meta.hex;             // publishable string
+meta.bytes.length;    // 2369
+meta.address.version; // 1
+```
+
+### `parseMetaAddress(input)`
+
+Parses a serialized meta-address from its hex string or raw bytes.
+
+```typescript
+const parsed = parseMetaAddress(meta.hex);
+parsed.address.spendingPk;
+parsed.address.viewingPk;
+```
+
+## Key encapsulation (KEM)
+
+These are the post-quantum core. The sender encapsulates to the viewing public key; the recipient decapsulates with the viewing secret key. Both sides end up with the same 32-byte shared secret.
+
+### `encapsulate(publicKey)`
+
+Sender-side operation against the recipient viewing public key.
+
+```typescript
+const enc = encapsulate(recipient.viewing.publicKey);
+enc.ciphertext;    // announce publicly
+enc.sharedSecret;  // secret-bearing, redacted
+```
+
+### `decapsulate(ciphertext, secretKey)`
+
+Recipient-side operation against the viewing secret key. Returns the same shared secret.
+
+```typescript
+const sharedSecret = decapsulate(enc.ciphertext, recipient.viewing.secretKey);
+```
+
+## View tags
+
+The view tag is a one-byte filter, not encryption. It lets a recipient skip almost every announcement that is not theirs before doing real work. See [view tags and scanning](/how-it-works/view-tags-and-scanning) for the why.
+
+### `computeViewTag(sharedSecret)`
+
+Returns the one-byte view tag as a number from 0 to 255.
+
+```typescript
+const tag = computeViewTag(sharedSecret);
+```
+
+### `verifyViewTag(sharedSecret, expectedTag)`
+
+Returns `true` if the tag matches.
+
+```typescript
+if (verifyViewTag(sharedSecret, incomingTag)) {
+  // candidate match, continue to full derivation
+}
+```
+
+## Stealth derivation
+
+### `deriveStealthAddress(spendingPk, sharedSecret)`
+
+Derives the stealth Ethereum address, `0x` plus 20 bytes.
+
+```typescript
+const ethAddress = deriveStealthAddress(recipient.spending.publicKey, sharedSecret);
+```
+
+### `deriveStealthSuiAddress(spendingPk, sharedSecret)`
+
+Derives the stealth Sui address, `0x` plus 32 bytes.
+
+```typescript
+const suiAddress = deriveStealthSuiAddress(recipient.spending.publicKey, sharedSecret);
+```
+
+### `deriveStealthKeys(spendingPk, sharedSecret)`
+
+Derives the full spendable key material for wallet import.
+
+```typescript
+const keys = deriveStealthKeys(recipient.spending.publicKey, sharedSecret);
+keys.ethAddress;
+keys.suiAddress;
+keys.publicKey;      // secp256k1 uncompressed public key
+keys.ethPrivateKey;  // secret-bearing, redacted
+```
+
+## High-level flow
+
+These two functions wrap the steps above. Reach for them first.
+
+### `createStealthPayment(metaAddress)`
+
+Sender helper. Parses the meta-address, encapsulates, derives the Ethereum and Sui stealth addresses, and computes the view tag.
+
+```typescript
+const payment = createStealthPayment(meta.hex);
+// { ephemeralCiphertext, viewTag, ethAddress, suiAddress }
+```
+
+### `scanAnnouncement(announcement, viewingKeys, spendingPublicKey)`
+
+Recipient helper for a single announcement.
+
+```typescript
+const result = scanAnnouncement(
+  { ephemeralCiphertext: payment.ephemeralCiphertext, viewTag: payment.viewTag },
+  recipient.viewing,
+  recipient.spending.publicKey,
+);
+
+if (result.isMatch) {
+  result.stealthKeys.ethAddress;
+} else {
+  result.reason; // 'view_tag_mismatch' | 'address_mismatch'
+}
+```
+
+### `scanAnnouncements(announcements, viewingKeys, spendingPublicKey)`
+
+Batch version. Returns an array of results.
+
+```typescript
+const results = scanAnnouncements(batch, recipient.viewing, recipient.spending.publicKey);
+const matches = results.filter((r) => r.isMatch);
+```
+
+## Sizes and constants
+
+Import these for runtime checks and schema alignment instead of hardcoding numbers. The values match ML-KEM-768 as standardized in FIPS 203.
+
+| Constant | Bytes | What it measures |
+|----------|-------|------------------|
+| `KYBER_PUBLIC_KEY_SIZE` | 1184 | ML-KEM-768 public key |
+| `KYBER_SECRET_KEY_SIZE` | 2400 | ML-KEM-768 secret key |
+| `KYBER_CIPHERTEXT_SIZE` | 1088 | Encapsulation ciphertext |
+| `KYBER_SHARED_SECRET_SIZE` | 32 | Shared secret |
+| `META_ADDRESS_SIZE` | 2369 | Serialized meta-address |
+| `VIEW_TAG_SIZE` | 1 | View tag |
+| `ETH_ADDRESS_SIZE` | 20 | Stealth Ethereum address |
+| `SUI_ADDRESS_SIZE` | 32 | Stealth Sui address |
+| `STEALTH_SECP256K1_PUBLIC_SIZE` | 65 | Uncompressed secp256k1 public key |
+| `STEALTH_ETH_PRIVATE_KEY_SIZE` | 32 | Recovered Ethereum private key |
+
+`PROTOCOL_VERSION` carries the current protocol version (`1`).
+
+```typescript
+import {
+  KYBER_PUBLIC_KEY_SIZE,
+  KYBER_CIPHERTEXT_SIZE,
+  META_ADDRESS_SIZE,
+  VIEW_TAG_SIZE,
+  PROTOCOL_VERSION,
+} from '@specterpq/sdk';
+```
+
+## Errors
+
+Every error the SDK throws is a `SpecterSdkError` with a `code`, a `category`, a `recoverable` flag, and a message.
+
+```typescript
+import { SpecterSdkError, encapsulate } from '@specterpq/sdk';
+
+try {
+  encapsulate('0xdeadbeef' as never);
+} catch (err) {
+  if (err instanceof SpecterSdkError) {
+    console.error(err.code, err.category, err.recoverable, err.message);
+  } else {
+    throw err;
+  }
+}
+```
+
+| Code | Meaning |
+|------|---------|
+| `NOT_INITIALIZED` | Crypto called before `initSpecterSdk()` |
+| `INVALID_KEY_SIZE` | Key length does not match the expected size |
+| `INVALID_CIPHERTEXT_SIZE` | Ciphertext length is wrong |
+| `INVALID_SHARED_SECRET_SIZE` | Shared secret length is wrong |
+| `INVALID_HEX` | Input is not valid hex |
+| `INVALID_META_ADDRESS` | Meta-address failed to parse |
+| `INVALID_METADATA_JSON` | Metadata is not valid JSON |
+| `INVALID_VIEW_TAG` | View tag is out of range |
+| `INVALID_API_RESPONSE` | A remote response failed validation |
+| `HTTP_ERROR` | The trusted API returned a non-success status |
+| `ENCAPSULATION_FAILED` | Encapsulation failed inside WASM |
+| `DECAPSULATION_FAILED` | Decapsulation failed inside WASM |
+| `STEALTH_DERIVATION_FAILED` | Stealth derivation failed |
+| `WASM_LOAD_FAILED` | The WebAssembly module could not load |
+| `INTERNAL_ERROR` | Unexpected internal failure |
+
+## Type notes
+
+- Cryptographic strings use branded hex aliases such as `KyberPublicKeyHex`.
+- Most low-level functions accept either branded hex or a `Uint8Array`.
+- Prefer the high-level functions for app integration unless you need step-by-step control.
+
+## Trusted HTTP client
+
+The SDK is local first. The functions below only run when you build a client against an API you trust. They are documented in [integration patterns](/sdk/integration#server-assisted-flows), and their trust implications are covered in the [security model](/sdk/security).
+
+```typescript
+import { createSpecterApiClient } from '@specterpq/sdk';
+
+const api = createSpecterApiClient({
+  baseUrl: 'https://api.example.com',
+  headers: { authorization: `Bearer ${token}` },
+});
+```
+
+Available methods: `generateKeysRemote()`, `createStealthPaymentRemote(metaAddress)`, `publishAnnouncement(input)`, and `scanRemote(input)`.
+
+<Warning>
+`generateKeysRemote()` and `scanRemote()` can send secret material to the server. Use them only against infrastructure you control, over TLS, behind your own authorization. For wallets, prefer `generateSpecterKeys()` and `scanAnnouncement()`, which never leave the device.
+</Warning>
+
+## Related
+
+- [Integration patterns](/sdk/integration)
+- [Security model](/sdk/security)
+- [Protocol flow](/how-it-works/protocol-flow)
+- [Hosted API reference](/api/introduction)
