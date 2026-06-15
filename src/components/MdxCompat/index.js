@@ -133,12 +133,17 @@ export function Accordion({title, children}) {
   );
 }
 
-export function ParamField({body, type, required, children}) {
+export function ParamField({body, path, query, type, required, default: defaultValue, children}) {
+  const name = body ?? path ?? query;
+
   return (
     <div className={styles.paramField}>
       <div className={styles.paramHeader}>
-        <span className={styles.paramName}>{body}</span>
+        <span className={styles.paramName}>{name}</span>
         {type ? <span className={styles.paramType}>{type}</span> : null}
+        {defaultValue !== undefined ? (
+          <span className={styles.paramType}>default: {String(defaultValue)}</span>
+        ) : null}
         {required ? <span className={styles.paramRequired}>required</span> : null}
       </div>
       <div className={styles.paramContent}>{children}</div>

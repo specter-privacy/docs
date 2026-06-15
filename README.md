@@ -53,7 +53,7 @@ The dev server starts at `http://localhost:3000` with hot reload.
 │   ├── how-it-works/            # Protocol flow, architecture, cryptography, security
 │   ├── reference/               # Verification matrix, changelog
 │   ├── roadmap/                 # Work yet to implement
-│   ├── use-cases/               # Private payments, name services, Yellow channels
+│   ├── use-cases/               # Private payments, name services, roadmap
 │   └── why-specter/             # The problem, how it works, vs others
 ├── src/
 │   ├── components/MdxCompat/    # Mintlify-compatibility component shims (Frame, Card, etc.)

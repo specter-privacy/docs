@@ -21,12 +21,12 @@ The matrix below maps the major public docs claims to source files and, where re
 
 | Docs claim | Verification source | Notes |
 |---|---|---|
-| The backend exposes `/health`, key generation, stealth, ENS, SuiNS, IPFS, registry, and Yellow routes | [`specter-api/src/routes.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/routes.rs) | Use this file as the route-level source of truth for API availability. |
+| The backend exposes `/health`, key generation, stealth, ENS, SuiNS, IPFS, and registry routes | [`specter-api/src/routes.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/routes.rs) | Use this file as the route-level source of truth for API availability. |
 | `POST /api/v1/keys/generate` returns long-term spending and viewing keys plus a `meta_address` | [`specter-api/src/handlers.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/handlers.rs), [`specter-api/src/dto.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/dto.rs) | This is current behavior. Client-side key generation is tracked in [issue #18](https://github.com/pranshurastogi/SPECTER/issues/18). |
-| `POST /api/v1/stealth/create` returns Ethereum and Sui stealth destinations plus announcement data | [`specter-api/src/handlers.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/handlers.rs), [`specter-api/src/dto.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/dto.rs) | The response includes `stealth_address`, `stealth_sui_address`, `ephemeral_ciphertext`, and `view_tag`. |
+| `POST /api/v1/stealth/create` returns Ethereum and Sui stealth destinations plus announcement data | [`specter-api/src/handlers.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/handlers.rs), [`specter-api/src/dto.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/dto.rs) | The response includes `payment_id`, `stealth_address`, `stealth_sui_address`, `ephemeral_ciphertext`, `view_tag`, and `announcement`. |
+| `POST /api/v1/registry/announcements` publishes through a server-authoritative `payment_id` path | [`specter-api/src/pending.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/pending.rs), [`specter-api/src/handlers.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/handlers.rs) | Loose client-supplied `ephemeral_key` + `view_tag` publish is no longer accepted. |
 | `POST /api/v1/stealth/scan` returns recovered discoveries including secret material | [`specter-api/src/handlers.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/handlers.rs), [`specter-api/src/dto.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/dto.rs) | The docs must continue to warn that `stealth_sk` and `eth_private_key` are sensitive outputs. |
 | ENS and SuiNS name resolution are first-class API features | [`specter-api/src/routes.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/routes.rs), [`specter-ens/`](https://github.com/pranshurastogi/SPECTER/tree/main/specter/specter-ens), [`specter-suins/`](https://github.com/pranshurastogi/SPECTER/tree/main/specter/specter-suins) | Public docs can describe both as implemented resolution paths. |
-| Yellow endpoints exist in the API surface | [`specter-api/src/routes.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/routes.rs), [`specter-api/src/handlers.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/handlers.rs) | The existence of routes is verified separately from production completeness. |
 
 ## Security, storage, and operations
 
@@ -36,13 +36,6 @@ The matrix below maps the major public docs claims to source files and, where re
 | The registry backend can run in memory or Turso | [`specter-api/src/state.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/state.rs), [`specter-registry/`](https://github.com/pranshurastogi/SPECTER/tree/main/specter/specter-registry) | Public docs should treat memory as development mode and Turso as the current durable backend. |
 | Announcement discovery is backend-managed today | [`specter-api/src/handlers.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/handlers.rs), [`specter-registry/`](https://github.com/pranshurastogi/SPECTER/tree/main/specter/specter-registry) | Backend-independent recovery is not implemented yet. Track [issue #16](https://github.com/pranshurastogi/SPECTER/issues/16). |
 | The repo has an open hardening backlog for release process and production readiness | [Issue #19](https://github.com/pranshurastogi/SPECTER/issues/19), [Issue #17](https://github.com/pranshurastogi/SPECTER/issues/17) | Use these issues when docs need to describe current limitations instead of future guarantees. |
-
-## Yellow integration status
-
-| Docs claim | Verification source | Notes |
-|---|---|---|
-| Channel create and discover flows are implemented as API handlers | [`specter-api/src/handlers.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/handlers.rs), [`specter-yellow/`](https://github.com/pranshurastogi/SPECTER/tree/main/specter/specter-yellow) | Public docs can describe these as current features. |
-| Funding and close responses still include placeholder-style behavior | [`specter-api/src/dto.rs`](https://github.com/pranshurastogi/SPECTER/blob/main/specter/specter-api/src/dto.rs), [`api/yellow.mdx`](/api/yellow) | Keep the docs explicit about partial behavior here. Do not present settlement as fully automated if it is not. |
 
 ## How to update docs safely
 

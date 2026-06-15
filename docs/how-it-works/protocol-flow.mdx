@@ -101,24 +101,26 @@ The announcement is the public breadcrumb. It contains:
 
 | Field | Purpose |
 |-------|---------|
-| `ephemeral_key` | The ML-KEM ciphertext (encrypted shared secret) |
-| `view_tag` | 1-byte filter for fast scanning |
-| `tx_hash` | Transaction reference (optional) |
+| `payment_id` | Server-held pending payment binding from `/stealth/create` |
+| `tx_hash` | Monad announce transaction hash in dev mode |
+| `payment_tx_hash` | Source-chain payment transaction hash (optional) |
+| `source_chain_id` | EIP-155 source-chain ID (optional) |
 | `amount` | Payment amount (optional) |
-| `chain` | Target chain (optional) |
-| `channel_id` | Yellow channel link (optional) |
+| `chain` | Source chain name (optional) |
+| `token` | ERC-20 token contract for payment verification (optional) |
 
 ```bash
 curl -s -X POST https://backend.specterpq.com/api/v1/registry/announcements \
   -H "Content-Type: application/json" \
   -d '{
-    "ephemeral_key":"<HEX_CIPHERTEXT>",
-    "view_tag":42,
+    "payment_id":"<PAYMENT_ID_FROM_STEALTH_CREATE>",
     "tx_hash":"0x...",
     "amount":"0.1",
     "chain":"ethereum"
   }' | jq .
 ```
+
+Preferred publishes use the server-held shared secret to encrypt payment metadata into a 93-byte blob. The fallback `announcement` path emits 77-byte plaintext metadata because the server has no shared secret.
 
 ---
 

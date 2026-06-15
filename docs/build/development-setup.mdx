@@ -17,7 +17,7 @@ cd SPECTER/specter
 cargo build
 ```
 
-The workspace compiles 12 crates. First build takes a few minutes; subsequent builds are incremental.
+The workspace build takes a few minutes the first time; subsequent builds are incremental.
 
 ## Run tests
 
@@ -32,7 +32,6 @@ This runs the full test suite (~195 tests) across all crates. Tests cover:
 - API route handlers
 - Registry backends
 - Name service resolution
-- Yellow channel operations
 
 ## Run the API server locally
 
@@ -55,11 +54,9 @@ specter/
 ├── specter-stealth/    # Payment creation and discovery logic
 ├── specter-scanner/    # Batch scanning engine
 ├── specter-registry/   # Announcement storage (memory + Turso)
-├── specter-cache/      # Lock-free concurrent cache
 ├── specter-ens/        # ENS name resolution
 ├── specter-suins/      # SuiNS name resolution
 ├── specter-ipfs/       # IPFS via Pinata
-├── specter-yellow/     # Yellow Network integration
 ├── specter-api/        # Axum REST server
 └── specter-cli/        # CLI tool
 ```

@@ -3,15 +3,12 @@ title: "API Overview"
 description: "The SPECTER REST API: endpoints, authentication, and how to get started"
 ---
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card title="Quickstart" icon="rocket" href="/getting-started/quickstart">
     Run the full flow in 4 API calls.
   </Card>
   <Card title="Stealth endpoints" icon="code" href="/api/stealth">
     Create and scan stealth payments.
-  </Card>
-  <Card title="Yellow endpoints" icon="chart-line" href="/api/yellow">
-    Private trading channels.
   </Card>
 </CardGroup>
 
@@ -31,7 +28,6 @@ flowchart TD
     Stealth --> Registry["/api/v1/registry/*"]
     Stealth --> Names["/api/v1/ens/*\n/api/v1/suins/*"]
     Names --> IPFS["/api/v1/ipfs/*"]
-    Stealth --> Yellow["/api/v1/yellow/*"]
 
     style Health fill:#0F766E,color:#fff
     style Keys fill:#0F766E,color:#fff
@@ -39,7 +35,6 @@ flowchart TD
     style Registry fill:#14B8A6,color:#fff
     style Names fill:#0d9488,color:#fff
     style IPFS fill:#0d9488,color:#fff
-    style Yellow fill:#115E59,color:#fff
 ```
 
 | Group | Endpoints | Purpose |
@@ -49,7 +44,6 @@ flowchart TD
 | **Registry** | `POST /registry/announcements`, `GET /registry/announcements`, `GET /registry/stats` | Store and query announcements |
 | **Names** | `GET /ens/resolve/:name`, `GET /suins/resolve/:name` | ENS and SuiNS name resolution |
 | **IPFS** | `POST /ipfs/upload`, `GET /ipfs/:cid` | Meta-address storage and retrieval |
-| **Yellow** | `POST /yellow/channel/*`, `GET /yellow/config` | Private channel operations |
 
 ## The integration loop
 
@@ -64,7 +58,7 @@ flowchart TD
     `POST /api/v1/stealth/create` with the recipient's meta-address.
   </Step>
   <Step title="Publish announcement" icon="bell">
-    `POST /api/v1/registry/announcements` with the returned ciphertext and view tag.
+    `POST /api/v1/registry/announcements` with the returned `payment_id` after the source-chain payment.
   </Step>
   <Step title="Scan and recover" icon="radar">
     `POST /api/v1/stealth/scan` with recipient keys to find and recover payments.
@@ -101,7 +95,7 @@ The API server includes built-in security middleware:
 
 - **API key auth** for write endpoints (when `API_KEY` env var is set)
 - **Per-IP rate limiting** (default: 10 req/s, 30 burst)
-- **Security headers** (CSP, X-Frame-Options, X-Content-Type-Options)
+- **Security headers** (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, legacy XSS protection)
 - **Body size limits** to prevent abuse
 - **CORS** configurable via `ALLOWED_ORIGINS`
 

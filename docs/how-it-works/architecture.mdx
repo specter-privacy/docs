@@ -28,11 +28,9 @@ flowchart LR
 
     subgraph Services["State and integrations"]
         Registry["specter-registry"]
-        Cache["specter-cache"]
         ENS["specter-ens"]
         SuiNS["specter-suins"]
         IPFS["specter-ipfs"]
-        Yellow["specter-yellow"]
     end
 
     UI --> Routes
@@ -44,17 +42,13 @@ flowchart LR
     MW --> Scanner
     MW --> ENS
     MW --> SuiNS
-    MW --> Yellow
 
     Stealth --> Crypto
     Scanner --> Registry
     Scanner --> Crypto
     ENS --> IPFS
     SuiNS --> IPFS
-    Yellow --> Stealth
-    Yellow --> Registry
     Stealth --> Registry
-    Registry --> Cache
     Stealth --> CoreTypes
     Scanner --> CoreTypes
     Registry --> CoreTypes
@@ -67,20 +61,19 @@ flowchart LR
 
 ## The Rust workspace
 
-SPECTER's backend is organized as a Cargo workspace with 12 crates. Each crate has a single responsibility:
+SPECTER's backend is organized as a Cargo workspace. Each crate has a single responsibility:
 
 | Crate | Purpose |
 |-------|---------|
 | **specter-core** | Shared types (`KeyPair`, `MetaAddress`, `Announcement`), error types, constants |
+| **specter-chain** | On-chain announcer bindings, calldata recovery, and chain indexing helpers |
 | **specter-crypto** | ML-KEM-768 encapsulation/decapsulation, view tags, SHAKE-256 derivation |
 | **specter-stealth** | Payment creation (`create_stealth_payment`) and discovery (`scan_announcement`) |
 | **specter-scanner** | Batch scanning with progress callbacks, resumable scans |
 | **specter-registry** | Announcement storage: in-memory (dev) or Turso/libSQL (production) |
-| **specter-cache** | Lock-free concurrent caching via `dashmap` |
 | **specter-ens** | ENS name resolution to IPFS-hosted meta-addresses |
 | **specter-suins** | SuiNS name resolution |
 | **specter-ipfs** | IPFS meta-address storage via Pinata gateway |
-| **specter-yellow** | Yellow Network private channel integration |
 | **specter-api** | Axum REST server, route handlers, middleware, DTOs |
 | **specter-cli** | CLI tool for generate, create, scan, bench, serve |
 
@@ -100,12 +93,13 @@ sequenceDiagram
     Crypto-->>API: ciphertext + shared_secret
     API->>Crypto: derive_stealth_address(spending_pk, shared_secret)
     Crypto-->>API: stealth_address + view_tag
-    API-->>Sender: {stealth_address, ephemeral_ciphertext, view_tag}
+    API->>Registry: store pending payment_id + shared_secret
+    API-->>Sender: {payment_id, stealth_address, ephemeral_ciphertext, view_tag}
 
     Note over Sender: Sends ETH/tokens to stealth_address
 
-    Sender->>API: POST /registry/announcements
-    API->>Registry: store(announcement)
+    Sender->>API: POST /registry/announcements {payment_id, tx_hash}
+    API->>Registry: store encrypted metadata + announcement
 ```
 
 ### Scanning for payments
@@ -145,7 +139,6 @@ The React frontend (`SPECTER-web/`) provides:
 - **Generate Keys** page - Create ML-KEM keypairs and save encrypted to browser
 - **Send Payment** page - Resolve names, create stealth payments
 - **Scan Payments** page - Discover incoming payments
-- **Yellow** page - Private channel management
 
 Keys are stored in an encrypted browser vault using AES-GCM. The frontend calls the same REST API documented in the API reference.
 

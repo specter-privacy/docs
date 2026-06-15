@@ -73,9 +73,6 @@ Hex-encoded viewing secret key (sensitive).
 <ParamField body="meta_address" type="string" required>
 Hex-encoded SPECTER meta-address combining spending + viewing public keys.
 </ParamField>
-<ParamField body="view_tag" type="integer" required>
-Base view tag derived from viewing public key bytes.
-</ParamField>
 
 <Warning>
 Never log or commit `spending_sk` or `viewing_sk`.
@@ -83,7 +80,7 @@ Never log or commit `spending_sk` or `viewing_sk`.
 
 <AccordionGroup>
   <Accordion title="How `view_tag` is computed here">
-    The endpoint computes `view_tag` from the viewing public key bytes (`compute_view_tag(viewing.public.as_bytes())`).
+    It is not computed here. Every announcement gets its own per-payment `view_tag` from the ML-KEM shared secret at stealth creation time.
   </Accordion>
   <Accordion title="What this endpoint does not do">
     It does not persist key material to disk and does not register ENS/SuiNS records.

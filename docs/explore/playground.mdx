@@ -16,9 +16,6 @@ description: "Use the SPECTER SDK playground directly in the docs."
   <Card title="API quickstart" icon="terminal" href="/getting-started/quickstart">
     Step-by-step with copy-paste commands.
   </Card>
-  <Card title="Yellow channels" icon="shield" href="https://specterpq.com/yellow">
-    Try private channel creation.
-  </Card>
 </CardGroup>
 
 <Note>
@@ -98,8 +95,7 @@ curl -s -X POST https://backend.specterpq.com/api/v1/stealth/create \
 Note the `stealth_address` in the response. That's where you'd send funds.
 
 ```bash
-EPHEMERAL_KEY=$(jq -r '.ephemeral_ciphertext' /tmp/specter-create.json)
-VIEW_TAG=$(jq -r '.view_tag' /tmp/specter-create.json)
+PAYMENT_ID=$(jq -r '.payment_id' /tmp/specter-create.json)
 STEALTH_ADDRESS=$(jq -r '.stealth_address' /tmp/specter-create.json)
 echo "Payment destination: $STEALTH_ADDRESS"
 ```
@@ -113,8 +109,7 @@ Post the announcement so the recipient can find the payment later.
 curl -s -X POST https://backend.specterpq.com/api/v1/registry/announcements \
   -H "Content-Type: application/json" \
   -d "{
-    \"ephemeral_key\":\"$EPHEMERAL_KEY\",
-    \"view_tag\":$VIEW_TAG,
+    \"payment_id\":\"$PAYMENT_ID\",
     \"tx_hash\":\"0x1111111111111111111111111111111111111111111111111111111111111111\",
     \"amount\":\"0.01\",
     \"chain\":\"ethereum\"
@@ -144,52 +139,6 @@ The scan response contains `eth_private_key`. This is real wallet secret materia
 
   </Tab>
 </Tabs>
-
----
-
-## Yellow channel playground
-
-Test the private channel flow:
-
-<Steps>
-  <Step title="Create a private channel" icon="plus">
-    ```bash
-    curl -s -X POST https://backend.specterpq.com/api/v1/yellow/channel/create \
-      -H "Content-Type: application/json" \
-      -d '{"recipient":"bob.eth","token":"USDC","amount":"1000"}' | jq .
-    ```
-  </Step>
-  <Step title="Discover incoming channels" icon="radar">
-    ```bash
-    curl -s -X POST https://backend.specterpq.com/api/v1/yellow/channel/discover \
-      -H "Content-Type: application/json" \
-      -d '{"viewing_sk":"<HEX>","spending_pk":"<HEX>","spending_sk":"<HEX>"}' | jq .
-    ```
-  </Step>
-  <Step title="Check channel config" icon="gear">
-    ```bash
-    curl -s https://backend.specterpq.com/api/v1/yellow/config | jq .
-    ```
-  </Step>
-</Steps>
-
-```mermaid
-flowchart LR
-    A["Create\nchannel"] --> B["Publish\nannouncement"]
-    B --> C["Discover\nchannel"]
-    C --> D["Fund /\nTransfer"]
-    D --> E["Close\nchannel"]
-
-    style A fill:#0F766E,color:#fff
-    style C fill:#0F766E,color:#fff
-    style E fill:#0F766E,color:#fff
-```
-
-<Warning>
-`/yellow/channel/fund` and `/yellow/channel/close` currently return placeholder values. They demonstrate the API shape but don't submit real L1 settlement transactions.
-</Warning>
-
----
 
 ## Multi-language examples
 
