@@ -35,7 +35,7 @@ Pick the one that fits your app:
       body: JSON.stringify({ meta_address: recipientMetaAddress })
     }).then(r => r.json());
 
-    // Send funds to payment.stealth_address, then publish announcement
+    // Send funds to payment.stealth_address, then publish announcement with payment.payment_id
     ```
   </Tab>
   <Tab title="Frontend-first">
@@ -75,9 +75,9 @@ sequenceDiagram
 
     Note over App: Per payment (sender side)
     App->>API: POST /stealth/create {meta_address}
-    API-->>App: {stealth_address, ciphertext, view_tag}
+    API-->>App: {payment_id, stealth_address, ciphertext, view_tag}
     App->>Chain: Send ETH/tokens to stealth_address
-    App->>API: POST /registry/announcements {ciphertext, view_tag, tx_hash}
+    App->>API: POST /registry/announcements {payment_id, tx_hash}
 
     Note over App: Periodic (recipient side)
     App->>API: POST /stealth/scan {viewing_sk, spending_pk, spending_sk}
@@ -108,11 +108,8 @@ If your users have ENS or SuiNS names, you can resolve them to meta-addresses au
 
 ```javascript
 // Resolve ENS name to meta-address
-const resolved = await fetch("https://backend.specterpq.com/api/v1/ens/resolve", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ name: "alice.eth" })
-}).then(r => r.json());
+const resolved = await fetch("https://backend.specterpq.com/api/v1/ens/resolve/alice.eth")
+  .then(r => r.json());
 
 // Use resolved.meta_address for stealth payment creation
 ```
@@ -134,8 +131,10 @@ The API returns standard HTTP status codes with JSON error bodies:
 
 ```json
 {
-  "error": "invalid_meta_address",
-  "message": "Meta-address hex string is malformed or incorrect length"
+  "error": {
+    "code": "BAD_REQUEST",
+    "message": "Meta-address hex string is malformed or incorrect length"
+  }
 }
 ```
 

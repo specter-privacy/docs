@@ -1,6 +1,6 @@
 ---
 title: "Registry endpoints"
-description: "Publish, list, and inspect SPECTER announcements in the in-memory registry"
+description: "Publish, list, and inspect SPECTER announcements in the registry"
 ---
 
 <CardGroup cols={3}>
@@ -19,23 +19,29 @@ description: "Publish, list, and inspect SPECTER announcements in the in-memory 
 
 ### Request schema
 
-<ParamField body="ephemeral_key" type="string" required>
-Hex-encoded ephemeral ciphertext.
+<ParamField body="payment_id" type="string">
+Preferred publish path. Use the `payment_id` returned by `/api/v1/stealth/create`.
 </ParamField>
-<ParamField body="view_tag" type="integer" required>
-Announcement view tag (`0-255`).
+<ParamField body="announcement" type="object">
+Fallback publish path. Use the full `announcement` object returned by `/api/v1/stealth/create` only when `payment_id` is unavailable or expired.
 </ParamField>
-<ParamField body="tx_hash" type="string" required>
-Transaction hash string. Must be non-empty.
+<ParamField body="tx_hash" type="string">
+Monad announce transaction hash. Required when the relayer is not configured; ignored when server-side relaying is active.
 </ParamField>
-<ParamField body="channel_id" type="string">
-Optional 32-byte channel id as 64 hex characters.
+<ParamField body="payment_tx_hash" type="string">
+Optional source-chain payment transaction hash for verification and encrypted metadata.
+</ParamField>
+<ParamField body="source_chain_id" type="integer">
+Optional EIP-155 chain ID for the source-chain payment.
 </ParamField>
 <ParamField body="amount" type="string">
-Optional human-readable amount string.
+Optional amount string in decimal base units or `0x` hex uint256.
 </ParamField>
 <ParamField body="chain" type="string">
-Optional chain identifier (for example `ethereum`, `sui`).
+Optional source-chain name (for example `ethereum`, `arbitrum`, `base`, `monad-testnet`).
+</ParamField>
+<ParamField body="token" type="string">
+Optional ERC-20 token contract address for source-chain payment verification.
 </ParamField>
 
 ### Response schema
@@ -45,6 +51,9 @@ Assigned registry announcement id.
 </ParamField>
 <ParamField body="success" type="boolean" required>
 Publish confirmation.
+</ParamField>
+<ParamField body="monad_tx_hash" type="string">
+Monad transaction hash of the `announce()` call. In dev mode this matches the supplied `tx_hash`.
 </ParamField>
 
 ## `GET /api/v1/registry/announcements`
@@ -96,11 +105,12 @@ Array of non-zero tag buckets (`tag`, `count`).
 curl -s -X POST https://backend.specterpq.com/api/v1/registry/announcements \
   -H "Content-Type: application/json" \
   -d '{
-    "ephemeral_key":"<HEX_CIPHERTEXT>",
-    "view_tag":42,
+    "payment_id":"<PAYMENT_ID_FROM_STEALTH_CREATE>",
     "tx_hash":"0xabc123...",
+    "payment_tx_hash":"0xdef456...",
+    "source_chain_id":1,
     "chain":"ethereum",
-    "amount":"0.10"
+    "amount":"100000000000000000"
   }' | jq .
 ```
 
@@ -125,12 +135,15 @@ curl -s "https://backend.specterpq.com/api/v1/registry/stats" | jq .
 
 <AccordionGroup>
   <Accordion title="Duplicate transaction hashes are rejected">
-    The in-memory registry normalizes `tx_hash` and prevents duplicate entries with the same transaction hash.
+    Publish reserves a dedup slot before relaying. When server DB keys are configured, `payment_tx_hash` is normalized and HMACed for duplicate-payment prevention without storing the payment hash plaintext.
   </Accordion>
   <Accordion title="List filter precedence">
     Listing uses `view_tag` when present. If absent, it uses time range only when both `from_timestamp` and `to_timestamp` are provided. Otherwise it returns all.
   </Accordion>
   <Accordion title="Storage scope">
-    API state uses `MemoryRegistry`, so announcements are process-local and reset when the process restarts.
+    API state uses `MemoryRegistry` in local/dev mode and Turso when `REGISTRY_BACKEND=turso` is configured.
+  </Accordion>
+  <Accordion title="Metadata encryption">
+    The preferred `payment_id` path encrypts payment metadata into a 93-byte blob while keeping byte 0 (`view_tag`) plaintext. The fallback `announcement` path has no shared secret and emits 77-byte plaintext metadata.
   </Accordion>
 </AccordionGroup>

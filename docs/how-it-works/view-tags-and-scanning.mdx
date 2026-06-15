@@ -75,12 +75,12 @@ The response returns an array of discovered payments, each with:
 - `stealth_address` - the Ethereum address holding funds
 - `stealth_sui_address` - the Sui address equivalent
 - `eth_private_key` - the derived spending key
-- `view_tag` - the matched tag
-- Metadata: `tx_hash`, `amount`, `chain`, `channel_id`
+- `stealth_sk` - the derived stealth private key
+- Metadata when available: `tx_hash`, `payment_tx_hash`, `amount`, `chain`, `source_chain_id`
 
 ## View tags are not encryption
 
-A view tag doesn't hide anything. It's an optimization, not a security feature. Anyone can see the view tag in the announcement. But knowing the view tag without the viewing secret key tells you nothing about who the recipient is.
+A view tag doesn't hide anything. It's an optimization, not a security feature. Anyone can see the view tag in the announcement. In the preferred encrypted metadata format, byte 0 remains plaintext for filtering while the remaining 76-byte metadata payload is encrypted. But knowing the view tag without the viewing secret key tells you nothing about who the recipient is.
 
 <CardGroup cols={2}>
   <Card title="Protocol flow" icon="sitemap" href="/how-it-works/protocol-flow">

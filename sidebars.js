@@ -38,7 +38,6 @@ const sidebars = {
       items: [
         'use-cases/private-payments',
         'use-cases/name-services',
-        'use-cases/yellow-private-channels',
         'use-cases/whats-next',
       ],
     },
@@ -89,11 +88,6 @@ const sidebars = {
         'api/ipfs',
         'api/registry',
       ],
-    },
-    {
-      type: 'category',
-      label: 'Yellow endpoints',
-      items: ['api/yellow'],
     },
   ],
 };

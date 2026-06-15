@@ -11,7 +11,7 @@ description: "Current auth model, error contract, and production hardening check
     Errors return a consistent JSON body with `code` and `message`.
   </Card>
   <Card title="Gateway required" icon="shield-halved">
-    Put auth and throttling in front of this API for production workloads.
+    Configure `API_KEY`, CORS, rate limits, and body limits before production workloads.
   </Card>
 </CardGroup>
 
@@ -41,7 +41,10 @@ Top-level error object.
 | Condition | HTTP | Example codes |
 | --- | --- | --- |
 | Bad input or invalid hex | `400` | `BAD_REQUEST` |
+| Missing or invalid API key | `401` | `UNAUTHORIZED` |
+| Resource or dedup conflict | `409` | `CONFLICT` |
 | Validation failure | `422` | `VALIDATION_ERROR` |
+| Rate limit exceeded | `429` | `RATE_LIMITED` |
 | ENS/SuiNS record not found | `404` | `ENS_NAME_NOT_FOUND`, `SUINS_NAME_NOT_FOUND` |
 | IPFS gateway/download failure | `502` | `IPFS_ERROR` |
 | Unhandled internal failure | `500` | `INTERNAL_ERROR` |
@@ -91,10 +94,10 @@ Top-level error object.
 
 <Steps>
   <Step title="Add auth at the edge">
-    Require API key or wallet-authentication in your reverse proxy or API gateway.
+    Set `API_KEY` and include it on mutating requests as the `X-API-Key` header.
   </Step>
   <Step title="Add rate limiting">
-    Throttle by IP and route group, especially on `/api/v1/stealth/*` scan endpoints.
+    Use the built-in per-IP rate limiter (`RATE_LIMIT_RPS`, `RATE_LIMIT_BURST`) and add edge throttling if your deployment needs stricter route-level controls.
   </Step>
   <Step title="Log error codes">
     Track `error.code` values for alerting and integration diagnostics.
@@ -103,7 +106,7 @@ Top-level error object.
 
 <AccordionGroup>
   <Accordion title="Where error codes come from">
-    `ApiError` maps from `SpecterError` in `specter-api/src/error.rs` and produces the final JSON envelope.
+    `ApiError` maps from `SpecterError` in `specter-api/src/error.rs` and produces the final JSON envelope. With `API_KEY` configured, internal error messages are sanitized to `An internal error occurred`.
   </Accordion>
   <Accordion title="Why 422 and 400 both exist">
     Validation errors from typed domain checks use `422`, while malformed request values and parse failures use `400`.

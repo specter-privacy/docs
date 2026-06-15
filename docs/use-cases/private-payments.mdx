@@ -64,8 +64,9 @@ The same meta-address produces valid stealth addresses on both Ethereum and Sui.
 
 ```json
 {
-  "stealth_address": "0x...",          // Ethereum
-  "stealth_sui_address": "0x...",      // Sui
+  "payment_id": "00000000-0000-0000-0000-000000000000",
+  "stealth_address": "0x...",
+  "stealth_sui_address": "0x...",
   "ephemeral_ciphertext": "...",
   "view_tag": 42
 }
@@ -86,7 +87,7 @@ Read [Name Services](/use-cases/name-services) for setup details.
   <Card title="Try it now" icon="play" href="/explore/playground">
     Run the full payment flow against the live API.
   </Card>
-  <Card title="Yellow private channels" icon="shield" href="/use-cases/yellow-private-channels">
-    Private payments meet private trading channels.
+  <Card title="Name services" icon="link" href="/use-cases/name-services">
+    Send privately with ENS and SuiNS names.
   </Card>
 </CardGroup>

@@ -81,14 +81,32 @@ cargo run --bin specter -- serve
 | `REGISTRY_BACKEND` | No | `memory` (default) or `turso` |
 | `TURSO_DATABASE_URL` | For turso | libSQL connection string |
 | `TURSO_AUTH_TOKEN` | For turso | Auth token |
-| `PINATA_JWT` | For IPFS | Pinata upload credentials |
-| `PINATA_GATEWAY_URL` | For IPFS | Your Pinata gateway |
-| `PINATA_GATEWAY_TOKEN` | For IPFS | Gateway access token |
-| `ETH_RPC_URL` | For ENS | Ethereum RPC endpoint |
-| `SUI_RPC_URL` | For SuiNS | Sui RPC endpoint |
+| `SPECTER_DB_ENC_KEY` | For hardened turso | Base64 32-byte DB master key for pending-secret wrapping, dedup MACs, and telemetry hashing |
+| `RELAYER_PRIVATE_KEY` | For relayer | Enables server-side Monad announcement relay |
+| `MONAD_RPC_URL` | For relayer/chain | Monad RPC endpoint |
+| `SPECTER_ANNOUNCER_ADDRESS` | For relayer/chain | SPECTERAnnouncer contract address |
+| `SPECTER_ANNOUNCER_DEPLOY_BLOCK` | For chain indexing | Deployment block when `ANNOUNCEMENT_SOURCE=chain` |
+| `ANNOUNCEMENT_SOURCE` | No | Set `chain` to enable chain indexer config |
+| `PINATA_JWT` | For IPFS upload | Pinata upload credentials |
+| `PINATA_GATEWAY_URL` | For IPFS retrieve | Dedicated Pinata gateway |
+| `PINATA_GATEWAY_TOKEN` | For IPFS retrieve | Gateway access token |
+| `ENS_RPC_URL` | No | Ethereum mainnet RPC endpoint for ENS (default: `https://ethereum.publicnode.com`) |
+| `SUI_RPC_URL` | No | Sui RPC endpoint (defaults by `USE_SUI_TESTNET`) |
+| `USE_TESTNET` | No | General EVM/Monad testnet flag (default: `false`) |
+| `USE_SUI_TESTNET` | No | SuiNS testnet flag; defaults to `USE_TESTNET` |
+| `ENABLE_CACHE` | No | IPFS cache toggle (default: enabled; set `false` or `0` to disable) |
+| `CHAIN_RPC_ETHEREUM` | For payment verification | Source-chain RPC for `chain: "ethereum"` |
+| `CHAIN_RPC_ARBITRUM` | For payment verification | Source-chain RPC for `chain: "arbitrum"` |
+| `CHAIN_RPC_BASE` | For payment verification | Source-chain RPC for `chain: "base"` |
+| `CHAIN_RPC_OPTIMISM` | For payment verification | Source-chain RPC for `chain: "optimism"` |
+| `CHAIN_RPC_POLYGON` | For payment verification | Source-chain RPC for `chain: "polygon"` |
+| `CHAIN_RPC_MONAD_TESTNET` | For payment verification | Source-chain RPC for `chain: "monad-testnet"` |
+| `CHAIN_RPC_SEPOLIA` | For payment verification | Source-chain RPC for `chain: "sepolia"` |
 | `API_KEY` | No | Enables auth for write endpoints |
 | `ALLOWED_ORIGINS` | No | CORS origins (default: `*`) |
 | `RATE_LIMIT_RPS` | No | Requests per second (default: 10) |
+| `RATE_LIMIT_BURST` | No | Burst size (default: 30) |
+| `MAX_BODY_SIZE` | No | Request body limit in bytes (default: 1048576) |
 
 ## Verify it's working
 

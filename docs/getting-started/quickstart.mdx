@@ -40,20 +40,19 @@ curl -s -X POST https://backend.specterpq.com/api/v1/stealth/create \
   -H 'Content-Type: application/json' \
   -d "{\"meta_address\":\"$META_ADDRESS\"}" | tee /tmp/specter-create.json
 
-EPHEMERAL_KEY=$(jq -r '.ephemeral_ciphertext' /tmp/specter-create.json)
-VIEW_TAG=$(jq -r '.view_tag' /tmp/specter-create.json)
+PAYMENT_ID=$(jq -r '.payment_id' /tmp/specter-create.json)
 STEALTH_ADDRESS=$(jq -r '.stealth_address' /tmp/specter-create.json)
 echo "Stealth destination: $STEALTH_ADDRESS"
 ```
 
-The API encapsulates to the recipient's `viewing_pk`, derives a shared secret, and computes the stealth address + view tag.
+The API encapsulates to the recipient's `viewing_pk`, derives a shared secret, stores the server-built announcement behind `payment_id`, and computes the stealth address + view tag.
 
 ### Step 3: Publish the announcement
 
 ```bash
 curl -s -X POST https://backend.specterpq.com/api/v1/registry/announcements \
   -H 'Content-Type: application/json' \
-  -d "{\"ephemeral_key\":\"$EPHEMERAL_KEY\",\"view_tag\":$VIEW_TAG,\"tx_hash\":\"0x1111111111111111111111111111111111111111111111111111111111111111\",\"amount\":\"0.01\",\"chain\":\"ethereum\"}" | jq .
+  -d "{\"payment_id\":\"$PAYMENT_ID\",\"tx_hash\":\"0x1111111111111111111111111111111111111111111111111111111111111111\",\"amount\":\"0.01\",\"chain\":\"ethereum\"}" | jq .
 ```
 
 ### Step 4: Scan and recover

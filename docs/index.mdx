@@ -97,7 +97,7 @@ flowchart LR
 
 1. The recipient creates a `meta-address` from public spending and viewing keys.
 2. The sender derives a one-time stealth address from that `meta-address`.
-3. The sender transfers funds and publishes an **announcement** with an `ephemeral_key` and `view_tag`.
+3. The sender transfers funds and publishes an **announcement** using the server-bound `payment_id`.
 4. The recipient scans announcements, recovers the matching stealth key, and spends normally.
 
 Observers can see the transfer and the announcement. They should not be able to link the stealth address back to the recipient without the private keys.
@@ -114,7 +114,6 @@ The docs describe the current shipped behavior, not the end-state vision.
 |---|---|
 | **Key generation** | The hosted API currently exposes `POST /api/v1/keys/generate`, which returns long-term keys from the backend flow. Client-side key generation is tracked in [issue #18](https://github.com/pranshurastogi/SPECTER/issues/18). |
 | **Announcement recovery** | Discovery currently depends on the backend-managed registry. Backend-independent recovery from on-chain announcements is tracked in [issue #16](https://github.com/pranshurastogi/SPECTER/issues/16). |
-| **Yellow integration** | Channel creation and discovery are documented as implemented. Funding and close flows still include integration scaffolding and placeholder-style behavior. |
 
 ---
 
