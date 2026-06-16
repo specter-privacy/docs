@@ -28,6 +28,60 @@ const config = {
         },
       }),
     },
+    // JSON-LD structured data: helps search engines and AI answer engines
+    // understand the site, expose a sitelinks search box, and attribute the
+    // software/organization correctly.
+    {
+      tagName: 'script',
+      attributes: {
+        type: 'application/ld+json',
+      },
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'WebSite',
+            '@id': 'https://docs.specterpq.com/#website',
+            name: 'SPECTER Documentation',
+            url: 'https://docs.specterpq.com/',
+            description:
+              'Post-quantum stealth addresses for private payments on Ethereum and Sui.',
+            inLanguage: 'en',
+            publisher: {'@id': 'https://docs.specterpq.com/#org'},
+            potentialAction: {
+              '@type': 'SearchAction',
+              target: {
+                '@type': 'EntryPoint',
+                urlTemplate:
+                  'https://docs.specterpq.com/search?q={search_term_string}',
+              },
+              'query-input': 'required name=search_term_string',
+            },
+          },
+          {
+            '@type': 'Organization',
+            '@id': 'https://docs.specterpq.com/#org',
+            name: 'SPECTER',
+            url: 'https://specterpq.com/',
+            logo: 'https://docs.specterpq.com/img/specter-logo.png',
+            sameAs: [
+              'https://github.com/pranshurastogi/SPECTER',
+              'https://x.com/specter_PQ',
+            ],
+          },
+          {
+            '@type': 'SoftwareApplication',
+            name: 'SPECTER',
+            applicationCategory: 'SecurityApplication',
+            operatingSystem: 'Web, Node.js',
+            description:
+              'Post-quantum stealth address protocol and SDK for private payments on Ethereum and Sui, using ML-KEM-768 announcement encryption and view-tag scanning.',
+            url: 'https://docs.specterpq.com/',
+            offers: {'@type': 'Offer', price: '0', priceCurrency: 'USD'},
+          },
+        ],
+      }),
+    },
   ],
   future: {
     v4: true,
@@ -45,15 +99,80 @@ const config = {
           sidebarPath: './sidebars.js',
           editUrl:
             'https://github.com/pranshurastogi/SPECTER/tree/main/docusaurus/specter-pq-docs/',
+          // Richer metadata for SEO + AI crawlers on every doc page.
+          showLastUpdateTime: true,
         },
         blog: false,
         theme: {
           customCss: './src/css/custom.css',
         },
+        sitemap: {
+          lastmod: 'date',
+          changefreq: 'weekly',
+          priority: 0.7,
+          filename: 'sitemap.xml',
+          ignorePatterns: ['/playground-app/**'],
+        },
       },
     ],
   ],
-  themes: ['@docusaurus/theme-mermaid'],
+  plugins: [
+    // Generates /llms.txt (index) and /llms-full.txt (full corpus) plus a
+    // clean markdown twin for every page, so LLMs and AI crawlers can ingest
+    // the docs without parsing rendered HTML. https://llmstxt.org
+    [
+      '@signalwire/docusaurus-plugin-llms-txt',
+      {
+        siteTitle: 'SPECTER',
+        siteDescription:
+          'Post-quantum stealth addresses for private payments on Ethereum and Sui. ML-KEM-768 announcement encryption, view-tag scanning, stealth address derivation, SDK and hosted API.',
+        depth: 2,
+        enableDescriptions: true,
+        content: {
+          enableMarkdownFiles: true,
+          enableLlmsFullTxt: true,
+          includeDocs: true,
+          includePages: true,
+          includeBlog: false,
+          excludeRoutes: ['/playground-app/**', '/search/**'],
+        },
+        optionalLinks: [
+          {
+            title: 'Research Paper (arXiv)',
+            url: 'https://arxiv.org/pdf/2501.13733v1',
+            description: 'Underlying post-quantum stealth address research.',
+          },
+          {
+            title: 'Live API health',
+            url: 'https://backend.specterpq.com/health',
+            description: 'Hosted SPECTER backend status endpoint.',
+          },
+        ],
+      },
+    ],
+  ],
+  themes: [
+    '@docusaurus/theme-mermaid',
+    // Offline, lunr-based full-text search. Fast typeahead with fuzzy matching,
+    // result highlighting and a Cmd/Ctrl+K shortcut — no external service.
+    [
+      '@easyops-cn/docusaurus-search-local',
+      {
+        hashed: true,
+        indexBlog: false,
+        indexPages: true,
+        docsRouteBasePath: '/',
+        language: ['en'],
+        highlightSearchTermsOnTargetPage: true,
+        explicitSearchResultPath: true,
+        searchBarShortcut: true,
+        searchBarShortcutHint: true,
+        searchBarPosition: 'right',
+        searchResultLimits: 8,
+        searchResultContextMaxLength: 60,
+      },
+    ],
+  ],
   markdown: {
     mermaid: true,
     hooks: {
@@ -62,6 +181,26 @@ const config = {
   },
   themeConfig: {
     image: 'images/specter/cover-specter-full.png',
+    metadata: [
+      {
+        name: 'keywords',
+        content:
+          'post-quantum, stealth addresses, ML-KEM, ML-KEM-768, private payments, Ethereum, Sui, view tags, privacy, zero-knowledge, ERC-5564, stealth meta-address, kyber, lattice cryptography, SPECTER',
+      },
+      {
+        name: 'description',
+        content:
+          'Post-quantum stealth addresses for private payments on Ethereum and Sui, built on ML-KEM-768 with view-tag scanning, an SDK, and a hosted API.',
+      },
+      {name: 'author', content: 'SPECTER'},
+      {name: 'robots', content: 'index, follow, max-image-preview:large'},
+      {property: 'og:type', content: 'website'},
+      {property: 'og:site_name', content: 'SPECTER Documentation'},
+      {property: 'og:locale', content: 'en_US'},
+      {name: 'twitter:card', content: 'summary_large_image'},
+      {name: 'twitter:site', content: '@specter_PQ'},
+      {name: 'twitter:creator', content: '@specter_PQ'},
+    ],
     colorMode: {
       defaultMode: 'dark',
       disableSwitch: true,
