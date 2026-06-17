@@ -283,6 +283,7 @@ export const PLAYGROUND_TEMPLATE = `
             <option value="payment">Create stealth payment</option>
             <option value="scan">Scan announcement</option>
             <option value="low-level">Low-level KEM + view-tag</option>
+            <option value="metadata">Announcement metadata</option>
             <option value="blank">Blank</option>
           </select>
         </div>
@@ -335,6 +336,12 @@ export const PLAYGROUND_TEMPLATE = `
         <span class="global-pill">scanAnnouncements</span>
         <span class="global-pill">createSpecterApiClient</span>
         <span class="global-pill">specterKeysViewingPk</span>
+        <span class="global-pill">sealAnnouncementMetadata</span>
+        <span class="global-pill">openAnnouncementMetadata</span>
+        <span class="global-pill">encodeAnnouncementMetadata</span>
+        <span class="global-pill">decodeAnnouncementMetadata</span>
+        <span class="global-pill">encryptAnnouncementMetadata</span>
+        <span class="global-pill">decryptAnnouncementMetadata</span>
         <span class="global-pill constant">KYBER_PUBLIC_KEY_SIZE</span>
         <span class="global-pill constant">KYBER_SECRET_KEY_SIZE</span>
         <span class="global-pill constant">KYBER_CIPHERTEXT_SIZE</span>
@@ -342,6 +349,11 @@ export const PLAYGROUND_TEMPLATE = `
         <span class="global-pill constant">STEALTH_ETH_PRIVATE_KEY_SIZE</span>
         <span class="global-pill constant">STEALTH_SECP256K1_PUBLIC_SIZE</span>
         <span class="global-pill constant">PROTOCOL_VERSION</span>
+        <span class="global-pill constant">PLAINTEXT_METADATA_SIZE</span>
+        <span class="global-pill constant">ENCRYPTED_METADATA_SIZE</span>
+        <span class="global-pill constant">METADATA_TX_HASH_SIZE</span>
+        <span class="global-pill constant">METADATA_AMOUNT_SIZE</span>
+        <span class="global-pill constant">METADATA_SOURCE_CHAIN_ID_SIZE</span>
       </div>
     </div>
   </div>
@@ -350,7 +362,7 @@ export const PLAYGROUND_TEMPLATE = `
     <p>
       <a href="https://github.com/specter-privacy/specter-sdk" target="_blank" rel="noreferrer">github.com/specter-privacy/specter-sdk</a>
       <span class="tag green">Apache-2.0</span>
-      <span class="tag">@specterpq/sdk@0.2.0</span>
+      <span class="tag">@specterpq/sdk@0.3.0</span>
     </p>
     <p>All cryptography runs client-side · No telemetry · No network calls</p>
   </footer>

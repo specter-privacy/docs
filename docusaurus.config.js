@@ -180,7 +180,7 @@ const config = {
     },
   },
   themeConfig: {
-    image: 'images/specter/cover-specter-full.png',
+    image: 'images/specter/specter-cover-full.png',
     metadata: [
       {
         name: 'keywords',
