@@ -329,7 +329,7 @@ const config = {
       copyright: `Copyright © ${new Date().getFullYear()} SPECTER.`,
     },
     zoom: {
-      selector: '.markdown img',
+      selector: '.markdown img, img[data-zoomable]',
       background: {
         light: 'rgba(10, 9, 18, 0.92)',
         dark: 'rgba(10, 9, 18, 0.92)',
