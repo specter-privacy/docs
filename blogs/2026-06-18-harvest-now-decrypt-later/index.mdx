@@ -1,0 +1,187 @@
+---
+slug: harvest-now-decrypt-later
+title: "What \"Harvest Now, Decrypt Later\" Means for Money You Move Today"
+authors: [specter]
+tags: [analysis, post-quantum, privacy]
+description: "On a permanent public ledger, the harvest is the hard part already solved for free. Continue reading why the classical stealth-address announcements are time capsules for the first quantum computer, and where SPECTER changes the math."
+image: ./harvest-timeline.png
+---
+
+import './styles.css';
+import harvestTimeline from './harvest-timeline.png';
+import sizeComparison from './size-comparison.png';
+
+<div className="hndl">
+  <div className="doc-page">
+
+    <header className="doc-header">
+      <div className="ring ring-1" />
+      <div className="ring ring-2" />
+      <div className="ring ring-3" />
+      <div className="ring ring-4" />
+      <div className="header-accent" />
+
+      <div className="eyebrow">Analysis &nbsp;·&nbsp; Post-Quantum Cryptography &nbsp;·&nbsp; Blockchain Privacy</div>
+
+      <h1 className="doc-title">What "Harvest Now, Decrypt Later" Means for Money You Move Today</h1>
+
+      <div className="title-rule" />
+
+      <p className="lede">The harvest is happening in the present tense. The decryption is the only part scheduled for the future—and on a permanent public ledger, the harvest is the hard part already solved for free.</p>
+    </header>
+
+    <div className="doc-body">
+
+      <p>The entire Ethereum transaction log fits on a single consumer SSD. Not a summary. Not an index. Every block since genesis, copyable to a laptop in an afternoon. That portability is the point of a public ledger, and it is also the problem nobody priced in. A copy made today does not expire. Whatever protects the data inside it has to outlive every machine that will ever try to read it.</p>
+
+      <p>Most people file the quantum threat under "later." Quantum computers capable of breaking the elliptic-curve cryptography behind Bitcoin and Ethereum do not exist yet, the timelines are contested, and a reasonable person concludes there is time. That conclusion answers the wrong question.</p>
+
+      <div className="pullquote">
+        <p>The attacker does not need a quantum computer today. They need a hard drive today and a quantum computer eventually.</p>
+      </div>
+
+      <section className="doc-section">
+        <div className="section-num">01 &nbsp;—&nbsp; The Asymmetry</div>
+        <h2>The asymmetry nobody mentions</h2>
+
+        <p>Classical cryptanalysis assumes the attacker and defender race in roughly the same time window. You encrypt, someone tries to break it, and if your key is strong enough the attempt fails before the data stops mattering. A wire transfer that becomes public in forty years is usually a non-event.</p>
+
+        <p>A blockchain breaks that assumption in two directions at once. The data is permanent, so it never stops mattering on a schedule you control. And the data is public, so the harvest cost is zero. Anyone can download the announcements that reveal who paid whom. They are sitting in the open right now, waiting only for the decryption key that a cryptographically relevant quantum computer would supply.</p>
+
+        <p>Stealth address protocols were built to break the link between a recipient and their on-chain identity. Umbra and Fluidkey, the two best-known deployments, both rely on classical elliptic-curve Diffie-Hellman to derive the one-time addresses that hide a recipient. The mechanism works against a classical observer. It also writes, permanently, a classical-ECDH announcement that a future quantum adversary can replay against Shor's algorithm to recover the link the protocol was supposed to sever.</p>
+
+        <figure>
+          <img src={harvestTimeline} alt="Harvest Now, Decrypt Later — timeline diagram showing how encrypted announcements are copied at T=0 and decrypted at T=N when a quantum computer arrives" />
+          <figcaption>The harvest-and-decrypt timeline. At T=0 the attacker copies encrypted announcements from the public ledger at zero cost. At T=N — whenever quantum hardware arrives — those stored ciphertexts are decrypted retroactively.</figcaption>
+        </figure>
+
+        <div className="dark-block">
+          <p>A privacy mechanism that depends on classical ECDH and publishes to a permanent ledger is a time capsule addressed to the first machine that can break ECDH.</p>
+        </div>
+
+        <p>Notice what this does to the usual reassurance. When someone says quantum-relevant hardware is a decade or two out, they are describing when the decryption arrives. They are not describing when the data becomes vulnerable, because the data became vulnerable the moment it was published. The lead time everyone treats as breathing room is, for permanent-ledger data, just the length of the fuse.</p>
+
+        <p>The defender's options also collapse in a way they don't for ordinary encrypted traffic. If you encrypt an email with a scheme that later weakens, you can re-encrypt the stored copy with something stronger. You control the storage. On a public blockchain you do not. The announcement is written once, replicated across thousands of nodes, and beyond your reach forever. No re-encryption, no rotation, no recall.</p>
+
+        <div className="callout">
+          <p className="callout-label">Key implication</p>
+          <p>The only move available is to not write the vulnerable thing in the first place. Classical stealth protocols cannot patch their way out of harvested announcements that already exist. Every Umbra and Fluidkey announcement published to date is already on whatever drives chose to copy it, and no future upgrade reaches backward to scrub them.</p>
+        </div>
+      </section>
+
+      <section className="doc-section">
+        <div className="section-num">02 &nbsp;—&nbsp; The Solution</div>
+        <h2>Where SPECTER changes the math</h2>
+
+        <p>SPECTER replaces the classical key exchange in the discovery path with ML-KEM-768, the lattice-based key encapsulation mechanism standardized by NIST as FIPS 203 in August 2024. ML-KEM-768 has no known quantum attack. Shor's algorithm, which collapses elliptic-curve and RSA security, does not apply to the lattice problem underneath it.</p>
+
+        <p>The architecture splits a recipient into two keypairs, both ML-KEM-768. A <em>Spend keypair</em> controls the funds. A <em>View keypair</em> detects incoming payments. Separating them means a recipient can hand a watch-only View key to a service that scans for payments without ever exposing the ability to move money.</p>
+
+        <p>That separation is not cosmetic. It mirrors how a recipient actually behaves: the work of constantly watching the chain for incoming payments is frequent and low-stakes, while the work of authorizing a spend is rare and high-stakes. Tying both to the same key would force the dangerous credential to be online for the routine task. Splitting them lets the View key live on a server scanning around the clock while the Spend key stays cold.</p>
+
+        <p>Both public keys, plus a one-byte view tag, form a meta-address. The recipient publishes it to IPFS and links it to a human-readable name through ENS on Ethereum or SuiNS on Sui. A sender resolves the name, fetches the meta-address, and has everything needed to pay without any further interaction with the recipient.</p>
+
+        <p>To send, the sender runs ML-KEM encapsulation against the recipient's View key. That produces a shared secret, used to derive a one-time stealth address, and a 1,088-byte ciphertext. The sender posts the ciphertext plus a one-byte view tag to the SPECTER Registry on-chain as an announcement, and sends funds to the derived address.</p>
+
+        <p>The recipient scans announcements. The view tag does the cheap filtering first, discarding roughly 99.6% of announcements that were never meant for this recipient, which brings scan time to around one to two seconds per 100,000 announcements. For the survivors, the recipient runs the full decapsulation to confirm a match and recover the address.</p>
+
+        <div className="compare">
+          <div className="compare-head">
+            <p>SPECTER vs. Classical Stealth Protocols</p>
+          </div>
+          <div className="compare-grid">
+            <div className="compare-col metric">
+              <p className="col-label">Metric</p>
+              <p className="col-rows">Meta-address size<br />Announcement ciphertext<br />Scan filter rate<br />Quantum-resistant discovery<br />Key standardization</p>
+            </div>
+            <div className="compare-col classical">
+              <p className="col-label">Classical (Umbra / Fluidkey)</p>
+              <p className="col-rows">~66 bytes<br />~33 bytes<br />—<br />No<br />ECDH</p>
+            </div>
+            <div className="compare-col specter">
+              <p className="col-label">SPECTER (ML-KEM-768)</p>
+              <p className="col-rows">2,368 bytes<br />1,088 bytes<br />99.6% filtered<br />Yes<br />NIST FIPS 203</p>
+            </div>
+          </div>
+        </div>
+
+        <figure>
+          <img src={sizeComparison} alt="Classical vs SPECTER size comparison: ECDH 33-byte announcement vs ML-KEM-768 1,088-byte ciphertext; ~66-byte meta-address vs 2,368-byte SPECTER meta-address" />
+          <figcaption>Size to scale: the larger SPECTER payloads reflect the lattice-based primitives that make them quantum-resistant. The view tag (1 byte) is what prevents that expansion from becoming a scanning bottleneck.</figcaption>
+        </figure>
+
+        <p>Those private keys never leave the device. They sit AES-GCM encrypted in the browser, which means the trust boundary is the user's own machine rather than any SPECTER server. Keeping the material on-device shrinks the set of places an adversary could have copied it from in the first place.</p>
+
+        <p>The announcement that lands on-chain is a lattice ciphertext, not a classical-ECDH handshake. Harvest it today and store it for thirty years, and the lattice problem still stands in the way. That is the specific thing SPECTER buys you: the permanent public record stops being a time capsule for the discovery path.</p>
+
+        <p>Set this against Umbra and Fluidkey directly. Both are working, deployed stealth-address systems, and both derive their one-time addresses from classical ECDH. The divergence only appears when you extend the timeline: their announcements carry the ECDH material that Shor's algorithm eventually unwinds, and SPECTER's carry a lattice ciphertext that it does not. The difference is invisible today and total in the decryption scenario—precisely the kind of difference that a permanent ledger makes you commit to before you can see it.</p>
+      </section>
+
+      <section className="doc-section">
+        <div className="section-num">03 &nbsp;—&nbsp; The Limitation</div>
+        <h2>The part SPECTER does not fix (yet)</h2>
+
+        <p>Here is the limitation, stated plainly because the protocol states it plainly. The spend path produces a secp256k1 key. That is classical elliptic-curve cryptography, the same family Shor's algorithm breaks.</p>
+
+        <p>SPECTER protects the discovery path—the question of which address received a payment and who controls it through the View key. It does not yet make the act of spending quantum-safe, because spending on Ethereum or Sui still settles through a classical secp256k1 signature. A future quantum adversary who can break secp256k1 threatens the spend authorization the same way it threatens every other account on those chains.</p>
+
+        <div className="callout note-amber">
+          <p className="callout-label">Scope note</p>
+          <p>SPECTER is not a quantum-safe wallet. It is a quantum-safe <em>discovery layer</em> bolted onto chains whose settlement is still classical. It removes one specific permanent-record vulnerability—the harvestable ECDH announcement—while leaving the spend signature exactly as exposed as everything else on-chain. Closing that second gap depends on the base chains adopting post-quantum signatures.</p>
+        </div>
+
+        <p>It is worth being precise about who this gap actually hurts and when. A spend signature only becomes a target once the funds are spent, and a quantum adversary breaking secp256k1 is a problem for every account on Ethereum and Sui at once, not a SPECTER-specific weakness. The discovery-path harvest is different in kind: it threatens privacy that was supposed to be permanent, retroactively, for transactions a recipient may have assumed were unlinkable for life.</p>
+
+        <p>SPECTER answers the discovery-path threat and explicitly does not answer the spend-path threat. A reader who wants full quantum safety is waiting on the base chains, not on this protocol.</p>
+      </section>
+
+      <section className="doc-section">
+        <div className="section-num">04 &nbsp;—&nbsp; The Timeline</div>
+        <h2>How honest the timeline really is</h2>
+
+        <p>The reason "harvest now, decrypt later" gets dismissed is that the second half sounds like science fiction. It is fair to ask how seriously to take a decryption event nobody can schedule.</p>
+
+        <p>The honest answer is that the timeline is contested and the disagreement is real, not manufactured. Estimates for a cryptographically relevant quantum computer span from under a decade to never, and the people making them are not cranks on either side. Hardware progress is steady, but the gap between today's noisy qubits and the millions of stable logical qubits Shor's algorithm needs is enormous. Anyone quoting a confident date is selling something.</p>
+
+        <p>That uncertainty is exactly why the framing matters. If you knew the decryption arrived in 2034, you could plan around it. Because you do not, you cannot time your defense to the threat. The only defense that works against an unknown arrival date is one that assumes the data is already compromised and acts accordingly. Refusing to publish a harvestable announcement does not depend on guessing the date right. Re-encrypting later does, and on a permanent ledger you cannot re-encrypt at all.</p>
+
+        <div className="pullquote">
+          <p>The contested timeline is not a reason to wait. It is the reason waiting fails. A defense keyed to a date you cannot know is not a defense at all.</p>
+        </div>
+      </section>
+
+      <section className="doc-section">
+        <div className="section-num">05 &nbsp;—&nbsp; The Tradeoffs</div>
+        <h2>What this costs</h2>
+
+        <p>Post-quantum primitives are bigger, and the numbers are not subtle. A SPECTER meta-address is 2,368 bytes against roughly 66 bytes for a classical equivalent. Each announcement ciphertext is 1,088 bytes against 33 bytes classical. That is a real expansion in what gets published and stored, paid in on-chain and IPFS footprint.</p>
+
+        <p>The view-tag design is what keeps that size from becoming a scanning tax. Filtering out 99.6% of announcements before any expensive decapsulation is the difference between a wallet that scans in seconds and one that grinds. The cost lands on storage and bandwidth, not on the recipient's ability to find their money. Whether that tradeoff stays comfortable as announcement volume grows is an open question, not a settled one.</p>
+
+        <p>There is also the matter of trust in the lattice assumption itself. ML-KEM-768 has no known quantum attack, which is not the same as a proof that none exists. The history of cryptography is a history of "no known attack" lasting until it doesn't. Betting on lattices is a better bet than betting on broken ECDH, but it is still a bet, and honesty requires saying so.</p>
+      </section>
+
+      <section className="doc-section">
+        <div className="section-num">06 &nbsp;—&nbsp; The Question</div>
+        <h2>The question to actually ask</h2>
+
+        <p>Stop asking when quantum computers arrive. The arrival date is genuinely uncertain, the estimates are contested by serious people, and you cannot act on a number nobody can pin down.</p>
+
+        <p>Ask instead what you are writing to a permanent record today, and how long the cryptography protecting it has to hold. Every classical-ECDH stealth announcement already on-chain is a wager that the decryption never comes, placed on data that never expires. SPECTER does not win that wager for the spend signature. For the discovery path, it refuses to place the bet at all.</p>
+
+        <div className="closing">
+          <p className="closing-lead">The harvest already started.</p>
+          <div className="closing-rule" />
+          <p className="closing-sub">The only variable left is what you handed over before you noticed.</p>
+        </div>
+      </section>
+
+      <div className="doc-footer">
+        <p>SPECTER Protocol &nbsp;·&nbsp; Post-Quantum Cryptography</p>
+        <p>June 2026</p>
+      </div>
+
+    </div>
+
+  </div>
+</div>

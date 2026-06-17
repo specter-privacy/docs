@@ -17,6 +17,31 @@ const config = {
         href: '/img/apple-touch-icon.png',
       },
     },
+    // Editorial fonts used by long-form blog posts (e.g. the "Harvest Now,
+    // Decrypt Later" analysis): EB Garamond for body/serif, Space Grotesk for
+    // labels and headings.
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preconnect',
+        href: 'https://fonts.googleapis.com',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'preconnect',
+        href: 'https://fonts.gstatic.com',
+        crossorigin: 'anonymous',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap',
+      },
+    },
     {
       tagName: 'script',
       attributes: {
@@ -102,7 +127,14 @@ const config = {
           // Richer metadata for SEO + AI crawlers on every doc page.
           showLastUpdateTime: true,
         },
-        blog: false,
+        blog: {
+          path: 'blogs',
+          routeBasePath: '/blogs',
+          blogSidebarTitle: 'All posts',
+          blogSidebarCount: 'ALL',
+          postsPerPage: 'ALL',
+          showReadingTime: true,
+        },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -134,7 +166,7 @@ const config = {
           enableLlmsFullTxt: true,
           includeDocs: true,
           includePages: true,
-          includeBlog: false,
+          includeBlog: true,
           excludeRoutes: ['/playground-app/**', '/search/**'],
         },
         optionalLinks: [
@@ -160,7 +192,8 @@ const config = {
       '@easyops-cn/docusaurus-search-local',
       {
         hashed: true,
-        indexBlog: false,
+        indexBlog: true,
+        blogRouteBasePath: '/blogs',
         indexPages: true,
         docsRouteBasePath: '/',
         language: ['en'],
@@ -261,19 +294,27 @@ const config = {
           position: 'left',
         },
         {
-          href: 'https://specterpq.com/',
-          label: 'Website',
+          to: '/blogs',
+          label: 'Blogs',
           position: 'right',
         },
         {
-          href: 'https://backend.specterpq.com/health',
-          label: 'Live API',
+          href: 'https://specterpq.com/',
           position: 'right',
+          className: 'navbar-icon-link navbar-website-link',
+          'aria-label': 'SPECTER website',
         },
         {
           href: 'https://github.com/pranshurastogi/SPECTER',
-          label: 'GitHub',
           position: 'right',
+          className: 'navbar-icon-link navbar-github-link',
+          'aria-label': 'GitHub repository',
+        },
+        {
+          href: 'https://x.com/specter_PQ',
+          position: 'right',
+          className: 'navbar-icon-link navbar-x-link',
+          'aria-label': 'X (Twitter)',
         },
       ],
     },
@@ -309,8 +350,8 @@ const config = {
               href: 'https://arxiv.org/pdf/2501.13733v1',
             },
             {
-              label: 'Verification Matrix',
-              to: '/reference/verification-matrix',
+              label: 'Blogs',
+              to: '/blogs',
             },
           ],
         },
