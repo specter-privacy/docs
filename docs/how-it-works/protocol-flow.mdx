@@ -7,33 +7,9 @@ description: "The complete SPECTER payment flow from key generation to spending,
 
 The protocol has six stages. Each one exists to separate public discovery from private ownership while keeping the result usable in today's wallets.
 
-```mermaid
-flowchart LR
-    subgraph Recipient["Recipient"]
-        S1["1. Generate keys"]
-        S2["2. Publish meta-address"]
-        S5["5. Scan announcements"]
-        S6["6. Spend recovered funds"]
-        S1 --> S2
-        S5 --> S6
-    end
-
-    subgraph Sender["Sender"]
-        S3["3. Create stealth payment"]
-        S4["4. Publish announcement"]
-        S3 --> S4
-    end
-
-    S2 --> S3
-    S4 --> S5
-
-    style S1 fill:#7c3aed,color:#fff
-    style S2 fill:#7c3aed,color:#fff
-    style S3 fill:#a855f7,color:#fff
-    style S4 fill:#a855f7,color:#fff
-    style S5 fill:#6b21a8,color:#fff
-    style S6 fill:#6b21a8,color:#fff
-```
+<Frame>
+  ![SPECTER protocol flow](/images/specter/specter-protocol-flow.png)
+</Frame>
 
 ---
 

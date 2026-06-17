@@ -3,8 +3,8 @@ title: "Security Boundaries"
 description: "What is quantum-safe in SPECTER today, what is not, and the path to full PQ"
 ---
 
-<Frame caption="SPECTER's security model: post-quantum receiving with classical spending compatibility">
-  ![Receiving vs spending comparison](/images/specter/receiving-vs-spending-comparison.svg)
+<Frame>
+  ![Security boundaries](/images/specter/security-boundaries.png)
 </Frame>
 
 ## The short version
@@ -37,19 +37,9 @@ The wallet-compatible spend path converts the ML-KEM shared secret into a secp25
 
 What this means in practice:
 
-```mermaid
-flowchart LR
-    subgraph PQ["Post-Quantum Safe"]
-        A["ML-KEM\nshared secret"] --> B["SHAKE-256\nderivation"]
-    end
-    subgraph Classical["Classical"]
-        B --> C["secp256k1\nprivate key"]
-        C --> D["Ethereum\ntransaction"]
-    end
-
-    style PQ fill:#7c3aed,color:#fff
-    style Classical fill:#d97706,color:#fff
-```
+<Frame>
+  ![Compatibility gap](/images/specter/compatibility-gap.png)
+</Frame>
 
 The **receiving** privacy is quantum-safe. Nobody can determine you received a payment.
 
@@ -107,7 +97,7 @@ This is the most practical route available today.
 3. Swap ECDSA verification for a PQ signature scheme when infrastructure is ready
 
 ```mermaid
-flowchart TD
+flowchart LR
     A["Today:\nML-KEM receive + secp256k1 spend"] --> B["Near-term:\nERC-4337 smart accounts\nwith PQ signature validation"]
     B --> C["Future:\nEIP-8141 native PQ\ntransaction support"]
 
@@ -115,10 +105,6 @@ flowchart TD
     style B fill:#a855f7,color:#fff
     style C fill:#7c3aed,color:#fff
 ```
-
-<Frame caption="The viewing path is post-quantum protected by ML-KEM-768. Classical execution stays compatible with today's chains.">
-  ![Diagram of where ML-KEM-768 protects the SPECTER viewing path against future quantum decryption](/images/specter/specter-ml-kem-full.png)
-</Frame>
 
 <CardGroup cols={2}>
   <Card title="ERC Proposal" icon="code" href="/deep-dive/erc-proposal">
