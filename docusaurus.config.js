@@ -117,6 +117,7 @@ const config = {
     ],
   ],
   plugins: [
+    'docusaurus-plugin-image-zoom',
     // Generates /llms.txt (index) and /llms-full.txt (full corpus) plus a
     // clean markdown twin for every page, so LLMs and AI crawlers can ingest
     // the docs without parsing rendered HTML. https://llmstxt.org
@@ -326,6 +327,13 @@ const config = {
         },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} SPECTER.`,
+    },
+    zoom: {
+      selector: '.markdown img',
+      background: {
+        light: 'rgba(10, 9, 18, 0.92)',
+        dark: 'rgba(10, 9, 18, 0.92)',
+      },
     },
     prism: {
       theme: prismThemes.github,
