@@ -33,19 +33,38 @@ The biggest difference is in the cryptographic primitive used for the sender-rec
 
 This means the announcement ciphertexts stored on-chain are protected against quantum attacks. A future attacker with a quantum computer can't retroactively break the privacy of old payments.
 
-<div className="diagramCenter">
-```mermaid
-flowchart LR
-    subgraph Classical["Classical (Umbra/Fluidkey)"]
-        A1["ECDH shared secret"] --> B1["Vulnerable to\nShor's algorithm"]
-    end
-    subgraph SPECTER["SPECTER"]
-        A2["ML-KEM-768\nshared secret"] --> B2["No known\nquantum attack"]
-    end
+<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', margin: '1.5rem 0'}}>
 
-    style B1 fill:#dc2626,color:#fff
-    style B2 fill:#7c3aed,color:#fff
+<div>
+
+<p style={{paddingLeft: '6rem'}}><strong>SPECTER</strong></p>
+
+```mermaid
+flowchart TD
+    A["Sender encapsulates\nML-KEM-768 viewing key"] --> B["Ciphertext on-chain\n(1,088 bytes)"]
+    B --> C["No known\nquantum attack"]
+    style A fill:#7c3aed,color:#fff
+    style B fill:#7c3aed,color:#fff
+    style C fill:#7c3aed,color:#fff
 ```
+
+</div>
+
+<div>
+
+**Classical (Umbra / Fluidkey)**
+
+```mermaid
+flowchart TD
+    A["Sender computes\nECDH shared secret"] --> B["EC pubkey on-chain\n(33 bytes)"]
+    B --> C["Broken by\nShor's algorithm"]
+    style A fill:#6b7280,color:#fff
+    style B fill:#6b7280,color:#fff
+    style C fill:#dc2626,color:#fff
+```
+
+</div>
+
 </div>
 
 ### Faster scanning
