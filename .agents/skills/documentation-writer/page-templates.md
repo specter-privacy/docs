@@ -14,7 +14,7 @@ slug: /
 ---
 
 <Frame>
-  ![SPECTER cover](/images/specter/cover-specter.png)
+  ![SPECTER cover](/images/specter/specter-cover-full.png)
 </Frame>
 
 ## [Primary value proposition in plain language]
