@@ -44,6 +44,7 @@ const sui = deriveStealthSuiAddress(recipient.spending.publicKey, sharedSecret);
 
 The sender and the recipient run derivations from the same inputs, but they need different things from it.
 
+<Zoomable label="Stealth key generation">
 ```mermaid
 flowchart TD
     SS["shared secret (32 B)"] --> SHAKE["SHAKE-256 + spending_pk"]
@@ -56,6 +57,7 @@ flowchart TD
     style ADDR fill:#a855f7,color:#fff
     style PRIV fill:#6b21a8,color:#fff
 ```
+</Zoomable>
 
 - The **sender** uses `deriveStealthAddress` to get the destination, sends funds there, and is done.
 - The **recipient** uses `deriveStealthKeys` to recover the full key material, including the private key that signs.

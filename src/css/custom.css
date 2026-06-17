@@ -238,6 +238,25 @@ body {
   margin-right: auto;
 }
 
+/* Wide diagrams that otherwise render small with lots of whitespace. The
+   mermaid runtime sets an inline max-width on the SVG, capping it well below
+   the content column; we override it so the SVG fills the available width
+   while staying contained inside the article (never under the sidebars). */
+.diagramWide {
+  width: 100%;
+}
+
+.diagramWide .docusaurus-mermaid-container {
+  width: 100%;
+}
+
+.diagramWide .docusaurus-mermaid-container > svg,
+.diagramWide svg {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto;
+}
+
 .markdown iframe {
   max-width: 100%;
 }

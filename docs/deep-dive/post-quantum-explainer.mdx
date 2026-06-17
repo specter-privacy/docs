@@ -67,6 +67,7 @@ Decapsulation:  Recipient uses secret key to recover the shared secret
 
 The security relies on the **Module Learning With Errors (MLWE)** problem: given the noisy product `A*s + e`, recovering `s` is computationally hard. No quantum algorithm solves this efficiently. No classical algorithm does either.
 
+<Zoomable label="ML-KEM lattice and classical ECDH">
 ```mermaid
 flowchart TD
     subgraph Classical["Classical ECDH"]
@@ -82,6 +83,7 @@ flowchart TD
     style C1 fill:#dc2626,color:#fff
     style C2 fill:#7c3aed,color:#fff
 ```
+</Zoomable>
 
 ## Why ML-KEM-768 specifically?
 

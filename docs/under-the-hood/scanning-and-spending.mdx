@@ -21,6 +21,7 @@ The sender computes it and includes it in the announcement. When a recipient sca
 
 There are 256 possible values, so an announcement that is not yours matches your tag by chance with probability 1 in 256, about 0.39 percent. That means roughly 255 of every 256 unrelated announcements are discarded before any expensive work. See [view tags and scanning](/how-it-works/view-tags-and-scanning) for the cost model in full.
 
+<Zoomable label="Scanning announcements">
 ```mermaid
 flowchart LR
     A["announcement"] --> B{"view tag matches?"}
@@ -34,6 +35,7 @@ flowchart LR
     style E fill:#a855f7,color:#fff
     style F fill:#6b21a8,color:#fff
 ```
+</Zoomable>
 
 ## Step 2: confirm by decapsulation
 
@@ -88,6 +90,7 @@ SPECTER stops at the recovered key. It does not sign or broadcast. Spending uses
 
 Because the spend uses a standard signature, the transaction looks ordinary on-chain. The privacy was established at receive time, when the stealth address was derived with no public link to your meta-address. The spend itself is a normal transfer.
 
+<Zoomable label="Spend">
 ```mermaid
 flowchart LR
     A["recovered private key"] --> B["your wallet (ethers / viem / Sui SDK)"]
@@ -96,6 +99,7 @@ flowchart LR
 
     style B fill:#7c3aed,color:#fff
 ```
+</Zoomable>
 
 ## The one classical step
 
