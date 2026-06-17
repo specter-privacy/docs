@@ -66,6 +66,81 @@ export function setElementBusy(buttonId, spinnerId, busy) {
   if (spinner) spinner.style.display = busy ? 'inline-block' : 'none';
 }
 
+const SECRET_MASK = '*'.repeat(48);
+
+export function setSecretValue(id, value) {
+  const field = byId(id);
+  if (!field) return;
+
+  field.dataset.full = value == null ? '' : String(value);
+  field.classList.remove('revealed');
+
+  const hasValue = Boolean(field.dataset.full);
+
+  const toggle = field.querySelector('.secret-toggle');
+  if (toggle) {
+    toggle.disabled = !hasValue;
+    toggle.setAttribute('aria-pressed', 'false');
+    toggle.setAttribute('aria-label', toggle.dataset.secretToggle === 'spending-sk' ? 'Reveal secret key' : 'Reveal private key');
+  }
+
+  const copy = field.querySelector('.secret-copy');
+  if (copy) {
+    copy.disabled = !hasValue;
+    copy.classList.remove('copied');
+  }
+
+  renderSecret(field);
+}
+
+export function toggleSecret(id) {
+  const field = byId(id);
+  if (!field || !field.dataset.full) return;
+
+  const revealed = field.classList.toggle('revealed');
+  const toggle = field.querySelector('.secret-toggle');
+  if (toggle) {
+    toggle.setAttribute('aria-pressed', String(revealed));
+    const baseLabel = toggle.getAttribute('aria-label').replace(/^(Reveal|Hide) /, '');
+    toggle.setAttribute('aria-label', `${revealed ? 'Hide' : 'Reveal'} ${baseLabel}`);
+  }
+
+  renderSecret(field);
+}
+
+export function copySecret(id) {
+  const field = byId(id);
+  if (!field || !field.dataset.full) return;
+
+  const button = field.querySelector('.secret-copy');
+  navigator.clipboard
+    .writeText(field.dataset.full)
+    .then(() => {
+      if (!button) return;
+      button.classList.add('copied');
+      button.setAttribute('aria-label', 'Copied');
+      clearTimeout(button._copyTimer);
+      button._copyTimer = setTimeout(() => {
+        button.classList.remove('copied');
+        button.setAttribute('aria-label', 'Copy secret key');
+      }, 1500);
+    })
+    .catch(() => {});
+}
+
+function renderSecret(field) {
+  const valueEl = field.querySelector('.secret-value');
+  if (!valueEl) return;
+
+  const full = field.dataset.full || '';
+  if (!full) {
+    valueEl.textContent = '—';
+    return;
+  }
+
+  valueEl.textContent = field.classList.contains('revealed') ? full : SECRET_MASK;
+}
+
 export function copyField(id) {
   const element = byId(id);
   if (!element) return;
@@ -101,6 +176,14 @@ export function wireUiControls(handlers) {
 
   queryRoot().querySelectorAll('[data-copy-field]').forEach((element) => {
     element.addEventListener('click', () => copyField(element.dataset.copyField));
+  });
+
+  queryRoot().querySelectorAll('[data-secret-toggle]').forEach((element) => {
+    element.addEventListener('click', () => toggleSecret(element.dataset.secretToggle));
+  });
+
+  queryRoot().querySelectorAll('[data-secret-copy]').forEach((element) => {
+    element.addEventListener('click', () => copySecret(element.dataset.secretCopy));
   });
 
   byId('btn-keygen')?.addEventListener('click', handlers.generateKeys);

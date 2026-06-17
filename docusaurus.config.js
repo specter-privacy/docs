@@ -182,6 +182,12 @@ const config = {
   },
   themeConfig: {
     image: 'images/specter/specter-cover-full.png',
+    docs: {
+      sidebar: {
+        // Accordion behavior: expanding a category collapses its siblings.
+        autoCollapseCategories: true,
+      },
+    },
     metadata: [
       {
         name: 'keywords',

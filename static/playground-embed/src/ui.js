@@ -35,6 +35,82 @@ export function setOutputValue(id, text, className = '') {
   element.className = `output-value${className ? ` ${className}` : ''}`;
 }
 
+const SECRET_MASK = '*'.repeat(48);
+
+// Populate a masked secret field. Stores the real value and renders it hidden
+// (asterisks) until the user reveals it with the eye toggle.
+export function setSecretValue(id, value) {
+  const field = byId(id);
+  if (!field) return;
+
+  field.dataset.full = value == null ? '' : String(value);
+  field.classList.remove('revealed');
+
+  const hasValue = Boolean(field.dataset.full);
+
+  const toggle = field.querySelector('.secret-toggle');
+  if (toggle) {
+    toggle.disabled = !hasValue;
+    toggle.setAttribute('aria-pressed', 'false');
+    toggle.setAttribute('aria-label', 'Reveal secret key');
+  }
+
+  const copy = field.querySelector('.secret-copy');
+  if (copy) {
+    copy.disabled = !hasValue;
+    copy.classList.remove('copied');
+  }
+
+  renderSecret(field);
+}
+
+export function copySecret(id) {
+  const field = byId(id);
+  if (!field || !field.dataset.full) return;
+
+  const button = field.querySelector('.secret-copy');
+  navigator.clipboard
+    .writeText(field.dataset.full)
+    .then(() => {
+      if (!button) return;
+      button.classList.add('copied');
+      button.setAttribute('aria-label', 'Copied');
+      clearTimeout(button._copyTimer);
+      button._copyTimer = setTimeout(() => {
+        button.classList.remove('copied');
+        button.setAttribute('aria-label', 'Copy secret key');
+      }, 1500);
+    })
+    .catch(() => {});
+}
+
+function renderSecret(field) {
+  const valueEl = field.querySelector('.secret-value');
+  if (!valueEl) return;
+
+  const full = field.dataset.full || '';
+  if (!full) {
+    valueEl.textContent = '—';
+    return;
+  }
+
+  valueEl.textContent = field.classList.contains('revealed') ? full : SECRET_MASK;
+}
+
+export function toggleSecret(id) {
+  const field = byId(id);
+  if (!field || !field.dataset.full) return;
+
+  const revealed = field.classList.toggle('revealed');
+  const toggle = field.querySelector('.secret-toggle');
+  if (toggle) {
+    toggle.setAttribute('aria-pressed', String(revealed));
+    toggle.setAttribute('aria-label', revealed ? 'Hide secret key' : 'Reveal secret key');
+  }
+
+  renderSecret(field);
+}
+
 export function truncateHex(hex, maxLength = 60) {
   if (!hex) return '';
 
@@ -95,6 +171,14 @@ export function wireUiControls(handlers) {
 
   document.querySelectorAll('[data-copy-field]').forEach((element) => {
     element.addEventListener('click', () => copyField(element.dataset.copyField));
+  });
+
+  document.querySelectorAll('[data-secret-toggle]').forEach((element) => {
+    element.addEventListener('click', () => toggleSecret(element.dataset.secretToggle));
+  });
+
+  document.querySelectorAll('[data-secret-copy]').forEach((element) => {
+    element.addEventListener('click', () => copySecret(element.dataset.secretCopy));
   });
 
   byId('btn-keygen')?.addEventListener('click', handlers.generateKeys);
