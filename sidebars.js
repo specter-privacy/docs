@@ -3,24 +3,23 @@ const sidebars = {
     'index',
     {
       type: 'category',
-      label: 'Start here',
-      collapsed: false,
+      label: 'Why SPECTER?',
       items: [
         'why-specter/the-problem',
         'why-specter/how-specter-works',
+        'why-specter/specter-vs-others',
         'getting-started/quickstart',
       ],
     },
     {
       type: 'category',
-      label: 'Understand SPECTER',
+      label: 'Understanding SPECTER',
       items: [
         'how-it-works/protocol-flow',
         'how-it-works/view-tags-and-scanning',
         'how-it-works/security-boundaries',
         'how-it-works/architecture',
         'how-it-works/post-quantum-crypto',
-        'why-specter/specter-vs-others',
       ],
     },
     {

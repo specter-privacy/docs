@@ -13,6 +13,9 @@ description: "Where SPECTER is headed: planned features, research tracks, and ho
   <Card title="ENS + SuiNS integration" icon="network">
     Name resolution for human-readable stealth payments on Ethereum and Sui.
   </Card>
+  <Card title="Four chains, testnet-first" icon="network">
+    Payments on Ethereum, Arbitrum, Monad, and Sui, with Monad serving as the announcement registry chain.
+  </Card>
 </CardGroup>
 
 ---
@@ -37,7 +40,7 @@ description: "Where SPECTER is headed: planned features, research tracks, and ho
   <Step title="L2 chain expansion" icon="network">
     **Priority: High**
 
-    Bring stealth addresses to Arbitrum, Base, and Optimism. The same meta-address already derives valid addresses for any EVM chain. The work is in registry support, frontend chain-switching, and gas optimization.
+    Bring stealth addresses to Base and Optimism. Ethereum, Arbitrum, and Monad are already live. The same meta-address already derives valid addresses for any EVM chain, so the remaining work is registry support, frontend chain-switching, and gas optimization for each new network.
   </Step>
   <Step title="Privacy keystore" icon="lock">
     **Priority: Medium**
@@ -132,9 +135,10 @@ flowchart LR
 | ML-KEM-768 receive/discover | **Live** | - | - |
 | ENS + SuiNS resolution | **Live** | - | - |
 | View tag scanning | **Live** | - | - |
+| Ethereum / Arbitrum / Monad / Sui | **Live** | - | - |
 | PQ smart account wallet | Research | High | Q2 2026 |
 | OAPA identity | Design | High | Q2 2026 |
-| Arbitrum / Base / Optimism | Planned | High | Q2 2026 |
+| Base / Optimism | Planned | High | Q2 2026 |
 | Privacy keystore | Design | Medium | Q3 2026 |
 | Migration contracts | Research | High | Q3 2026 |
 | Cross-chain stealth | Research | Medium | Q3 2026 |

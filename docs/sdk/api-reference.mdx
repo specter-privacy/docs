@@ -200,6 +200,46 @@ const results = scanAnnouncements(batch, recipient.viewing, recipient.spending.p
 const matches = results.filter((r) => r.isMatch);
 ```
 
+## Announcement metadata
+
+A sender can attach payment context to an announcement: the source-chain transaction hash, the amount, and the EIP-155 source chain id. These fields live in a fixed 77-byte block that encrypts to 93 bytes under AES-256-GCM. Byte 0 is the view tag and stays in the clear so scanners can filter without decrypting. The shared secret derived during encapsulation is the encryption key, so only the intended recipient can read the rest. This mirrors the hosted backend's [registry behavior](/api/registry).
+
+Most apps only need the two high-level functions.
+
+### `sealAnnouncementMetadata(input, sharedSecret)`
+
+Sender-side. Encodes the fields, derives the view tag from the shared secret, and encrypts. Returns the 93-byte block as hex. The view tag is always taken from the shared secret, never from the caller.
+
+```typescript
+const sealed = sealAnnouncementMetadata(
+  { txHash: '0xabc…', amount: 100000000000000000n, sourceChainId: 42161 },
+  sharedSecret,
+);
+```
+
+### `openAnnouncementMetadata(encrypted, sharedSecret)`
+
+Recipient-side. Decrypts the block and decodes the fields. Throws `METADATA_DECRYPTION_FAILED` when the authentication tag does not verify, which is the normal outcome for announcements that are not yours.
+
+```typescript
+const meta = openAnnouncementMetadata(sealed, sharedSecret);
+meta.viewTag;
+meta.txHash;        // undefined if the sender omitted it
+meta.amount;        // big-endian uint256 hex, or undefined
+meta.sourceChainId; // EIP-155 id, or undefined
+```
+
+### Low-level metadata functions
+
+Reach for these when you need to handle the encoding and encryption steps separately.
+
+| Function | Purpose |
+|----------|---------|
+| `encodeAnnouncementMetadata(input)` | Pack `{ viewTag, txHash?, amount?, sourceChainId? }` into the canonical 77-byte block. Absent fields are encoded as zeros. |
+| `decodeAnnouncementMetadata(raw)` | Parse a 77-byte block back into fields. All-zero fields decode to `undefined`. |
+| `encryptAnnouncementMetadata(plaintext, sharedSecret)` | AES-256-GCM encrypt a 77-byte block into the 93-byte form. |
+| `decryptAnnouncementMetadata(encrypted, sharedSecret)` | Decrypt a 93-byte block back to 77 bytes. Throws `METADATA_DECRYPTION_FAILED` on tag failure. |
+
 ## Sizes and constants
 
 Import these for runtime checks and schema alignment instead of hardcoding numbers. The values match ML-KEM-768 as standardized in FIPS 203.
@@ -216,6 +256,11 @@ Import these for runtime checks and schema alignment instead of hardcoding numbe
 | `SUI_ADDRESS_SIZE` | 32 | Stealth Sui address |
 | `STEALTH_SECP256K1_PUBLIC_SIZE` | 65 | Uncompressed secp256k1 public key |
 | `STEALTH_ETH_PRIVATE_KEY_SIZE` | 32 | Recovered Ethereum private key |
+| `PLAINTEXT_METADATA_SIZE` | 77 | Announcement metadata block, plaintext |
+| `ENCRYPTED_METADATA_SIZE` | 93 | Announcement metadata block, AES-256-GCM |
+| `METADATA_TX_HASH_SIZE` | 32 | Source-chain transaction hash field |
+| `METADATA_AMOUNT_SIZE` | 32 | Amount field (uint256) |
+| `METADATA_SOURCE_CHAIN_ID_SIZE` | 8 | Source chain id field (big-endian u64) |
 
 `PROTOCOL_VERSION` carries the current protocol version (`1`).
 
@@ -256,12 +301,15 @@ try {
 | `INVALID_HEX` | Input is not valid hex |
 | `INVALID_META_ADDRESS` | Meta-address failed to parse |
 | `INVALID_METADATA_JSON` | Metadata is not valid JSON |
+| `INVALID_METADATA_SIZE` | Metadata block is not the expected length |
+| `INVALID_METADATA_FIELD` | A metadata field is out of range |
 | `INVALID_VIEW_TAG` | View tag is out of range |
 | `INVALID_API_RESPONSE` | A remote response failed validation |
 | `HTTP_ERROR` | The trusted API returned a non-success status |
 | `ENCAPSULATION_FAILED` | Encapsulation failed inside WASM |
 | `DECAPSULATION_FAILED` | Decapsulation failed inside WASM |
 | `STEALTH_DERIVATION_FAILED` | Stealth derivation failed |
+| `METADATA_DECRYPTION_FAILED` | Metadata authentication tag did not verify |
 | `WASM_LOAD_FAILED` | The WebAssembly module could not load |
 | `INTERNAL_ERROR` | Unexpected internal failure |
 

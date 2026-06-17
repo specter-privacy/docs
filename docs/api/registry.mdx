@@ -53,7 +53,7 @@ Assigned registry announcement id.
 Publish confirmation.
 </ParamField>
 <ParamField body="monad_tx_hash" type="string">
-Monad transaction hash of the `announce()` call. In dev mode this matches the supplied `tx_hash`.
+Monad Testnet transaction hash of the `announce()` call. Monad is the registry chain where announcements are recorded. When the relayer is not configured, this matches the `tx_hash` you supplied.
 </ParamField>
 
 ## `GET /api/v1/registry/announcements`
@@ -145,5 +145,17 @@ curl -s "https://backend.specterpq.com/api/v1/registry/stats" | jq .
   </Accordion>
   <Accordion title="Metadata encryption">
     The preferred `payment_id` path encrypts payment metadata into a 93-byte blob while keeping byte 0 (`view_tag`) plaintext. The fallback `announcement` path has no shared secret and emits 77-byte plaintext metadata.
+
+    The plaintext block is 77 bytes laid out as:
+
+    | Bytes | Field | Size |
+    |-------|-------|------|
+    | 0 | `view_tag` | 1 |
+    | 1-32 | `tx_hash` | 32 |
+    | 33-64 | `amount` (uint256) | 32 |
+    | 65-72 | `source_chain_id` (big-endian u64) | 8 |
+    | 73-76 | reserved | 4 |
+
+    Encryption uses AES-256-GCM and adds a 16-byte authentication tag over bytes 1-76, leaving the `view_tag` in the clear: 1 + 76 + 16 = 93 bytes. The `@specterpq/sdk` produces the same block client-side. See [announcement metadata](/sdk/api-reference#announcement-metadata).
   </Accordion>
 </AccordionGroup>

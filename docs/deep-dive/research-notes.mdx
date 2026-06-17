@@ -15,8 +15,8 @@ Ethereum wallets only understand secp256k1 signatures. To make stealth addresses
 
 ```
 ML-KEM shared secret
-  → SHAKE-256("SPECTER_STEALTH_PK" || shared_secret)
-    → secp256k1 seed
+  → SHAKE-256("SPECTER_ETH_KEY_V1" || shared_secret || spending_pk)
+    → secp256k1 seed (reduced to a valid scalar)
       → Ethereum private key + address
 ```
 
@@ -40,8 +40,12 @@ See the [ERC Proposal](/deep-dive/erc-proposal) for the formal specification, an
 
 SPECTER uses SHAKE-256 (a NIST-standardized extendable-output function) for all key derivations with domain separation:
 
-- `"SPECTER_VIEW_TAG"` for view tag computation
-- `"SPECTER_STEALTH_PK"` for stealth key derivation
+- `"SPECTER_VIEW_TAG_V1"` for view tag computation
+- `"SPECTER_STEALTH_PK_V1"` for stealth public key derivation
+- `"SPECTER_STEALTH_SK_V1"` for the matching stealth secret key
+- `"SPECTER_ETH_KEY_V1"` for the secp256k1 Ethereum spending key
+
+The `_V1` suffix versions each label, leaving room for future derivations without ambiguity.
 
 Domain separation prevents cross-protocol attacks where the same shared secret might produce colliding outputs in different contexts. SHAKE-256 provides 128-bit post-quantum security at 256-bit output length.
 

@@ -1,5 +1,5 @@
 ---
-title: "Under the Hood"
+title: "Overview"
 description: "A step-by-step technical walkthrough of the SPECTER cryptographic pipeline: key generation, shared secrets, stealth derivation, scanning, and spending."
 ---
 
@@ -88,11 +88,11 @@ flowchart TD
 Almost everything after encapsulation comes from the 32-byte shared secret, expanded with domain-separated SHAKE-256 so that two different uses of the same secret never collide:
 
 ```
-view_tag      = SHAKE-256("SPECTER_VIEW_TAG"  || shared_secret)[0]
-stealth_key   = SHAKE-256("SPECTER_STEALTH_PK" || shared_secret)  combined with spending_pk
+view_tag      = SHAKE-256("SPECTER_VIEW_TAG_V1"  || shared_secret)[0]
+stealth_key   = SHAKE-256("SPECTER_STEALTH_PK_V1" || shared_secret)  combined with spending_pk
 ```
 
-The domain strings are the separator. The same shared secret feeds both, but the prefixes guarantee the view tag tells you nothing about the stealth key. The exact constructions live in the SPECTER Rust core; this section describes what each one produces and why.
+The domain strings are the separator, and the `_V1` suffix versions them so the protocol can introduce new derivations later without ambiguity. The same shared secret feeds both, but the prefixes guarantee the view tag tells you nothing about the stealth key. The exact constructions live in the SPECTER Rust core; this section describes what each one produces and why.
 
 ## Related
 

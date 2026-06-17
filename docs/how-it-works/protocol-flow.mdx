@@ -77,12 +77,12 @@ The sender then sends ETH/tokens to the returned `stealth_address`.
 
 ## Stage 4: Sender posts an announcement
 
-The announcement is the public breadcrumb. It contains:
+The announcement is the public breadcrumb. Payments settle on Ethereum, Arbitrum, Monad, or Sui, but every announcement is recorded on Monad Testnet, which serves as the registry chain. It contains:
 
 | Field | Purpose |
 |-------|---------|
 | `payment_id` | Server-held pending payment binding from `/stealth/create` |
-| `tx_hash` | Monad announce transaction hash in dev mode |
+| `tx_hash` | Monad announce transaction hash. Required when the relayer is not configured |
 | `payment_tx_hash` | Source-chain payment transaction hash (optional) |
 | `source_chain_id` | EIP-155 source-chain ID (optional) |
 | `amount` | Payment amount (optional) |

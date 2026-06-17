@@ -14,7 +14,7 @@ Every stealth payment publishes an announcement. To find payments meant for you,
 The view tag is one byte derived from the shared secret under its own domain string:
 
 ```
-view_tag = SHAKE-256("SPECTER_VIEW_TAG" || shared_secret)[0]
+view_tag = SHAKE-256("SPECTER_VIEW_TAG_V1" || shared_secret)[0]
 ```
 
 The sender computes it and includes it in the announcement. When a recipient scans, they reproduce the expected tag from their own decapsulation and compare. A view tag is a filter, not encryption. It carries no key material. Its only job is to let the recipient reject announcements quickly.
@@ -86,7 +86,7 @@ The recovered private key spends real funds. Keep it inside the signing path. Do
 SPECTER stops at the recovered key. It does not sign or broadcast. Spending uses your existing wallet stack with the private key the scan returned:
 
 - On **Ethereum**, the key is a standard secp256k1 private key. Import it into ethers, viem, or any signer and send a normal transaction.
-- On **Sui**, the key is an Ed25519 key usable with the Sui SDK.
+- On **Sui**, the same secp256k1 key signs under Sui's secp256k1 scheme, usable with the Sui SDK.
 
 Because the spend uses a standard signature, the transaction looks ordinary on-chain. The privacy was established at receive time, when the stealth address was derived with no public link to your meta-address. The spend itself is a normal transfer.
 
@@ -103,7 +103,7 @@ flowchart LR
 
 ## The one classical step
 
-Receiving is post-quantum: the shared secret behind every announcement is protected by [ML-KEM-768](/under-the-hood/shared-secret). The spend signature is classical: secp256k1 on Ethereum, Ed25519 on Sui. A future quantum computer could attack those signatures, but only after the key is used on-chain, by which point the funds have moved. The protocol prioritizes the receiving path because announcement data is permanent and public, while a spend is a one-time event. The full reasoning and the migration path are in [security boundaries](/how-it-works/security-boundaries).
+Receiving is post-quantum: the shared secret behind every announcement is protected by [ML-KEM-768](/under-the-hood/shared-secret). The spend signature is classical: secp256k1 on both Ethereum and Sui. A future quantum computer could attack those signatures, but only after the key is used on-chain, by which point the funds have moved. The protocol currently prioritizes the receiving path because announcement data is permanent and public, while a spend is a one-time event. The full reasoning and the migration path are in [security boundaries](/how-it-works/security-boundaries).
 
 ## Next
 

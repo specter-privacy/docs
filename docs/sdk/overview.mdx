@@ -33,6 +33,7 @@ It packages the same protocol the rest of these docs describe, exposed as plain 
 - Encapsulate to a viewing key and derive a one-time stealth address on Ethereum and Sui.
 - Compute and check the one-byte view tag that makes scanning cheap.
 - Decapsulate a match and recover the spendable private key.
+- Encode and encrypt announcement metadata (transaction hash, amount, source chain id) client-side, matching the hosted backend's 93-byte encrypted block. See the [registry reference](/api/registry).
 
 The three phases below are the whole story. Switch between them to see who acts and what moves on each step.
 

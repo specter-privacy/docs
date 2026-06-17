@@ -1,6 +1,6 @@
 ---
 title: "Private Payments"
-description: "How SPECTER enables private receiving on Ethereum and Sui"
+description: "How SPECTER enables private receiving on Ethereum, Arbitrum, Monad, and Sui"
 ---
 
 ## The core use case
@@ -64,7 +64,7 @@ Two parties want to settle an over-the-counter trade without broadcasting their 
 
 ## Multi-chain support
 
-The same meta-address produces valid stealth addresses on both Ethereum and Sui. The API returns both:
+The same meta-address produces valid stealth addresses for both the EVM chains and Sui. The API returns an EVM address, which works on Ethereum, Arbitrum, and Monad, and a separate Sui address:
 
 ```json
 {
@@ -76,7 +76,7 @@ The same meta-address produces valid stealth addresses on both Ethereum and Sui.
 }
 ```
 
-Arbitrum, Base, and Optimism support is on the roadmap.
+Ethereum, Arbitrum, Monad, and Sui are supported today (testnet-first). Base and Optimism are on the roadmap.
 
 ## Name service integration
 

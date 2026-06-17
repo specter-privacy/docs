@@ -1,5 +1,5 @@
 ---
-title: "SPECTER vs Others"
+title: "Differentiators"
 description: "How SPECTER compares to Umbra, Fluidkey, and classical stealth address systems"
 ---
 
@@ -19,7 +19,7 @@ SPECTER's contribution is replacing the classical cryptographic foundation with 
 | **NIST standardized crypto** | Yes (FIPS 203) | No (pre-standard curves) | No |
 | **View tag optimization** | 1 byte, ~99.6% skip rate | 1 byte | 1 byte |
 | **Scan speed (100k announcements)** | ~1-2 seconds | ~10-15 seconds | N/A |
-| **Chains supported** | Ethereum, Sui | Ethereum | Ethereum |
+| **Chains supported** | Ethereum, Arbitrum, Monad, Sui | Ethereum | Ethereum |
 | **Name service support** | ENS + SuiNS | ENS | ENS |
 | **ERC-5564 compatible** | Yes (schemeId 2) | Yes (schemeId 1) | Partial |
 | **Spend path** | secp256k1 (classical) | secp256k1 (classical) | secp256k1 (classical) |
@@ -73,7 +73,7 @@ SPECTER's Rust-based scanner processes announcements faster than JavaScript-base
 
 ### Multi-chain from day one
 
-Stealth addresses derived by SPECTER work on both Ethereum and Sui. The same ML-KEM shared secret can produce valid addresses for either chain.
+Stealth addresses derived by SPECTER work across the EVM chains (Ethereum, Arbitrum, and Monad) and Sui. The same ML-KEM shared secret produces a valid EVM address and a valid Sui address.
 
 ## What's the same
 
