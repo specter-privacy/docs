@@ -4,6 +4,7 @@ import {
   openStep,
   setElementBusy,
   setOutputValue,
+  setSecretValue,
   showOutputError,
   truncateHex,
 } from './ui.js';
@@ -18,6 +19,7 @@ export async function generateKeys() {
     setOutputValue('viewing-pk', truncateHex(appState.recipientKeys.viewing.publicKey), 'accent');
     byId('spending-pk').dataset.full = appState.recipientKeys.spending.publicKey;
     byId('viewing-pk').dataset.full = appState.recipientKeys.viewing.publicKey;
+    setSecretValue('spending-sk', appState.recipientKeys.spending.secretKey);
 
     byId('fn-keygen').classList.add('done');
     byId('step-1').classList.add('done');
@@ -127,6 +129,7 @@ export async function scanAnnouncement() {
       setOutputValue('scan-sui', result.stealthKeys.suiAddress, 'blue');
       byId('scan-eth').dataset.full = result.stealthKeys.ethAddress;
       byId('scan-sui').dataset.full = result.stealthKeys.suiAddress;
+      setSecretValue('scan-eth-sk', result.stealthKeys.ethPrivateKey);
       keysGrid.style.display = 'grid';
       byId('fn-scan').classList.add('done');
       byId('step-4').classList.add('done');

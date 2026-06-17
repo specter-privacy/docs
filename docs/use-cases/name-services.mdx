@@ -7,6 +7,7 @@ description: "How SPECTER integrates with ENS and SuiNS for human-readable steal
 
 Nobody wants to share a 2,368-byte hex string. SPECTER integrates with ENS (Ethereum Name Service) and SuiNS (Sui Name Service) so senders can just use a name like `alice.eth` or `alice.sui`.
 
+<Zoomable label="Name services">
 ```mermaid
 flowchart LR
     A["Sender enters\nalice.eth"] --> B["ENS resolves to\nIPFS CID"]
@@ -16,6 +17,7 @@ flowchart LR
     style A fill:#7c3aed,color:#fff
     style D fill:#7c3aed,color:#fff
 ```
+</Zoomable>
 
 ## How it works
 

@@ -21,21 +21,9 @@ description: "The SPECTER REST API: endpoints, authentication, and how to get st
 
 ## Endpoint map
 
-```mermaid
-flowchart TD
-    Health["/health"] --> Keys["/api/v1/keys/*"]
-    Keys --> Stealth["/api/v1/stealth/*"]
-    Stealth --> Registry["/api/v1/registry/*"]
-    Stealth --> Names["/api/v1/ens/*\n/api/v1/suins/*"]
-    Names --> IPFS["/api/v1/ipfs/*"]
-
-    style Health fill:#7c3aed,color:#fff
-    style Keys fill:#7c3aed,color:#fff
-    style Stealth fill:#a855f7,color:#fff
-    style Registry fill:#a855f7,color:#fff
-    style Names fill:#0d9488,color:#fff
-    style IPFS fill:#0d9488,color:#fff
-```
+<div style={{maxWidth: '65%'}}>
+  <Frame>![API route map](/images/specter/api-route-map.png)</Frame>
+</div>
 
 | Group | Endpoints | Purpose |
 |-------|-----------|---------|

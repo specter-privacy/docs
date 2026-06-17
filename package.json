@@ -22,6 +22,7 @@
     "@mdx-js/react": "^3.0.0",
     "@signalwire/docusaurus-plugin-llms-txt": "^1.2.2",
     "clsx": "^2.0.0",
+    "docusaurus-plugin-image-zoom": "^3.0.1",
     "framer-motion": "^12.40.0",
     "lottie-react": "^2.4.1",
     "prism-react-renderer": "^2.3.0",

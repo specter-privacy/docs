@@ -13,11 +13,15 @@ Think of SPECTER as a private mailbox system. You put up a public sign that says
 
 It's a **private receiving layer**. You publish one public profile, and each sender turns it into a different one-time address. To everyone else, the payment lands at an address that looks unrelated to you.
 
-## Three concepts, that's it
+## The 3 phases
 
 Step through the same three phases here, then read the detail below.
 
 <FlowExplainer />
+
+<Frame>
+  ![Phases of SPECTER](/images/specter/specter-core-objects.png)
+</Frame>
 
 ### 1. Meta-address (your public profile)
 
@@ -74,10 +78,6 @@ A new address is private, but it leaves you with a problem: how do *you* find ou
 The shared secret between sender and recipient is created with **ML-KEM-768**, not the classical ECDH that older stealth address schemes use. This matters because of one specific threat. The announcement sits on-chain forever, and anyone can copy it today. With ECDH, an attacker could store that data now and decrypt it years later, once a quantum computer can break elliptic-curve cryptography. That is the harvest-now-decrypt-later problem.
 
 ML-KEM-768 is built on lattice math with no known efficient quantum attack, so the ciphertext in a SPECTER announcement is designed to stay private even against an adversary who saved it today and runs a quantum computer tomorrow.
-
-<Frame caption="ML-KEM-768: How the sender and recipient derive a shared secret without classical key exchange">
-  <img src={mlKemDiagram} alt="ML-KEM-768 diagram" />
-</Frame>
 
 ## The honest picture
 

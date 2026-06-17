@@ -3,9 +3,9 @@ title: "View Tags and Scanning"
 description: "How SPECTER filters announcements fast and what the scanning process looks like"
 ---
 
-<div style={{display: 'flex', justifyContent: 'center', margin: '0.5rem 0 1rem'}}>
-  <LottiePlayer src="/lottie/scan-pulse.json" size={120} />
-</div>
+<Frame>
+  ![View tag scanning](/images/specter/view-tag-scanning.png)
+</Frame>
 
 ## The scanning problem
 
@@ -34,19 +34,13 @@ There are 256 possible view tag values. For any announcement that isn't yours, t
 
 That means **~99.6% of irrelevant announcements are rejected at the view tag step**, before doing any heavy computation.
 
-```mermaid
-flowchart TD
-    A["100,000\nannouncements"] --> B["Decapsulate +\ncompute view tag"]
-    B --> C{"View tag\nmatch?"}
-    C -->|"~99.6% No"| D["Skip\n(~99,600)"]
-    C -->|"~0.4% Yes"| E["Full address\nderivation (~400)"]
-    E --> F{"Address\nmatch?"}
-    F -->|"No"| G["False positive\n(~399)"]
-    F -->|"Yes"| H["Your payment!\n(~1)"]
+<Frame>
+  ![SPECTER scan performance](/images/specter/specter-scan-performance.png)
+</Frame>
 
-    style D fill:#a855f7,color:#fff
-    style H fill:#7c3aed,color:#fff
-```
+<Frame>
+  ![SPECTER scan performance flow](/images/specter/specter-scan-performance-flow.png)
+</Frame>
 
 For 100,000 announcements with one real payment:
 - **99,600** are rejected by view tag (cheap)

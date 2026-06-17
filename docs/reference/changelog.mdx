@@ -3,6 +3,35 @@ title: "Changelog"
 description: "Release history and notable changes in SPECTER"
 ---
 
+## Docs: four-chain support documented
+
+*June 2026*
+
+### Changed
+
+- Chain support pages now reflect the live set: Ethereum, Arbitrum, Monad, and Sui, running testnet-first (Sepolia, Arbitrum Sepolia, Monad Testnet, Sui testnet). Monad is described as the announcement registry chain. Base and Optimism remain on the roadmap.
+- Crypto domain separators now show their exact `_V1` labels (`SPECTER_VIEW_TAG_V1`, `SPECTER_STEALTH_PK_V1`, and related).
+
+---
+
+## @specterpq/sdk v0.3.0
+
+*June 2026*
+
+Announcement metadata can now be encoded and encrypted client-side, matching the hosted backend. Backend synced to upstream `8294c2f`.
+
+### Added
+
+- Announcement metadata API: `sealAnnouncementMetadata`, `openAnnouncementMetadata`, and the lower-level `encodeAnnouncementMetadata`, `decodeAnnouncementMetadata`, `encryptAnnouncementMetadata`, `decryptAnnouncementMetadata`.
+- Metadata size constants: `PLAINTEXT_METADATA_SIZE` (77), `ENCRYPTED_METADATA_SIZE` (93), `METADATA_TX_HASH_SIZE`, `METADATA_AMOUNT_SIZE`, `METADATA_SOURCE_CHAIN_ID_SIZE`.
+- Error codes: `INVALID_METADATA_SIZE`, `INVALID_METADATA_FIELD`, `METADATA_DECRYPTION_FAILED`.
+
+### Changed
+
+- Metadata `txHash` and `amount` inputs accept plain `0x` hex strings (in addition to `Uint8Array`, and `bigint` for `amount`).
+
+---
+
 ## @specterpq/sdk v0.2.0
 
 *June 2026*
@@ -35,7 +64,7 @@ The first public release of SPECTER, a post-quantum stealth address protocol for
 ### Core
 
 - ML-KEM-768 key generation, encapsulation, and decapsulation
-- Stealth address derivation for Ethereum (secp256k1) and Sui (Ed25519)
+- Stealth address derivation for Ethereum and Sui from one secp256k1 key (keccak256 for Ethereum, blake2b-256 with the secp256k1 scheme flag for Sui)
 - View tag computation and verification (1-byte, ~99.6% filter rate)
 - SHAKE-256 key derivation with domain separation
 - Batch scanning engine with progress callbacks

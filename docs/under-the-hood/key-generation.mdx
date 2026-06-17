@@ -51,6 +51,7 @@ The secret keys exist on the returned object but are non-enumerable and redacted
 
 A recipient never publishes four separate keys. The two public keys are serialized into one **meta-address**, optionally with metadata such as a display name or avatar.
 
+<Zoomable label="Public keys to meta-address">
 ```mermaid
 flowchart LR
     A["spending_pk (1184 B)"] --> M["meta-address (2369 B)"]
@@ -60,6 +61,7 @@ flowchart LR
 
     style M fill:#7c3aed,color:#fff
 ```
+</Zoomable>
 
 The serialized form is 2,369 bytes: the two 1,184-byte public keys plus a version byte and the metadata structure. The meta-address is the only address a recipient hands out, and it is reusable. Every payment to it still lands at a different stealth address, which is the subject of the [stealth derivation](/under-the-hood/stealth-derivation) page.
 

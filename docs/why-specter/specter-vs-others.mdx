@@ -1,5 +1,5 @@
 ---
-title: "SPECTER vs Others"
+title: "Differentiators"
 description: "How SPECTER compares to Umbra, Fluidkey, and classical stealth address systems"
 ---
 
@@ -19,7 +19,7 @@ SPECTER's contribution is replacing the classical cryptographic foundation with 
 | **NIST standardized crypto** | Yes (FIPS 203) | No (pre-standard curves) | No |
 | **View tag optimization** | 1 byte, ~99.6% skip rate | 1 byte | 1 byte |
 | **Scan speed (100k announcements)** | ~1-2 seconds | ~10-15 seconds | N/A |
-| **Chains supported** | Ethereum, Sui | Ethereum | Ethereum |
+| **Chains supported** | Ethereum, Arbitrum, Monad, Sui | Ethereum | Ethereum |
 | **Name service support** | ENS + SuiNS | ENS | ENS |
 | **ERC-5564 compatible** | Yes (schemeId 2) | Yes (schemeId 1) | Partial |
 | **Spend path** | secp256k1 (classical) | secp256k1 (classical) | secp256k1 (classical) |
@@ -33,19 +33,38 @@ The biggest difference is in the cryptographic primitive used for the sender-rec
 
 This means the announcement ciphertexts stored on-chain are protected against quantum attacks. A future attacker with a quantum computer can't retroactively break the privacy of old payments.
 
-<div className="diagramCenter">
-```mermaid
-flowchart LR
-    subgraph Classical["Classical (Umbra/Fluidkey)"]
-        A1["ECDH shared secret"] --> B1["Vulnerable to\nShor's algorithm"]
-    end
-    subgraph SPECTER["SPECTER"]
-        A2["ML-KEM-768\nshared secret"] --> B2["No known\nquantum attack"]
-    end
+<div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', margin: '1.5rem 0'}}>
 
-    style B1 fill:#dc2626,color:#fff
-    style B2 fill:#7c3aed,color:#fff
+<div>
+
+<p style={{paddingLeft: '6rem'}}><strong>SPECTER</strong></p>
+
+```mermaid
+flowchart TD
+    A["Sender encapsulates\nML-KEM-768 viewing key"] --> B["Ciphertext on-chain\n(1,088 bytes)"]
+    B --> C["No known\nquantum attack"]
+    style A fill:#7c3aed,color:#fff
+    style B fill:#7c3aed,color:#fff
+    style C fill:#7c3aed,color:#fff
 ```
+
+</div>
+
+<div>
+
+**Classical (Umbra / Fluidkey)**
+
+```mermaid
+flowchart TD
+    A["Sender computes\nECDH shared secret"] --> B["EC pubkey on-chain\n(33 bytes)"]
+    B --> C["Broken by\nShor's algorithm"]
+    style A fill:#6b7280,color:#fff
+    style B fill:#6b7280,color:#fff
+    style C fill:#dc2626,color:#fff
+```
+
+</div>
+
 </div>
 
 ### Faster scanning
@@ -54,7 +73,7 @@ SPECTER's Rust-based scanner processes announcements faster than JavaScript-base
 
 ### Multi-chain from day one
 
-Stealth addresses derived by SPECTER work on both Ethereum and Sui. The same ML-KEM shared secret can produce valid addresses for either chain.
+Stealth addresses derived by SPECTER work across the EVM chains (Ethereum, Arbitrum, and Monad) and Sui. The same ML-KEM shared secret produces a valid EVM address and a valid Sui address.
 
 ## What's the same
 

@@ -140,6 +140,40 @@ console.log('Sui stealth address:', suiAddr);
 const keys = deriveStealthKeys(recipient.spending.publicKey, sharedSecret);
 console.log('secp256k1 pubkey:', keys.publicKey.slice(0, 40) + '...');`,
 
+  metadata: `await initSpecterSdk();
+
+// Announcement metadata encryption (AES-256-GCM, keyed from ML-KEM shared secret)
+// The 77-byte plaintext block: [view_tag(1)] [tx_hash(32)] [amount(32)] [chain_id(8)] [reserved(4)]
+// The 93-byte encrypted block adds a 16-byte GCM authentication tag.
+console.log('Plaintext metadata size:', PLAINTEXT_METADATA_SIZE, 'bytes');
+console.log('Encrypted metadata size:', ENCRYPTED_METADATA_SIZE, 'bytes');
+
+// Derive a shared secret via ML-KEM (simulates the encapsulation a sender would do)
+const recipient = generateSpecterKeys();
+const enc = encapsulate(recipient.viewing.publicKey);
+
+// SENDER: seal — view tag is derived from sharedSecret automatically
+const encryptedMeta = sealAnnouncementMetadata(
+  {
+    txHash: '0x' + 'ab'.repeat(32),  // 32-byte tx hash
+    amount: 1000000000000000000n,      // 1 ETH in wei (bigint accepted)
+    sourceChainId: 1,                  // Ethereum mainnet
+  },
+  enc.sharedSecret,
+);
+console.log('\\nSealed metadata (first 80):', encryptedMeta.slice(0, 80) + '...');
+console.log('Sealed size:', encryptedMeta.length / 2, 'bytes');
+
+// RECIPIENT: derive the same shared secret, then open
+const recipientSecret = decapsulate(enc.ciphertext, recipient.viewing.secretKey);
+const meta = openAnnouncementMetadata(encryptedMeta, recipientSecret);
+
+console.log('\\nDecoded metadata:');
+console.log('  viewTag:', meta.viewTag);
+console.log('  txHash:', meta.txHash?.slice(0, 20) + '...');
+console.log('  amount:', meta.amount);
+console.log('  sourceChainId:', meta.sourceChainId);`,
+
   blank: `await initSpecterSdk();
 
 // Write your code here.

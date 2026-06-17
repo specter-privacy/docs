@@ -20,6 +20,7 @@ import {
 import {Reveal, Stagger, StaggerItem} from '@site/src/components/Motion';
 import LottiePlayer from '@site/src/components/Lottie';
 import FlowExplainer from '@site/src/components/FlowExplainer';
+import Zoomable from '@site/src/components/Zoomable';
 
 export default {
   ...MDXComponents,
@@ -28,6 +29,7 @@ export default {
   StaggerItem,
   LottiePlayer,
   FlowExplainer,
+  Zoomable,
   Accordion,
   AccordionGroup,
   Callout,

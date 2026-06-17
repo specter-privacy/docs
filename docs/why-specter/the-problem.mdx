@@ -13,6 +13,10 @@ The core issue: **on a public blockchain, your address is your identity.** Once 
 
 ## The two problems SPECTER solves
 
+<Frame>
+  ![Generic wallet vs SPECTER](/images/specter/generic-wallet-vs-specter.png)
+</Frame>
+
 ### Problem 1: Receiving payments destroys privacy
 
 Every existing stealth address system (Umbra, Fluidkey) uses classical elliptic curve cryptography (ECDH) for the privacy layer. That works against today's computers.
@@ -23,21 +27,9 @@ But stealth systems leave cryptographic data on-chain permanently: ciphertexts, 
 
 This is the harvest-now-decrypt-later attack:
 
-<div className="diagramCenter">
-```mermaid
-flowchart TD
-    A["Adversary records on-chain\nciphertexts today"] --> B["Stores them\nfor years"]
-    B --> C["Quantum computer\nbecomes available"]
-    C --> D["Breaks ECDH\nusing Shor's algorithm"]
-    D --> E["Decrypts all historical\nstealth payments"]
-
-    style A fill:#dc2626,color:#fff
-    style B fill:#dc2626,color:#fff
-    style C fill:#dc2626,color:#fff
-    style D fill:#dc2626,color:#fff
-    style E fill:#dc2626,color:#fff
-```
-</div>
+<Frame>
+  ![Post-quantum cryptography](/images/specter/post-quantum-crypto.png)
+</Frame>
 
 An attacker doesn't need a quantum computer today. They just need to save the data. When quantum computers are powerful enough (NIST estimates 10-15 years), they can retroactively break the privacy of every classical stealth payment ever made.
 

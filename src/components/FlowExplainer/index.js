@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {motion, AnimatePresence} from 'framer-motion';
-import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './styles.module.css';
 
 // The three phases of a SPECTER payment. Text stays short on purpose — the
@@ -10,7 +9,7 @@ const STAGES = [
     id: 'setup',
     label: 'Setup',
     actor: 'Recipient, once',
-    image: '/images/specter/How-setup-works.png',
+    image: '/images/specter/specter-setup-30s.png',
     alt: 'Recipient generates a spending keypair and a viewing keypair, then bundles both public keys into a single meta-address that they publish.',
     summary:
       'You generate two ML-KEM-768 keypairs and publish one meta-address. That is the only address you ever share.',
@@ -24,7 +23,7 @@ const STAGES = [
     id: 'send',
     label: 'Send',
     actor: 'Sender, per payment',
-    image: '/images/specter/How-send-works.png',
+    image: '/images/specter/specter-send-30s.png',
     alt: 'Sender encapsulates to the recipient viewing key, derives a fresh one-time stealth address, and publishes an announcement carrying the ciphertext and a one-byte view tag.',
     summary:
       'The sender encapsulates to your viewing key, derives a fresh stealth address, and posts an announcement with a one-byte view tag.',
@@ -38,7 +37,7 @@ const STAGES = [
     id: 'scan',
     label: 'Scan',
     actor: 'Recipient, ongoing',
-    image: '/images/specter/How-scan-works.png',
+    image: '/images/specter/specter-scan-30s.png',
     alt: 'Recipient filters announcements by the one-byte view tag, decapsulates the matches with the viewing secret key, confirms the derived address, and recovers the stealth private key.',
     summary:
       'You filter announcements by view tag, decapsulate the matches, and recover the private key for each payment that is yours.',
@@ -53,7 +52,6 @@ const STAGES = [
 export default function FlowExplainer() {
   const [active, setActive] = useState(0);
   const stage = STAGES[active];
-  const image = useBaseUrl(stage.image);
 
   return (
     <div className={styles.wrap}>
@@ -82,27 +80,34 @@ export default function FlowExplainer() {
       </div>
 
       <div className={styles.panel}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={stage.id}
-            className={styles.panelInner}
-            initial={{opacity: 0, y: 14}}
-            animate={{opacity: 1, y: 0}}
-            exit={{opacity: 0, y: -14}}
-            transition={{duration: 0.35, ease: [0.22, 1, 0.36, 1]}}>
-            <figure className={styles.figure}>
-              <img src={image} alt={stage.alt} loading="lazy" />
-            </figure>
-            <div className={styles.detail}>
+        <div className={styles.panelInner}>
+          {/* A single, persistent <img> node whose src swaps with the active
+              tab. Because it has no changing key and keeps its render position,
+              React reuses the same DOM node and only patches `src` — so
+              medium-zoom stays attached to one stable element and zoom-out,
+              scroll-to-dismiss, and re-click all keep working across tabs. */}
+          <figure className={styles.figure}>
+            <img src={stage.image} alt={stage.alt} data-zoomable />
+          </figure>
+
+          {/* Only the text panel animates on stage change. */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={stage.id}
+              className={styles.detail}
+              initial={{opacity: 0, y: 14}}
+              animate={{opacity: 1, y: 0}}
+              exit={{opacity: 0, y: -14}}
+              transition={{duration: 0.35, ease: [0.22, 1, 0.36, 1]}}>
               <p className={styles.summary}>{stage.summary}</p>
               <ul className={styles.points}>
                 {stage.points.map((p) => (
                   <li key={p}>{p}</li>
                 ))}
               </ul>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

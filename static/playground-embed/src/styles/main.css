@@ -434,6 +434,77 @@
     font-style: italic;
   }
 
+  /* Masked secret field with eye reveal toggle */
+  .output-value.secret-field {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .secret-field .secret-value {
+    flex: 1 1 auto;
+    color: var(--text-dim);
+    letter-spacing: 0.14em;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+  }
+
+  .secret-field.revealed .secret-value {
+    color: var(--text);
+    letter-spacing: 0;
+    max-height: 140px;
+    overflow-y: auto;
+  }
+
+  .secret-toggle,
+  .secret-copy {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+
+  .secret-toggle:hover:not(:disabled),
+  .secret-copy:hover:not(:disabled) {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--surface2);
+  }
+
+  .secret-toggle:disabled,
+  .secret-copy:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .secret-toggle svg,
+  .secret-copy svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .secret-toggle .icon-eye-off { display: none; }
+  .secret-field.revealed .secret-toggle .icon-eye { display: none; }
+  .secret-field.revealed .secret-toggle .icon-eye-off { display: inline; }
+
+  .secret-copy .icon-check { display: none; }
+  .secret-copy.copied .icon-copy { display: none; }
+  .secret-copy.copied .icon-check { display: inline; }
+  .secret-copy.copied {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
   .output-value.empty {
     color: var(--text-dim);
     font-style: italic;
