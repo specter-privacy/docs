@@ -8,7 +8,7 @@ description: "Key terms used throughout the SPECTER documentation"
 | Term | Definition |
 |------|-----------|
 | **Stealth address** | A one-time destination derived by the sender from the recipient's meta-address. Each payment creates a fresh one. |
-| **Meta-address** | The recipient's public profile containing `spending_pk` and `viewing_pk`. Published once, used by all senders. |
+| **Meta-address** | The recipient's public profile containing `spending_pub` and `viewing_pk`. Published once, used by all senders. |
 | **Announcement** | A public record containing the encrypted shared secret (ciphertext) and view tag. Lets the recipient find their payment. |
 | **View tag** | A 1-byte value derived from the shared secret. Filters out ~99.6% of irrelevant announcements during scanning. |
 
@@ -28,9 +28,9 @@ description: "Key terms used throughout the SPECTER documentation"
 
 | Term | Definition |
 |------|-----------|
-| **spending_pk / spending_sk** | The spending keypair. The public key is part of the meta-address. The shared secret + spending key determine the stealth address. |
+| **spending_pub / spending_sk** | The secp256k1 spending keypair. The public key (`spending_pub`, 33 bytes) is part of the meta-address. The shared secret + spending key determine the stealth address and, via the additive tweak, the spendable key. |
 | **viewing_pk / viewing_sk** | The viewing keypair. The sender encapsulates to `viewing_pk`. The recipient decapsulates with `viewing_sk` to discover payments. |
-| **eth_private_key** | The derived secp256k1 private key returned by the scan endpoint. Used to spend from the stealth address in Ethereum wallets. |
+| **eth_private_key** | The one-time secp256k1 private key derived **client-side** from a scan discovery's `shared_secret` plus the spending secret key. Used to spend from the stealth address in Ethereum wallets. The scan endpoint never returns it. |
 
 ## Protocol
 

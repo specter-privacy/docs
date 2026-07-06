@@ -18,7 +18,7 @@ With thousands (or millions) of announcements on-chain, brute-force scanning doe
 A view tag is a single byte (value 0-255) derived from the shared secret:
 
 ```
-view_tag = SHAKE-256("SPECTER_VIEW_TAG" || shared_secret)[0]
+view_tag = SHAKE-256("SPECTER_VIEW_TAG_V1" || shared_secret)[0]
 ```
 
 The sender computes this and includes it in the announcement. When you scan:
@@ -64,16 +64,14 @@ curl -s -X POST https://backend.specterpq.com/api/v1/stealth/scan \
   -H "Content-Type: application/json" \
   -d '{
     "viewing_sk": "<your_viewing_secret_key_hex>",
-    "spending_pk": "<your_spending_public_key_hex>",
-    "spending_sk": "<your_spending_secret_key_hex>"
+    "spending_pub": "<your_spending_public_key_hex>"
   }' | jq .
 ```
 
 The response returns an array of discovered payments, each with:
 - `stealth_address` - the Ethereum address holding funds
 - `stealth_sui_address` - the Sui address equivalent
-- `eth_private_key` - the derived spending key
-- `stealth_sk` - the derived stealth private key
+- `shared_secret` - the per-payment ML-KEM secret; combine it with your spending secret key locally to derive the spendable one-time key (the scan is spend-key-free and returns no private keys)
 - Metadata when available: `tx_hash`, `payment_tx_hash`, `amount`, `chain`, `source_chain_id`
 
 ## View tags are not encryption

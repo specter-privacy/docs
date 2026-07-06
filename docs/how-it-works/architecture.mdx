@@ -45,7 +45,7 @@ sequenceDiagram
     Sender->>API: POST /stealth/create {meta_address}
     API->>Crypto: encapsulate(viewing_pk)
     Crypto-->>API: ciphertext + shared_secret
-    API->>Crypto: derive_stealth_address(spending_pk, shared_secret)
+    API->>Crypto: derive_stealth_address(spending_pub, shared_secret)
     Crypto-->>API: stealth_address + view_tag
     API->>Registry: store pending payment_id + shared_secret
     API-->>Sender: {payment_id, stealth_address, ephemeral_ciphertext, view_tag}
@@ -70,7 +70,7 @@ sequenceDiagram
     participant Registry as specter-registry
     participant Crypto as specter-crypto
 
-    Recipient->>API: POST /stealth/scan {viewing_sk, spending_pk, spending_sk}
+    Recipient->>API: POST /stealth/scan {viewing_sk, spending_pub}
     API->>Scanner: scan(keys)
     Scanner->>Registry: load announcements
 
@@ -79,15 +79,16 @@ sequenceDiagram
         Crypto-->>Scanner: shared_secret
         Scanner->>Crypto: compute_view_tag(shared_secret)
         alt view_tag matches
-            Scanner->>Crypto: derive_stealth_keys(spending_sk, shared_secret)
-            Crypto-->>Scanner: stealth_private_key
+            Scanner->>Crypto: derive_stealth_address(spending_pub, shared_secret)
+            Crypto-->>Scanner: stealth_address (public only)
         else view_tag doesn't match
             Note over Scanner: Skip (~99.6% of announcements)
         end
     end
 
     Scanner-->>API: discovered_payments[]
-    API-->>Recipient: [{stealth_address, eth_private_key, ...}]
+    API-->>Recipient: [{stealth_address, shared_secret, ...}]
+    Note over Recipient: Derives the spend key locally:<br/>spending_sk + tweak(shared_secret)
 ```
 
 </Zoomable>
@@ -96,7 +97,7 @@ sequenceDiagram
 
 The React frontend (`SPECTER-web/`) provides:
 
-- **Generate Keys** page - Create ML-KEM keypairs and save encrypted to browser
+- **Generate Keys** page - Create the hybrid identity (secp256k1 spending keypair + ML-KEM-768 viewing keypair) and save encrypted to browser
 - **Send Payment** page - Resolve names, create stealth payments
 - **Scan Payments** page - Discover incoming payments
 

@@ -19,10 +19,10 @@ The protocol has six stages. Each one exists to separate public discovery from p
   ![SPECTER key generation](/images/specter/key-generation.png)
 </Frame>
 
-The backend generates two ML-KEM-768 keypairs:
+The backend generates a hybrid identity — two keypairs of different types:
 
-- **Spending keypair** (`spending_pk` / `spending_sk`) - determines where money lands
-- **Viewing keypair** (`viewing_pk` / `viewing_sk`) - lets you find your payments
+- **Spending keypair** (`spending_pub` / `spending_sk`) - a **secp256k1** keypair that determines where money lands and, later, spends it
+- **Viewing keypair** (`viewing_pk` / `viewing_sk`) - an **ML-KEM-768** keypair that lets you find your payments
 
 These are bundled into your **meta-address**: the public-facing profile that senders use.
 
@@ -30,9 +30,9 @@ These are bundled into your **meta-address**: the public-facing profile that sen
 curl -s -X POST https://backend.specterpq.com/api/v1/keys/generate | jq .
 ```
 
-Response includes `meta_address`, `spending_pk`, `spending_sk`, `viewing_pk`, `viewing_sk`.
+Response includes `meta_address`, `spending_pub`, `spending_sk`, `viewing_pk`, `viewing_sk`, `protocol_version`.
 
-<Frame caption="Setup: key generation produces ML-KEM-768 spending and viewing keypairs, bundled into one meta-address">
+<Frame caption="Setup: key generation produces a secp256k1 spending keypair and an ML-KEM-768 viewing keypair, bundled into one meta-address">
   ![Setup flow: the recipient generates a spending keypair and a viewing keypair, then publishes a single meta-address](/images/specter/How-setup-works.png)
 </Frame>
 
@@ -59,7 +59,7 @@ This is where ML-KEM does its work. The sender:
    - A **ciphertext** (1,088 bytes) - this is the encrypted hint
    - A **shared secret** (32 bytes) - known to both sender and recipient
 3. Computes a 1-byte **view tag** from the shared secret
-4. Derives a **stealth address** (Ethereum and/or Sui) from the shared secret + your `spending_pk`
+4. Derives a **stealth address** (Ethereum and/or Sui) from the shared secret + your `spending_pub`
 
 ```bash
 curl -s -X POST https://backend.specterpq.com/api/v1/stealth/create \
@@ -119,8 +119,7 @@ curl -s -X POST https://backend.specterpq.com/api/v1/stealth/scan \
   -H "Content-Type: application/json" \
   -d '{
     "viewing_sk":"<HEX>",
-    "spending_pk":"<HEX>",
-    "spending_sk":"<HEX>"
+    "spending_pub":"<HEX>"
   }' | jq .
 ```
 
@@ -132,18 +131,23 @@ curl -s -X POST https://backend.specterpq.com/api/v1/stealth/scan \
 
 ## Stage 6: Spend the funds
 
-The scan returns everything needed to spend:
+The scan returns everything needed to locate and unlock the funds:
 
 | Field | What it is |
 |-------|-----------|
 | `stealth_address` | The Ethereum address holding the funds |
 | `stealth_sui_address` | The Sui address (if applicable) |
-| `eth_private_key` | The derived private key for spending |
+| `shared_secret` | The per-payment ML-KEM secret used to derive the spend key |
 
-Import the private key into any Ethereum wallet and spend normally.
+The scan is **spend-key-free** — it never receives or returns a private key. To spend, combine
+`shared_secret` with your spending secret key **locally**: the one-time private key is
+`spending_sk + tweak(shared_secret) mod n`. Import the derived key into any Ethereum wallet and
+spend normally.
 
 <Warning>
-The scan response contains wallet secret material (`eth_private_key`, `stealth_sk`). Treat it like a seed phrase. Never log it, never expose it in analytics.
+`viewing_sk` and every `shared_secret` in the scan response are sensitive — a shared secret plus
+your spending secret key recovers a spendable key. Treat them like a seed phrase. Never log them,
+never expose them in analytics.
 </Warning>
 
 ---
