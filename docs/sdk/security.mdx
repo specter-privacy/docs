@@ -47,20 +47,14 @@ Local crypto helpers are offline. Network calls happen in exactly one place: the
 | `encapsulate`, `decapsulate` | None | None |
 | `createStealthPayment` | None | None |
 | `scanAnnouncement`, `scanAnnouncements` | None | None |
-| `generateKeysRemote` | Yes | Server generates and sees the keys |
 | `createStealthPaymentRemote` | Yes | Meta-address only |
 | `publishAnnouncement` | Yes | Announcement data only |
-| `scanRemote` | Yes | Sends the viewing secret key |
 
-### Using the remote helpers safely
+The HTTP client (`createSpecterApiClient`) is **public-data only**. There is no way to send a secret key over the wire.
 
-`generateKeysRemote` and `scanRemote` are useful when a backend owns the whole flow, but they move secret material off the device. If you use them:
+### No remote key generation or scanning
 
-- Point them only at infrastructure you control.
-- Require TLS.
-- Put your own authorization boundary in front of the API.
-
-For wallets and anything holding user funds, prefer the local equivalents. They never leave the machine.
+Earlier versions exposed `generateKeysRemote` and `scanRemote`, which could move secret material off the device. **Both were removed in v1.0.0.** Key generation and scanning are always local: `generateSpecterKeys()` and `scanAnnouncement()` / `scanAnnouncements()` run in WebAssembly on the device and never transmit a secret key.
 
 ## Disclosure
 

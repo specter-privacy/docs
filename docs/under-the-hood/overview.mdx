@@ -34,11 +34,11 @@ Every artifact in SPECTER has a fixed size. Knowing them makes the rest of this 
 
 | Object | Size | Lives | Secret |
 |--------|------|-------|--------|
-| Spending public key | 1,184 B | In the meta-address | No |
-| Spending secret key | 2,400 B | Recipient device | Yes |
-| Viewing public key | 1,184 B | In the meta-address | No |
-| Viewing secret key | 2,400 B | Recipient device | Yes |
-| Meta-address (serialized) | 2,369 B | Published | No |
+| Spending public key (secp256k1) | 33 B | In the meta-address | No |
+| Spending secret key (secp256k1) | 32 B | Recipient device | Yes |
+| Viewing public key (ML-KEM-768) | 1,184 B | In the meta-address | No |
+| Viewing secret key (ML-KEM-768) | 2,400 B | Recipient device | Yes |
+| Meta-address (serialized) | 1,218 B | Published | No |
 | Announcement ciphertext | 1,088 B | On-chain or in the registry | No |
 | Shared secret | 32 B | Derived on both sides | Yes |
 | View tag | 1 B | In the announcement | No |
@@ -88,11 +88,12 @@ flowchart TD
 Almost everything after encapsulation comes from the 32-byte shared secret, expanded with domain-separated SHAKE-256 so that two different uses of the same secret never collide:
 
 ```
-view_tag      = SHAKE-256("SPECTER_VIEW_TAG_V1"  || shared_secret)[0]
-stealth_key   = SHAKE-256("SPECTER_STEALTH_PK_V1" || shared_secret)  combined with spending_pk
+view_tag      = SHAKE-256("SPECTER_VIEW_TAG_V1"      || shared_secret)[0]
+tweak  t      = H_to_scalar("SPECTER_STEALTH_TWEAK_V2" || shared_secret || counter)
+stealth addr  P = spending_pub + t·G     (additive tweak; recipient spends with b + t)
 ```
 
-The domain strings are the separator, and the `_V1` suffix versions them so the protocol can introduce new derivations later without ambiguity. The same shared secret feeds both, but the prefixes guarantee the view tag tells you nothing about the stealth key. The exact constructions live in the SPECTER Rust core; this section describes what each one produces and why.
+The domain strings are the separator, and the version suffix (`_V1` for the view tag, `_V2` for the tweak) versions them so the protocol can revise a derivation without ambiguity — the `_V2` tweak replaced a pre-2.0 hash-only construction that let the sender reconstruct the stealth private key. The same shared secret feeds both, but the prefixes guarantee the view tag tells you nothing about the stealth key. The exact constructions live in the SPECTER Rust core; this section describes what each one produces and why. See [stealth derivation](/under-the-hood/stealth-derivation) for the full tweak construction.
 
 ## Related
 

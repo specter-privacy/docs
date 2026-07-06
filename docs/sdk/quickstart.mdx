@@ -64,7 +64,7 @@ The package ships both browser and Node WebAssembly builds and picks the right o
     // Publish meta.hex to your registry or profile page.
     ```
 
-    **Verify:** `meta.bytes.length` is `2369` and `meta.address.version` is `1`.
+    **Verify:** `meta.bytes.length` is `1218` and `meta.address.version` is `2`.
   </Step>
 
   <Step title="Create a stealth payment (sender)" icon="route-2">
@@ -96,6 +96,7 @@ The package ships both browser and Node WebAssembly builds and picks the right o
       },
       recipient.viewing,
       recipient.spending.publicKey,
+      recipient.spending.secretKey, // recovers the spendable stealthKeys on a match
     );
 
     if (scan.isMatch) {
@@ -112,7 +113,7 @@ The package ships both browser and Node WebAssembly builds and picks the right o
 
 You ran the complete protocol without a server:
 
-1. Created two ML-KEM-768 keypairs and a meta-address.
+1. Created a hybrid identity — a secp256k1 spending keypair and an ML-KEM-768 viewing keypair — and a meta-address.
 2. Encapsulated to the viewing key to derive a one-time stealth address.
 3. Filtered by view tag, decapsulated the match, and recovered the spendable key.
 

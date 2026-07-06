@@ -20,6 +20,7 @@ export function setSdkModule(sdk) {
     verifyViewTag: sdk.verifyViewTag,
     deriveStealthAddress: sdk.deriveStealthAddress,
     deriveStealthSuiAddress: sdk.deriveStealthSuiAddress,
+    deriveStealthPublic: sdk.deriveStealthPublic,
     deriveStealthKeys: sdk.deriveStealthKeys,
     createStealthPayment: sdk.createStealthPayment,
     scanAnnouncement: sdk.scanAnnouncement,

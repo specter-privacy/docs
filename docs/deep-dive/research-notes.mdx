@@ -11,13 +11,14 @@ SPECTER's security model has a deliberate split: the receiving/discovery layer u
 
 ### Why the split exists
 
-Ethereum wallets only understand secp256k1 signatures. To make stealth addresses spendable in existing wallets, SPECTER derives a secp256k1 private key from the ML-KEM shared secret. The derivation path:
+Ethereum wallets only understand secp256k1 signatures. To make stealth addresses spendable in existing wallets, SPECTER shifts the recipient's secp256k1 spending key by a tweak derived from the ML-KEM shared secret — an ERC-5564-style additive construction. The derivation path:
 
 ```
 ML-KEM shared secret
-  → SHAKE-256("SPECTER_ETH_KEY_V1" || shared_secret || spending_pk)
-    → secp256k1 seed (reduced to a valid scalar)
-      → Ethereum private key + address
+  → t = H_to_scalar("SPECTER_STEALTH_TWEAK_V2" || shared_secret || counter)  // secp256k1 scalar, rejection-sampled
+    → stealth address  P = spending_pub + t·G        (sender, public data only)
+      → stealth private p = spending_sk + t (mod n)  (recipient, needs the secret spending key)
+        → Ethereum private key + address (keccak256), reused for the Sui address
 ```
 
 This gives you a wallet-compatible output today while protecting the discovery layer against future quantum attacks.
@@ -41,11 +42,9 @@ See the [ERC Proposal](/deep-dive/erc-proposal) for the formal specification, an
 SPECTER uses SHAKE-256 (a NIST-standardized extendable-output function) for all key derivations with domain separation:
 
 - `"SPECTER_VIEW_TAG_V1"` for view tag computation
-- `"SPECTER_STEALTH_PK_V1"` for stealth public key derivation
-- `"SPECTER_STEALTH_SK_V1"` for the matching stealth secret key
-- `"SPECTER_ETH_KEY_V1"` for the secp256k1 Ethereum spending key
+- `"SPECTER_STEALTH_TWEAK_V2"` for the secp256k1 stealth-address tweak `t` — the same scalar produces the address (`P = spending_pub + t·G`) and the spend key (`p = spending_sk + t`)
 
-The `_V1` suffix versions each label, leaving room for future derivations without ambiguity.
+The version suffix versions each label, leaving room to revise a derivation without ambiguity. The tweak label is at `_V2`: it replaced a pre-2.0 hash-only stealth derivation (`SPECTER_STEALTH_PK_V1` / `SK_V1` / `ETH_KEY_V1`) under which the sender could reconstruct the stealth private key.
 
 Domain separation prevents cross-protocol attacks where the same shared secret might produce colliding outputs in different contexts. SHAKE-256 provides 128-bit post-quantum security at 256-bit output length.
 

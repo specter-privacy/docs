@@ -1,6 +1,6 @@
 const SDK_URLS = [
-  'https://cdn.jsdelivr.net/npm/@specterpq/sdk@0.3.0/dist/index.js',
-  'https://unpkg.com/@specterpq/sdk@0.3.0/dist/index.js',
+  'https://cdn.jsdelivr.net/npm/@specterpq/sdk@2.0.0/dist/index.js',
+  'https://unpkg.com/@specterpq/sdk@2.0.0/dist/index.js',
 ];
 
 async function importExternalModule(url) {

@@ -41,8 +41,8 @@ flowchart TD
 
 Two jobs happen with the shared secret:
 
-1. **View tag derivation** - `SHAKE-256("SPECTER_VIEW_TAG" || shared_secret)` produces a 1-byte filter
-2. **Stealth key derivation** - `SHAKE-256("SPECTER_STEALTH_PK" || shared_secret)` combined with `spending_pk` produces the one-time address
+1. **View tag derivation** - `SHAKE-256("SPECTER_VIEW_TAG_V1" || shared_secret)` produces a 1-byte filter
+2. **Stealth tweak derivation** - `t = H_to_scalar("SPECTER_STEALTH_TWEAK_V2" || shared_secret || counter)` gives a secp256k1 scalar; the one-time address is `P = spending_pub + t·G`, spendable with `spending_sk + t`
 
 Both use domain-separated SHAKE-256, so different derivations from the same secret never collide.
 
