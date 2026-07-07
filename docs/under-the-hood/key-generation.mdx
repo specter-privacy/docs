@@ -1,9 +1,9 @@
 ---
 title: "Key Generation"
-description: "How SPECTER generates the spending and viewing ML-KEM-768 keypairs, why there are two, and how the public keys become a meta-address."
+description: "How SPECTER generates the secp256k1 spending keypair and the ML-KEM-768 viewing keypair, why there are two, and how the public keys become a meta-address."
 ---
 
-A recipient identity is two ML-KEM-768 keypairs: a **spending** pair and a **viewing** pair. This page explains how they are produced, why the protocol keeps them separate, and how their public halves combine into the one meta-address a recipient shares.
+A recipient identity is a **hybrid** pair: a **secp256k1 spending** keypair (the same curve Ethereum and Sui use) and a post-quantum **ML-KEM-768 viewing** keypair. This page explains how they are produced, why the protocol keeps them separate, and how their public halves combine into the one meta-address a recipient shares.
 
 ## Two keypairs, two jobs
 
@@ -16,16 +16,16 @@ The split exists so that a recipient can let software watch for payments without
 
 A scanning service or a hot device can hold the viewing secret key and still never move funds. The spending secret key can stay in colder storage and only come out to sign. See [security boundaries](/how-it-works/security-boundaries) for why this matters.
 
-## What ML-KEM-768 produces
+## What each keypair produces
 
-Each `generateKeysLocal` call runs the ML-KEM-768 key generation algorithm and returns one keypair:
+The two keypairs use different curves, so their sizes differ:
 
-| Part | Size | Notes |
-|------|------|-------|
-| Public key (encapsulation key) | 1,184 B | Safe to publish |
-| Secret key (decapsulation key) | 2,400 B | Never leaves the device |
+| Keypair | Public key | Secret key | Notes |
+|---------|-----------|-----------|-------|
+| Spending (secp256k1) | 33 B (compressed) | 32 B (scalar) | Standard Ethereum/Sui curve; safe to publish the public key |
+| Viewing (ML-KEM-768) | 1,184 B (encapsulation key) | 2,400 B (decapsulation key) | Post-quantum; the viewing public key encapsulates shared secrets |
 
-`generateSpecterKeys` calls this twice and labels the results `spending` and `viewing`. The sizes are fixed by [FIPS 203](https://csrc.nist.gov/pubs/fips/203/final); they are also exported as `KYBER_PUBLIC_KEY_SIZE` and `KYBER_SECRET_KEY_SIZE` so your code never has to hardcode them.
+`generateSpecterKeys` produces both and labels them `spending` and `viewing`. The viewing sizes are fixed by [FIPS 203](https://csrc.nist.gov/pubs/fips/203/final) and exported as `KYBER_PUBLIC_KEY_SIZE` / `KYBER_SECRET_KEY_SIZE`; the spending sizes are exported as `SPEND_PUBLIC_KEY_SIZE` / `SPEND_SECRET_KEY_SIZE`. `generateKeysLocal` remains available if you want a single ML-KEM-768 viewing keypair on its own.
 
 ## Where the randomness and the keys live
 
@@ -54,8 +54,8 @@ A recipient never publishes four separate keys. The two public keys are serializ
 <Zoomable label="Public keys to meta-address">
 ```mermaid
 flowchart LR
-    A["spending_pk (1184 B)"] --> M["meta-address (2369 B)"]
-    B["viewing_pk (1184 B)"] --> M
+    A["spending_pub (33 B, secp256k1)"] --> M["meta-address (1218 B)"]
+    B["viewing_pk (1184 B, ML-KEM)"] --> M
     C["version + metadata"] --> M
     M --> P["publish: meta.hex"]
 
@@ -63,7 +63,7 @@ flowchart LR
 ```
 </Zoomable>
 
-The serialized form is 2,369 bytes: the two 1,184-byte public keys plus a version byte and the metadata structure. The meta-address is the only address a recipient hands out, and it is reusable. Every payment to it still lands at a different stealth address, which is the subject of the [stealth derivation](/under-the-hood/stealth-derivation) page.
+The serialized form is 1,218 bytes: a version byte, the 33-byte secp256k1 spending public key, and the 1,184-byte ML-KEM viewing public key (any display metadata is carried alongside). The meta-address is the only address a recipient hands out, and it is reusable. Every payment to it still lands at a different stealth address, which is the subject of the [stealth derivation](/under-the-hood/stealth-derivation) page.
 
 ```typescript
 import { metaAddressFromPublicKeys } from '@specterpq/sdk';
@@ -73,7 +73,7 @@ const meta = metaAddressFromPublicKeys(
   recipient.viewing.publicKey,
   { description: 'Receive profile' },
 );
-// meta.hex is publishable; meta.bytes.length === 2369
+// meta.hex is publishable; meta.bytes.length === 1218
 ```
 
 ## Recovery implications

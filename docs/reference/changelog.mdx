@@ -10,7 +10,36 @@ description: "Release history and notable changes in SPECTER"
 ### Changed
 
 - Chain support pages now reflect the live set: Ethereum, Arbitrum, Monad, and Sui, running testnet-first (Sepolia, Arbitrum Sepolia, Monad Testnet, Sui testnet). Monad is described as the announcement registry chain. Base and Optimism remain on the roadmap.
-- Crypto domain separators now show their exact `_V1` labels (`SPECTER_VIEW_TAG_V1`, `SPECTER_STEALTH_PK_V1`, and related).
+- Crypto domain separators now show their exact labels (`SPECTER_VIEW_TAG_V1` for the view tag, `SPECTER_STEALTH_TWEAK_V2` for the stealth-address tweak).
+
+---
+
+## @specterpq/sdk v2.0.0
+
+*July 2026*
+
+Stealth-address derivation now matches the SPECTER backend byte-for-byte. **Breaking:** the addresses returned by `deriveStealthPublic` / `deriveStealthKeys` change, so upgrade to discover and spend real funds.
+
+### Fixed
+
+- The tweak scalar previously used the `SPECTER_STEALTH_TWEAK_V1` domain, the bare shared secret, and modular reduction. The backend (which computes the address the sender actually funds) uses `SPECTER_STEALTH_TWEAK_V2`, hashes `shared_secret || counter`, and selects the scalar by rejection sampling. The mismatch resolved every payment to an unfunded address. The two implementations are now locked together by a cross-implementation known-answer test. No funds were lost — they sit at the backend-derived addresses and become visible again after upgrade.
+
+---
+
+## @specterpq/sdk v1.0.0
+
+*July 2026*
+
+Hybrid recipient identity and a hardened HTTP client. **Breaking** change to the meta-address wire format and the spending-key type.
+
+### Changed
+
+- Recipients now hold a **secp256k1 spending keypair** plus the **ML-KEM-768 viewing keypair**. The meta-address wire format is v2 (1,218 bytes: version + 33-byte spending public key + 1,184-byte viewing public key). `generateSpecterKeys()` returns this hybrid identity.
+- Stealth derivation moved to an ERC-5564-style additive tweak (`P = B + t·G`, `p = b + t mod n`). The sender can compute the address but not the private key — fixing a flaw where the sender could reconstruct the recipient's stealth private key.
+
+### Security
+
+- Removed `generateKeysRemote()` and `scanRemote()` from the HTTP client, which could transmit secret keys. The client is now public-data only (`createStealthPaymentRemote`, `publishAnnouncement`). Generate keys and scan locally.
 
 ---
 

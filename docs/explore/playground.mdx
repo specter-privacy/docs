@@ -64,11 +64,11 @@ Run these in order. Each step feeds into the next.
 <Tabs>
   <Tab title="Step 1: Generate keys">
 
-Generate a fresh ML-KEM-768 keypair. This gives you everything needed to receive private payments.
+Generate a fresh hybrid identity — a secp256k1 spending keypair plus an ML-KEM-768 viewing keypair. This gives you everything needed to receive private payments.
 
 ```bash
 curl -s -X POST https://backend.specterpq.com/api/v1/keys/generate \
-  | tee /tmp/specter-keys.json | jq '{meta_address: .meta_address[0:40], spending_pk: .spending_pk[0:40], viewing_pk: .viewing_pk[0:40]}' && echo "... (truncated, full keys saved to /tmp/specter-keys.json)"
+  | tee /tmp/specter-keys.json | jq '{meta_address: .meta_address[0:40], spending_pub: .spending_pub[0:40], viewing_pk: .viewing_pk[0:40]}' && echo "... (truncated, full keys saved to /tmp/specter-keys.json)"
 ```
 
 Save the variables for the next steps:
@@ -76,8 +76,7 @@ Save the variables for the next steps:
 ```bash
 META_ADDRESS=$(jq -r '.meta_address' /tmp/specter-keys.json)
 VIEWING_SK=$(jq -r '.viewing_sk' /tmp/specter-keys.json)
-SPENDING_PK=$(jq -r '.spending_pk' /tmp/specter-keys.json)
-SPENDING_SK=$(jq -r '.spending_sk' /tmp/specter-keys.json)
+SPENDING_PUB=$(jq -r '.spending_pub' /tmp/specter-keys.json)
 ```
 
   </Tab>
@@ -126,15 +125,14 @@ curl -s -X POST https://backend.specterpq.com/api/v1/stealth/scan \
   -H "Content-Type: application/json" \
   -d "{
     \"viewing_sk\":\"$VIEWING_SK\",
-    \"spending_pk\":\"$SPENDING_PK\",
-    \"spending_sk\":\"$SPENDING_SK\"
+    \"spending_pub\":\"$SPENDING_PUB\"
   }" | jq .
 ```
 
-You should see one discovery with the same `stealth_address` from step 2.
+You should see one discovery with the same `stealth_address` from step 2, plus a `shared_secret` you combine with your spending secret key locally to derive the spendable key.
 
 <Warning>
-The scan response contains `eth_private_key`. This is real wallet secret material. Don't expose it in logs or analytics.
+The scan is spend-key-free — it takes only `viewing_sk` + `spending_pub` and never returns private keys. Still treat `viewing_sk` and each `shared_secret` as secret material.
 </Warning>
 
   </Tab>

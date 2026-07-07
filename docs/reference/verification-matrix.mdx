@@ -34,10 +34,10 @@ The matrix below maps the major public docs claims to source files and, where re
 
 | Docs claim | Verification source | Notes |
 |---|---|---|
-| `@specterpq/sdk` runs ML-KEM-768 key generation, encapsulation, and decapsulation locally in WebAssembly | [npm: `@specterpq/sdk`](https://www.npmjs.com/package/@specterpq/sdk), [`specter-sdk`](https://github.com/specter-privacy/specter-sdk) | Version 0.3.0. Ships browser and Node WASM builds compiled from the pinned Rust core. |
+| `@specterpq/sdk` runs ML-KEM-768 key generation, encapsulation, and decapsulation locally in WebAssembly | [npm: `@specterpq/sdk`](https://www.npmjs.com/package/@specterpq/sdk), [`specter-sdk`](https://github.com/specter-privacy/specter-sdk) | Version 2.0.0. Ships browser and Node WASM builds compiled from the pinned Rust core. |
 | The SDK derives stealth Ethereum and Sui addresses and recovers the spendable key | [npm: `@specterpq/sdk`](https://www.npmjs.com/package/@specterpq/sdk) | `createStealthPayment`, `scanAnnouncement`, `deriveStealthKeys`. Sizes are exported as constants. |
 | Secret-bearing fields are redacted from JSON and console output | [npm: `@specterpq/sdk`](https://www.npmjs.com/package/@specterpq/sdk) | Applies to `secretKey`, `sharedSecret`, and `ethPrivateKey`. Redaction does not protect against an app copying the value elsewhere. |
-| Local SDK helpers make no network calls | [npm: `@specterpq/sdk`](https://www.npmjs.com/package/@specterpq/sdk) | Network access is limited to the opt-in `createSpecterApiClient`. `scanRemote` and `generateKeysRemote` can expose secrets to the configured backend. |
+| Local SDK helpers make no network calls | [npm: `@specterpq/sdk`](https://www.npmjs.com/package/@specterpq/sdk) | Network access is limited to the opt-in `createSpecterApiClient`, which is public-data only (`createStealthPaymentRemote`, `publishAnnouncement`). Remote key generation and scanning were removed in v1.0.0, so no secret key can be sent to a backend. |
 
 ## Security, storage, and operations
 

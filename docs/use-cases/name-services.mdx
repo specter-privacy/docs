@@ -5,7 +5,7 @@ description: "How SPECTER integrates with ENS and SuiNS for human-readable steal
 
 ## Pay by name, not by hex
 
-Nobody wants to share a 2,368-byte hex string. SPECTER integrates with ENS (Ethereum Name Service) and SuiNS (Sui Name Service) so senders can just use a name like `alice.eth` or `alice.sui`.
+Nobody wants to share a 1,218-byte hex string. SPECTER integrates with ENS (Ethereum Name Service) and SuiNS (Sui Name Service) so senders can just use a name like `alice.eth` or `alice.sui`.
 
 <Zoomable label="Name services">
 ```mermaid
@@ -95,7 +95,7 @@ SPECTER uses Pinata as the IPFS gateway. The backend needs `PINATA_JWT`, `PINATA
 
 ## Why IPFS?
 
-Meta-addresses are ~2.4 KB (two ML-KEM public keys). Storing that directly in ENS text records works but is gas-expensive. IPFS stores the full payload off-chain with a small CID on-chain, keeping costs reasonable.
+Meta-addresses are ~1.2 KB (a 33-byte secp256k1 spending key plus a 1,184-byte ML-KEM viewing key). Storing that directly in ENS text records works but is gas-expensive. IPFS stores the full payload off-chain with a small CID on-chain, keeping costs reasonable.
 
 <CardGroup cols={2}>
   <Card title="Private payments" icon="shield-lock" href="/use-cases/private-payments">

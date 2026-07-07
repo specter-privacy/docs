@@ -18,7 +18,7 @@ More precisely:
 | Recipient discovery (scanning) | ML-KEM-768 | Post-quantum safe |
 | Shared secret derivation | ML-KEM-768 | Post-quantum safe |
 | View tag computation | SHAKE-256 | Post-quantum safe |
-| Stealth address derivation | SHAKE-256 + keccak256 | Post-quantum safe |
+| Stealth address derivation | SHAKE-256 tweak + secp256k1 + keccak256 | Post-quantum safe |
 | **Spending the funds** | **secp256k1** | **Classical (not PQ)** |
 
 ## Why receiving is stronger

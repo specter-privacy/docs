@@ -80,8 +80,9 @@ sequenceDiagram
     App->>API: POST /registry/announcements {payment_id, tx_hash}
 
     Note over App: Periodic (recipient side)
-    App->>API: POST /stealth/scan {viewing_sk, spending_pk, spending_sk}
-    API-->>App: [{stealth_address, eth_private_key, ...}]
+    App->>API: POST /stealth/scan {viewing_sk, spending_pub}
+    API-->>App: [{stealth_address, shared_secret, ...}]
+    App->>App: Derive spend key locally (spending_sk + tweak)
 ```
 
 ## Key management

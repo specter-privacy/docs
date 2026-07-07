@@ -21,11 +21,14 @@ console.log('\\nETH stealth address:', payment.ethAddress);
 console.log('Sui stealth address:', payment.suiAddress);
 console.log('View tag:', payment.viewTag);
 
-// 4. Recipient scans the announcement
+// 4. Recipient scans the announcement.
+//    Passing the spending SECRET key makes a match return stealthKeys
+//    (the spendable ethPrivateKey). Omit it for a watch-only scan.
 const result = scanAnnouncement(
   { ephemeralCiphertext: payment.ephemeralCiphertext, viewTag: payment.viewTag },
   recipient.viewing,
-  recipient.spending.publicKey
+  recipient.spending.publicKey,
+  recipient.spending.secretKey
 );
 console.log('\\nisMatch:', result.isMatch);
 if (result.isMatch) {
@@ -91,11 +94,12 @@ const meta = metaAddressFromPublicKeys(
 );
 const payment = createStealthPayment(meta.hex);
 
-// Single scan
+// Single scan (spending secret key derives the spendable stealthKeys)
 const result = scanAnnouncement(
   { ephemeralCiphertext: payment.ephemeralCiphertext, viewTag: payment.viewTag },
   recipient.viewing,
-  recipient.spending.publicKey
+  recipient.spending.publicKey,
+  recipient.spending.secretKey
 );
 console.log('isMatch:', result.isMatch);
 if (result.isMatch) {
@@ -137,8 +141,14 @@ const suiAddr = deriveStealthSuiAddress(recipient.spending.publicKey, sharedSecr
 console.log('\\nETH stealth address:', ethAddr);
 console.log('Sui stealth address:', suiAddr);
 
-const keys = deriveStealthKeys(recipient.spending.publicKey, sharedSecret);
-console.log('secp256k1 pubkey:', keys.publicKey.slice(0, 40) + '...');`,
+// Detection (public data only): re-derive the stealth secp256k1 public key
+const detected = deriveStealthPublic(recipient.spending.publicKey, sharedSecret);
+console.log('secp256k1 pubkey:', detected.publicKey.slice(0, 40) + '...');
+
+// Spending (needs the SECRET spending key): recover the one-time private key
+const spendKeys = deriveStealthKeys(recipient.spending.secretKey, sharedSecret);
+console.log('stealth ETH address:', spendKeys.ethAddress);
+console.log('ethPrivateKey: [redacted by SDK]');`,
 
   metadata: `await initSpecterSdk();
 

@@ -58,8 +58,8 @@ console.log(keys.meta_address);
 
 ## Response schema
 
-<ParamField body="spending_pk" type="string" required>
-Hex-encoded spending public key.
+<ParamField body="spending_pub" type="string" required>
+Hex-encoded spending public key (33-byte compressed secp256k1).
 </ParamField>
 <ParamField body="spending_sk" type="string" required>
 Hex-encoded spending secret key (sensitive).
@@ -71,7 +71,10 @@ Hex-encoded viewing public key.
 Hex-encoded viewing secret key (sensitive).
 </ParamField>
 <ParamField body="meta_address" type="string" required>
-Hex-encoded SPECTER meta-address combining spending + viewing public keys.
+Hex-encoded SPECTER meta-address combining spending + viewing public keys (1218 bytes).
+</ParamField>
+<ParamField body="protocol_version" type="integer" required>
+SPECTER protocol version encoded in the meta-address (currently `2`).
 </ParamField>
 
 <Warning>

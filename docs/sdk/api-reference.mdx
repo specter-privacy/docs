@@ -72,8 +72,8 @@ const meta = metaAddressFromPublicKeys(
 );
 
 meta.hex;             // publishable string
-meta.bytes.length;    // 2369
-meta.address.version; // 1
+meta.bytes.length;    // 1218
+meta.address.version; // 2
 ```
 
 ### `parseMetaAddress(input)`
@@ -148,15 +148,14 @@ Derives the stealth Sui address, `0x` plus 32 bytes.
 const suiAddress = deriveStealthSuiAddress(recipient.spending.publicKey, sharedSecret);
 ```
 
-### `deriveStealthKeys(spendingPk, sharedSecret)`
+### `deriveStealthKeys(spendingSk, sharedSecret)`
 
-Derives the full spendable key material for wallet import.
+Derives the full spendable key material for wallet import. Needs the recipient's **secret** spending key — passing a public key throws `INVALID_KEY_SIZE`. (For a watch-only re-derivation of the addresses and stealth public key without the secret, use `deriveStealthPublic(spendingPk, sharedSecret)`.)
 
 ```typescript
-const keys = deriveStealthKeys(recipient.spending.publicKey, sharedSecret);
+const keys = deriveStealthKeys(recipient.spending.secretKey, sharedSecret);
 keys.ethAddress;
 keys.suiAddress;
-keys.publicKey;      // secp256k1 uncompressed public key
 keys.ethPrivateKey;  // secret-bearing, redacted
 ```
 
@@ -173,27 +172,29 @@ const payment = createStealthPayment(meta.hex);
 // { ephemeralCiphertext, viewTag, ethAddress, suiAddress }
 ```
 
-### `scanAnnouncement(announcement, viewingKeys, spendingPublicKey)`
+### `scanAnnouncement(announcement, viewingKeys, spendingPublicKey[, spendingSecretKey])`
 
-Recipient helper for a single announcement.
+Recipient helper for a single announcement. Detection needs only the viewing keys and the spending **public** key. Pass the spending **secret** key as the optional fourth argument to also recover the spendable `stealthKeys`; omit it for a watch-only scan (a match then returns `result.detected` addresses with no private key).
 
 ```typescript
 const result = scanAnnouncement(
   { ephemeralCiphertext: payment.ephemeralCiphertext, viewTag: payment.viewTag },
   recipient.viewing,
   recipient.spending.publicKey,
+  recipient.spending.secretKey, // optional: derive the spendable stealthKeys
 );
 
 if (result.isMatch) {
-  result.stealthKeys.ethAddress;
+  result.stealthKeys.ethAddress;   // present because the secret key was supplied
+  result.stealthKeys.ethPrivateKey;
 } else {
   result.reason; // 'view_tag_mismatch' | 'address_mismatch'
 }
 ```
 
-### `scanAnnouncements(announcements, viewingKeys, spendingPublicKey)`
+### `scanAnnouncements(announcements, viewingKeys, spendingPublicKey[, spendingSecretKey])`
 
-Batch version. Returns an array of results.
+Batch version. Returns an array of results. Same optional spending-secret argument as `scanAnnouncement`.
 
 ```typescript
 const results = scanAnnouncements(batch, recipient.viewing, recipient.spending.publicKey);
@@ -250,7 +251,7 @@ Import these for runtime checks and schema alignment instead of hardcoding numbe
 | `KYBER_SECRET_KEY_SIZE` | 2400 | ML-KEM-768 secret key |
 | `KYBER_CIPHERTEXT_SIZE` | 1088 | Encapsulation ciphertext |
 | `KYBER_SHARED_SECRET_SIZE` | 32 | Shared secret |
-| `META_ADDRESS_SIZE` | 2369 | Serialized meta-address |
+| `META_ADDRESS_SIZE` | 1218 | Serialized meta-address (version + 33-byte secp256k1 spending key + 1184-byte ML-KEM viewing key) |
 | `VIEW_TAG_SIZE` | 1 | View tag |
 | `ETH_ADDRESS_SIZE` | 20 | Stealth Ethereum address |
 | `SUI_ADDRESS_SIZE` | 32 | Stealth Sui address |
@@ -332,10 +333,10 @@ const api = createSpecterApiClient({
 });
 ```
 
-Available methods: `generateKeysRemote()`, `createStealthPaymentRemote(metaAddress)`, `publishAnnouncement(input)`, and `scanRemote(input)`.
+Available methods: `createStealthPaymentRemote(metaAddress)` and `publishAnnouncement(input)`.
 
 <Warning>
-`generateKeysRemote()` and `scanRemote()` can send secret material to the server. Use them only against infrastructure you control, over TLS, behind your own authorization. For wallets, prefer `generateSpecterKeys()` and `scanAnnouncement()`, which never leave the device.
+The HTTP client is **public-data only** — it never transmits secret keys. The former `generateKeysRemote()` and `scanRemote()` methods were removed in v1.0.0 because they could send secret material over the wire. Generate keys with `generateSpecterKeys()` and scan with `scanAnnouncement()`; both run entirely on the device.
 </Warning>
 
 ## Related

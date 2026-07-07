@@ -50,6 +50,7 @@ const result = scanAnnouncement(
   { ephemeralCiphertext: announcement.ciphertext, viewTag: announcement.viewTag },
   recipient.viewing,
   recipient.spending.publicKey,
+  recipient.spending.secretKey, // recovers the spendable stealthKeys on a match
 );
 
 if (result.isMatch) {
@@ -62,8 +63,12 @@ if (result.isMatch) {
 For a batch, `scanAnnouncements` runs the same loop over an array and returns one result per announcement.
 
 ```typescript
-const matches = scanAnnouncements(batch, recipient.viewing, recipient.spending.publicKey)
-  .filter((r) => r.isMatch);
+const matches = scanAnnouncements(
+  batch,
+  recipient.viewing,
+  recipient.spending.publicKey,
+  recipient.spending.secretKey,
+).filter((r) => r.isMatch);
 ```
 
 ## Step 3: recover the key
@@ -78,7 +83,7 @@ for (const match of matches) {
 ```
 
 <Warning>
-The recovered private key spends real funds. Keep it inside the signing path. Do not log it, store it in plaintext, or send it to any service. Local scanning keeps this key on the device; remote scanning sends your viewing secret key to a backend, which is a different trust decision. See the [SDK security model](/sdk/security).
+The recovered private key spends real funds. Keep it inside the signing path. Do not log it, store it in plaintext, or send it to any service. The SDK scans locally: decapsulation and key recovery run on the device, and no secret key is ever transmitted. See the [SDK security model](/sdk/security).
 </Warning>
 
 ## Step 4: spend

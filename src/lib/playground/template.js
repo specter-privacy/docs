@@ -126,7 +126,7 @@ export const PLAYGROUND_TEMPLATE = `
   keys.viewing.publicKey,
   { description: <span class="str">'Alice'</span> }
 );
-<span class="cm">// meta.hex - 2369 bytes, publishable</span></div>
+<span class="cm">// meta.hex - 1218 bytes, publishable</span></div>
           <button class="btn btn-primary" id="btn-meta" disabled>
             <span class="spinner is-hidden" id="sp-meta"></span>
             RUN metaAddressFromPublicKeys()
@@ -201,6 +201,7 @@ export const PLAYGROUND_TEMPLATE = `
   { ephemeralCiphertext, viewTag },
   recipient.viewing,
   recipient.spending.publicKey,
+  recipient.spending.secretKey, <span class="cm">// spend key → derives stealthKeys</span>
 );
 <span class="kw">if</span> (result.isMatch) {
   <span class="cm">// result.stealthKeys.ethPrivateKey → import into viem / ethers</span>
@@ -350,6 +351,7 @@ export const PLAYGROUND_TEMPLATE = `
         <span class="global-pill">verifyViewTag</span>
         <span class="global-pill">deriveStealthAddress</span>
         <span class="global-pill">deriveStealthSuiAddress</span>
+        <span class="global-pill">deriveStealthPublic</span>
         <span class="global-pill">deriveStealthKeys</span>
         <span class="global-pill">createStealthPayment</span>
         <span class="global-pill">scanAnnouncement</span>
@@ -382,7 +384,7 @@ export const PLAYGROUND_TEMPLATE = `
     <p>
       <a href="https://github.com/specter-privacy/specter-sdk" target="_blank" rel="noreferrer">github.com/specter-privacy/specter-sdk</a>
       <span class="tag green">Apache-2.0</span>
-      <span class="tag">@specterpq/sdk@0.3.0</span>
+      <span class="tag">@specterpq/sdk@2.0.0</span>
     </p>
     <p>All cryptography runs client-side · No telemetry · No network calls</p>
   </footer>

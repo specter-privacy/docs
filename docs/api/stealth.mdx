@@ -95,11 +95,10 @@ Announcement object returned for client-side reference and fallback publish.
 <ParamField body="viewing_sk" type="string" required>
 Viewing secret key in hex.
 </ParamField>
-<ParamField body="spending_pk" type="string" required>
-Spending public key in hex.
-</ParamField>
-<ParamField body="spending_sk" type="string" required>
-Spending secret key in hex.
+<ParamField body="spending_pub" type="string" required>
+Spending public key in hex (33-byte compressed secp256k1). The scan endpoint never
+accepts the spending **secret** key — it returns each match's `shared_secret` so the client
+derives spend keys locally.
 </ParamField>
 <ParamField body="view_tags" type="array">
 Optional list of specific view tags to pre-filter announcements.
@@ -121,14 +120,27 @@ Array of discovered payments.
   <ParamField body="stealth_sui_address" type="string" required>
   Discovered Sui stealth address.
   </ParamField>
-  <ParamField body="stealth_sk" type="string" required>
-  Hex stealth private key.
+  <ParamField body="shared_secret" type="string" required>
+  Hex ML-KEM shared secret for this match. The client uses it with the spending **secret**
+  key locally to derive the one-time stealth private key — the server never sees the spend key.
   </ParamField>
-  <ParamField body="eth_private_key" type="string" required>
-  Ethereum-compatible private key.
+  <ParamField body="announcement_id" type="integer" required>
+  Registry ID of the matched announcement.
+  </ParamField>
+  <ParamField body="timestamp" type="integer" required>
+  Announcement timestamp (Unix seconds).
+  </ParamField>
+  <ParamField body="tx_hash" type="string">
+  Optional Monad announce transaction hash.
   </ParamField>
   <ParamField body="payment_tx_hash" type="string">
   Source-chain payment transaction hash decrypted from metadata.
+  </ParamField>
+  <ParamField body="amount" type="string">
+  Optional amount (hex uint256; empty when unavailable).
+  </ParamField>
+  <ParamField body="chain" type="string">
+  Optional chain identifier.
   </ParamField>
   <ParamField body="source_chain_id" type="integer">
   EIP-155 source-chain ID decrypted from metadata.
@@ -172,8 +184,7 @@ curl -s -X POST https://backend.specterpq.com/api/v1/stealth/scan \
   -H "Content-Type: application/json" \
   -d '{
     "viewing_sk":"<HEX_VIEWING_SK>",
-    "spending_pk":"<HEX_SPENDING_PK>",
-    "spending_sk":"<HEX_SPENDING_SK>",
+    "spending_pub":"<HEX_SPENDING_PUB>",
     "view_tags":[42]
   }' | jq .
 ```
@@ -202,11 +213,14 @@ console.log(createData.payment_id, createData.stealth_address, createData.view_t
   <Accordion title="Hex prefix handling">
     Scan key fields accept values with or without a `0x` prefix (`strip_hex_prefix` in handler).
   </Accordion>
-  <Accordion title="Secret material in discoveries">
-    Discovery output includes `stealth_sk` and `eth_private_key`. Treat response payload as highly sensitive.
+  <Accordion title="No private keys in discoveries">
+    Discovery output contains `shared_secret`, not private keys. The scan is spend-key-free: the
+    client combines `shared_secret` with the spending secret key **locally** to derive the one-time
+    stealth private key. The server never receives or returns spend keys.
   </Accordion>
 </AccordionGroup>
 
 <Warning>
-Treat all secret key fields and scan discovery private keys as production secrets.
+`viewing_sk` and every `shared_secret` in the response are sensitive — a shared secret plus the
+spending secret key recovers a spendable key. Treat them as production secrets.
 </Warning>

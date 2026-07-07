@@ -120,6 +120,10 @@ export async function scanAnnouncement() {
       { ephemeralCiphertext: ciphertext, viewTag },
       appState.recipientKeys.viewing,
       appState.recipientKeys.spending.publicKey,
+      // Pass the spending secret key so a match returns `stealthKeys` (with the
+      // spendable ethPrivateKey). Without it, scanAnnouncement is watch-only and
+      // returns only `detected` addresses (no private key).
+      appState.recipientKeys.spending.secretKey,
     );
 
     resultContainer.classList.add('visible');

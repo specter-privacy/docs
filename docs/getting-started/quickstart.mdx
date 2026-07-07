@@ -19,11 +19,10 @@ This quickstart uses the hosted backend at `https://backend.specterpq.com`. For 
 curl -s -X POST https://backend.specterpq.com/api/v1/keys/generate | tee /tmp/specter-keys.json
 META_ADDRESS=$(jq -r '.meta_address' /tmp/specter-keys.json)
 VIEWING_SK=$(jq -r '.viewing_sk' /tmp/specter-keys.json)
-SPENDING_PK=$(jq -r '.spending_pk' /tmp/specter-keys.json)
-SPENDING_SK=$(jq -r '.spending_sk' /tmp/specter-keys.json)
+SPENDING_PUB=$(jq -r '.spending_pub' /tmp/specter-keys.json)
 ```
 
-This creates two ML-KEM-768 keypairs and bundles the public keys into a `meta_address`.
+This creates a hybrid identity — a secp256k1 spending keypair plus an ML-KEM-768 viewing keypair — and bundles the two public keys into a `meta_address`.
 
 ### Step 2: Create the stealth payload
 
@@ -52,23 +51,23 @@ curl -s -X POST https://backend.specterpq.com/api/v1/registry/announcements \
 ```bash
 curl -s -X POST https://backend.specterpq.com/api/v1/stealth/scan \
   -H 'Content-Type: application/json' \
-  -d "{\"viewing_sk\":\"$VIEWING_SK\",\"spending_pk\":\"$SPENDING_PK\",\"spending_sk\":\"$SPENDING_SK\"}" | jq .
+  -d "{\"viewing_sk\":\"$VIEWING_SK\",\"spending_pub\":\"$SPENDING_PUB\"}" | jq .
 ```
 
 You should see:
 - One discovery in the results
 - `stealth_address` matching what you got in step 2
-- `eth_private_key` for spending the funds
+- `shared_secret` for this match — combine it with your spending secret key locally to derive the spendable stealth private key
 
 <Warning>
-Treat the scan response like wallet secret material. The `eth_private_key` and `stealth_sk` fields can spend real funds. Don't log them or expose them in client analytics.
+The scan is spend-key-free: it takes only `viewing_sk` + `spending_pub` and never returns private keys. Still treat `viewing_sk` and each `shared_secret` as secret material — a shared secret plus your spending secret key recovers a spendable key.
 </Warning>
 
 ## What just happened?
 
 You ran the complete SPECTER protocol:
 
-1. **Key generation** - Created ML-KEM-768 keypairs
+1. **Key generation** - Created a secp256k1 spending keypair + an ML-KEM-768 viewing keypair
 2. **Payment creation** - Used ML-KEM encapsulation to derive a one-time stealth address
 3. **Announcement** - Published the encrypted breadcrumb
 4. **Scanning** - Used view tag filtering + ML-KEM decapsulation to find and recover the payment

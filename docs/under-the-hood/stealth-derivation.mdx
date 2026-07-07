@@ -5,17 +5,24 @@ description: "How SPECTER turns a 32-byte shared secret and the recipient spendi
 
 The shared secret is not used as a key directly. It is expanded into the material for a fresh, one-time address, bound to the recipient's spending identity so that only the right recipient can recover the key that spends it. This page follows that expansion to a usable Ethereum and Sui address.
 
-## The expansion step
+## The tweak step
 
-The derivation starts from two inputs the sender already has: the 32-byte shared secret and the recipient's spending public key. It runs them through SHAKE-256 under a fixed domain string:
+The derivation starts from two inputs the sender already has: the 32-byte shared secret and the recipient's secp256k1 spending public key `B`. The shared secret is hashed into a secp256k1 scalar — the **tweak** `t` — under a fixed domain string:
 
 ```
-material = SHAKE-256("SPECTER_STEALTH_PK_V1" || shared_secret)   bound to spending_pk
+t = H_to_scalar("SPECTER_STEALTH_TWEAK_V2" || shared_secret || counter)
 ```
 
-The `"SPECTER_STEALTH_PK_V1"` prefix is the domain separator. It guarantees this output is independent of the [view tag](/under-the-hood/scanning-and-spending), which is derived from the same shared secret under a different prefix. The spending public key is mixed in so the resulting address is tied to one recipient. The matching secret path uses `"SPECTER_STEALTH_SK_V1"`, and the Ethereum spending key is derived under `"SPECTER_ETH_KEY_V1"` over `shared_secret || spending_pk`. The `_V1` suffix versions each label so future derivations stay unambiguous.
+`H_to_scalar` is SHAKE-256 with rejection sampling: it draws 32-byte candidates, incrementing the one-byte `counter` each time, until one lands in the valid range `[1, n)` for the secp256k1 group order `n`. The `"SPECTER_STEALTH_TWEAK_V2"` prefix is the domain separator, so this scalar is independent of the [view tag](/under-the-hood/scanning-and-spending), which is derived from the same shared secret under a different prefix. The `_V2` suffix versions the construction: it replaced the pre-2.0 hash-only derivation, under which the sender could reconstruct the stealth *private* key.
 
-The exact construction lives in the SPECTER Rust core. What matters for integration is the inputs, the outputs, and their sizes.
+The tweak then shifts the recipient's spending key — an ERC-5564-style additive construction over secp256k1:
+
+```
+stealth address   P = B + t·G      (sender computes this from the PUBLIC key B)
+stealth private   p = b + t mod n   (recipient computes this with the SECRET key b)
+```
+
+Because `p·G = P`, the address the sender funds from public data is exactly the one the recipient can spend. Critically, the sender **cannot** compute `p`: that needs the secret spending scalar `b`, which never leaves the recipient. The exact construction lives in the SPECTER Rust core and is matched byte-for-byte by the SDK. What matters for integration is the inputs, the outputs, and their sizes.
 
 ## Ethereum: a secp256k1 address
 
@@ -47,27 +54,27 @@ The sender and the recipient run derivations from the same inputs, but they need
 <Zoomable label="Stealth key generation">
 ```mermaid
 flowchart TD
-    SS["shared secret (32 B)"] --> SHAKE["SHAKE-256 + spending_pk"]
-    SHAKE --> ETH["secp256k1 keypair"]
-    ETH --> ADDR["Eth + Sui stealth address (sender needs this)"]
-    ETH --> PRIV["stealth private key (recipient needs this)"]
+    SS["shared secret (32 B)"] --> TWEAK["H_to_scalar → tweak t"]
+    B["spending pubkey B"] --> ADDR["P = B + t·G → Eth + Sui stealth address (sender needs this)"]
+    TWEAK --> ADDR
+    TWEAK --> PRIV["p = b + t → stealth private key (recipient needs secret b)"]
 
-    style SHAKE fill:#7c3aed,color:#fff
+    style TWEAK fill:#7c3aed,color:#fff
     style ADDR fill:#a855f7,color:#fff
     style PRIV fill:#6b21a8,color:#fff
 ```
 </Zoomable>
 
-- The **sender** uses `deriveStealthAddress` to get the destination, sends funds there, and is done.
-- The **recipient** uses `deriveStealthKeys` to recover the full key material, including the private key that signs.
+- The **sender** uses `deriveStealthAddress` (public key only) to get the destination, sends funds there, and is done.
+- The **recipient** uses `deriveStealthKeys` with their **secret** spending key to recover the private key that signs. (A watch-only client can call `deriveStealthPublic` to re-derive just the addresses and the stealth public key, without the secret.)
 
 ```typescript
 import { deriveStealthKeys } from '@specterpq/sdk';
 
-const keys = deriveStealthKeys(recipient.spending.publicKey, sharedSecret);
+// Needs the recipient's SECRET spending key — only they can run this.
+const keys = deriveStealthKeys(recipient.spending.secretKey, sharedSecret);
 keys.ethAddress;
 keys.suiAddress;
-keys.publicKey;      // secp256k1 uncompressed
 keys.ethPrivateKey;  // secret-bearing, spends the funds
 ```
 

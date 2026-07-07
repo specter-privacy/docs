@@ -78,6 +78,7 @@ const results = scanAnnouncements(
   announcements,
   recipient.viewing,
   recipient.spending.publicKey,
+  recipient.spending.secretKey, // recover the spendable stealthKeys on matches
 );
 
 for (const result of results) {
@@ -124,21 +125,9 @@ await api.publishAnnouncement({
 
 Publishing by `paymentId` lets the server announce its own stored data rather than trusting client-supplied view tags.
 
-### Remote key generation and scanning
+### No remote key generation or scanning
 
-`generateKeysRemote()` and `scanRemote()` exist for backends that own the full flow. Both can expose secret material to the server.
-
-```typescript
-const remoteScan = await api.scanRemote({
-  announcements,
-  viewingSk: recipient.viewing.secretKey,
-  spendingPk: recipient.spending.publicKey,
-});
-```
-
-<Warning>
-`scanRemote` sends the viewing secret key to your backend, and `generateKeysRemote` means the server generates and sees the keys. For anything holding user funds, prefer the local functions. Reach for these only when the server is yours and the trust is intentional. See the [security model](/sdk/security).
-</Warning>
+Earlier versions exposed `generateKeysRemote()` and `scanRemote()`, which could send secret key material to the server. **They were removed in v1.0.0.** The HTTP client is now public-data only (`createStealthPaymentRemote`, `publishAnnouncement`). Generate keys with `generateSpecterKeys()` and scan with `scanAnnouncement()` / `scanAnnouncements()` — both run entirely on the device and never transmit a secret key. See the [security model](/sdk/security).
 
 ## What the SDK does not do
 
