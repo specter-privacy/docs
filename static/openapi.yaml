@@ -1,0 +1,525 @@
+openapi: 3.1.0
+
+info:
+  title: SPECTER API
+  version: "1.0.0"
+  summary: Post-quantum stealth address payments for ENS and SuiNS names.
+  description: |
+    SPECTER lets anyone pay a human-readable name (`alice.eth`, `bob.sui`) so that
+    **only the recipient can discover, link, or spend the funds**. Discovery is
+    protected by ML-KEM-768 (NIST FIPS 203), so it stays private even against a
+    quantum adversary.
+
+    This API exposes **public data and server-side helpers only**. Secret keys are
+    generated and used inside the user's device via the WASM SDK; no endpoint here
+    accepts or returns a secret key.
+
+    ## How a payment works
+
+    A private payment is a four-step sequence, and the order matters:
+
+    1. `GET /api/v1/ens/resolve/{name}` — resolve the recipient to a meta-address.
+    2. `POST /api/v1/stealth/create` — get a `payment_id` and a one-time
+       `stealth_address`. **Nothing has been paid yet.**
+    3. Send the funds on-chain to `stealth_address`. This happens outside this API.
+       Wait for confirmation and keep the transaction hash.
+    4. `POST /api/v1/registry/announcements` with the `payment_id` from step 2 and
+       the `payment_tx_hash` from step 3.
+
+    ## The one rule that matters
+
+    **Always publish with `payment_id`.** The server holds the ML-KEM shared secret
+    against that id and uses it to encrypt the payment metadata (source transaction
+    hash, amount, chain) into the on-chain announcement.
+
+    Publishing with the raw `announcement` object instead is a fallback for clients
+    that lost their `payment_id`. It still makes the payment discoverable and
+    claimable, but the server has no secret to encrypt with, so the payment details
+    are **omitted** from the announcement. Prefer `payment_id` every time.
+
+    If a publish fails, **retry with the same `payment_id`** — it is preserved
+    across failed attempts and is only consumed once the announcement is broadcast.
+
+  contact:
+    name: SPECTER
+    url: https://specterpq.com
+  license:
+    name: MIT OR Apache-2.0
+
+servers:
+  - url: https://backend.specterpq.com
+    description: Production
+
+tags:
+  - name: Health
+    description: Service status.
+  - name: Names
+    description: Resolve ENS and SuiNS names to SPECTER meta-addresses.
+  - name: Payments
+    description: Create a stealth payment and publish its announcement.
+  - name: Registry
+    description: Read the announcement registry.
+  - name: IPFS
+    description: Pin and fetch meta-addresses.
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      operationId: getHealth
+      summary: Service health and registry size
+      description: |
+        Liveness plus a snapshot of backing services. Use this to check the API is
+        reachable before starting a payment flow.
+      responses:
+        "200":
+          description: Service is up.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/HealthResponse" }
+
+  /api/v1/ens/resolve/{name}:
+    get:
+      tags: [Names]
+      operationId: resolveEnsName
+      summary: Resolve an ENS name to a SPECTER meta-address
+      description: |
+        Reads the `specter` text record on the name (falling back to its content
+        hash) and fetches the meta-address from IPFS.
+
+        A `404 NO_SPECTER_RECORD` means the name exists but its owner has not set
+        up SPECTER — they cannot receive a private payment. Stop and tell the user
+        rather than retrying.
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: A full ENS name, including the TLD.
+          schema: { type: string }
+          examples:
+            registered: { value: empoweryourid.eth }
+      responses:
+        "200":
+          description: The name has a SPECTER meta-address.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ResolveEnsResponse" }
+        "404":
+          $ref: "#/components/responses/NoSpecterRecord"
+        "502":
+          $ref: "#/components/responses/UpstreamError"
+
+  /api/v1/suins/resolve/{name}:
+    get:
+      tags: [Names]
+      operationId: resolveSuinsName
+      summary: Resolve a SuiNS name to a SPECTER meta-address
+      description: |
+        The SuiNS equivalent of `resolveEnsName`. A `404
+        NO_SUINS_SPECTER_RECORD` means the name has no SPECTER record.
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: A full SuiNS name, including the `.sui` suffix.
+          schema: { type: string }
+          examples:
+            example: { value: alice.sui }
+      responses:
+        "200":
+          description: The name has a SPECTER meta-address.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ResolveSuinsResponse" }
+        "404":
+          $ref: "#/components/responses/NoSpecterRecord"
+        "502":
+          $ref: "#/components/responses/UpstreamError"
+
+  /api/v1/stealth/create:
+    post:
+      tags: [Payments]
+      operationId: createStealthPayment
+      summary: Derive a one-time stealth address for a recipient
+      description: |
+        Performs the ML-KEM encapsulation and returns a fresh, unlinkable address
+        to pay, plus a `payment_id` the server uses to remember the shared secret.
+
+        **This does not move any funds.** After calling it you must send the payment
+        on-chain to `stealth_address`, then publish the announcement with the
+        `payment_id`.
+
+        Keep the `payment_id`. It is valid for 24 hours, survives failed publishes,
+        and is consumed once the announcement is broadcast.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateStealthRequest" }
+      responses:
+        "200":
+          description: A one-time address the sender should fund.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CreateStealthResponse" }
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/registry/announcements:
+    get:
+      tags: [Registry]
+      operationId: listAnnouncements
+      summary: List announcements
+      description: |
+        Public announcement feed, newest first. Recipients scan this client-side:
+        the 1-byte `view_tag` discards roughly 99.6% of entries before any
+        cryptography runs.
+
+        Nothing here identifies a recipient — matching an announcement to a person
+        requires their secret viewing key, which never leaves their device.
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum entries to return.
+          schema: { type: integer, minimum: 1, default: 100 }
+        - name: offset
+          in: query
+          description: Pagination offset.
+          schema: { type: integer, minimum: 0, default: 0 }
+        - name: view_tag
+          in: query
+          description: Return only announcements with this view tag (0-255).
+          schema: { type: integer, minimum: 0, maximum: 255 }
+        - name: from_timestamp
+          in: query
+          description: Unix seconds, inclusive lower bound.
+          schema: { type: integer }
+        - name: to_timestamp
+          in: query
+          description: Unix seconds, inclusive upper bound.
+          schema: { type: integer }
+      responses:
+        "200":
+          description: A page of announcements.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListAnnouncementsResponse" }
+
+    post:
+      tags: [Payments]
+      operationId: publishAnnouncement
+      summary: Publish the announcement for a completed payment
+      description: |
+        The final step. The server verifies the payment landed on the source chain,
+        encrypts the payment metadata, and relays the announcement on-chain so the
+        recipient can discover it. Gas is sponsored — the caller pays nothing here.
+
+        Send `payment_id` and `payment_tx_hash`. Do **not** send the raw
+        `announcement` object unless the `payment_id` is genuinely unrecoverable:
+        without it the payment metadata cannot be encrypted and is left out of the
+        announcement entirely.
+
+        Call this only **after** the on-chain payment has confirmed. Verification
+        against the source chain will reject an unconfirmed transaction, and a
+        `400` saying the transaction "isn't visible on the source chain yet"
+        usually means you published too early — wait and retry with the same
+        `payment_id`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PublishAnnouncementRequest" }
+      responses:
+        "200":
+          description: Announcement relayed on-chain.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PublishAnnouncementResponse" }
+        "400":
+          description: |
+            Invalid input, the payment could not be verified, or the `payment_id`
+            is unknown or expired.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: |
+            This payment was already announced. If an earlier attempt succeeded the
+            recipient can already discover it — check the registry before retrying.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "503":
+          description: Every source-chain RPC endpoint was rate-limited. Safe to retry.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /api/v1/registry/stats:
+    get:
+      tags: [Registry]
+      operationId: getRegistryStats
+      summary: Registry size and view-tag distribution
+      responses:
+        "200":
+          description: Aggregate registry statistics.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RegistryStatsResponse" }
+
+  /api/v1/ipfs/upload:
+    post:
+      tags: [IPFS]
+      operationId: uploadMetaAddress
+      summary: Pin a meta-address to IPFS
+      description: |
+        Pins a meta-address and returns the CID plus a ready-to-use `text_record`
+        value. Set that value as the `specter` text record on an ENS name to start
+        receiving private payments.
+
+        A meta-address is public: it reveals no payment history and cannot be used
+        to spend.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UploadIpfsRequest" }
+      responses:
+        "200":
+          description: Pinned.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UploadIpfsResponse" }
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /api/v1/ipfs/{cid}:
+    get:
+      tags: [IPFS]
+      operationId: fetchMetaAddress
+      summary: Fetch a meta-address by CID
+      description: Returns the raw meta-address bytes for a pinned CID.
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: An IPFS CID, with or without an `ipfs://` prefix.
+          schema: { type: string }
+      responses:
+        "200":
+          description: Raw meta-address bytes.
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+        "500":
+          $ref: "#/components/responses/UpstreamError"
+
+components:
+  responses:
+    BadRequest:
+      description: The request was malformed or failed validation.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    NoSpecterRecord:
+      description: The name resolves but has no SPECTER record, so it cannot receive private payments.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    UpstreamError:
+      description: An upstream dependency (RPC or IPFS gateway) failed. Usually transient.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              description: Stable machine-readable code.
+              examples: [NO_SPECTER_RECORD, BAD_REQUEST, INTERNAL_ERROR, IPFS_ERROR, RPC_RATE_LIMITED]
+            message:
+              type: string
+              description: Human-readable explanation.
+
+    HealthResponse:
+      type: object
+      properties:
+        status: { type: string, examples: [ok] }
+        version: { type: string, examples: ["0.1.0"] }
+        uptime_seconds: { type: integer }
+        announcements_count: { type: integer, description: Announcements currently in the registry. }
+        use_testnet: { type: boolean, description: True when EVM flows target testnets. }
+        use_sui_testnet: { type: boolean }
+        relayer_ok: { type: boolean, description: Whether gas-sponsored publishing is available. }
+        turso_ok: { type: boolean }
+        poller_last_block: { type: [integer, "null"] }
+        poller_ok: { type: boolean }
+
+    ResolveEnsResponse:
+      type: object
+      required: [ens_name, meta_address, spending_pub, viewing_pk]
+      properties:
+        ens_name: { type: string, examples: [empoweryourid.eth] }
+        meta_address:
+          type: string
+          description: Hex meta-address. Pass this straight to `createStealthPayment`.
+        spending_pub: { type: string, description: Compressed secp256k1 spending public key (hex). }
+        viewing_pk: { type: string, description: ML-KEM-768 viewing public key (hex). }
+        ipfs_cid: { type: [string, "null"] }
+
+    ResolveSuinsResponse:
+      type: object
+      required: [suins_name, meta_address, spending_pub, viewing_pk]
+      properties:
+        suins_name: { type: string, examples: [alice.sui] }
+        meta_address: { type: string }
+        spending_pub: { type: string }
+        viewing_pk: { type: string }
+        ipfs_cid: { type: [string, "null"] }
+
+    CreateStealthRequest:
+      type: object
+      required: [meta_address]
+      properties:
+        meta_address:
+          type: string
+          description: Hex meta-address, normally taken from a name resolution response.
+
+    CreateStealthResponse:
+      type: object
+      required: [payment_id, stealth_address, stealth_sui_address, ephemeral_ciphertext, view_tag, announcement]
+      properties:
+        payment_id:
+          type: string
+          format: uuid
+          description: |
+            Server handle for this payment. Required when publishing so the metadata
+            can be encrypted. Valid 24h; survives failed publishes; single-use once
+            the announcement is broadcast.
+        stealth_address:
+          type: string
+          description: The EVM address to send funds to. Fresh and unlinkable to the recipient.
+        stealth_sui_address:
+          type: string
+          description: The equivalent Sui address, for payments on Sui.
+        ephemeral_ciphertext: { type: string, description: ML-KEM-768 ciphertext (hex, 1088 bytes). }
+        view_tag: { type: integer, minimum: 0, maximum: 255 }
+        announcement: { $ref: "#/components/schemas/Announcement" }
+
+    PublishAnnouncementRequest:
+      type: object
+      description: |
+        Supply `payment_id` (strongly preferred) **or** `announcement`. Sending
+        `payment_id` is what allows the payment metadata to be encrypted.
+      properties:
+        payment_id:
+          type: string
+          format: uuid
+          description: From `createStealthPayment`. Use this.
+        announcement:
+          $ref: "#/components/schemas/Announcement"
+        payment_tx_hash:
+          type: string
+          description: Hash of the confirmed on-chain payment to the stealth address.
+        chain:
+          type: string
+          description: Source chain the payment was made on.
+          examples: [sepolia, ethereum, arbitrum, monad-testnet, sui]
+        source_chain_id:
+          type: integer
+          description: EIP-155 chain id of the source chain.
+          examples: [11155111]
+        amount:
+          type: string
+          description: Amount in base units (wei / MIST) as a decimal string.
+          examples: ["1000000000000000"]
+        token:
+          type: string
+          description: ERC-20 contract address, when the payment was a token transfer rather than native value.
+        tx_hash:
+          type: string
+          description: Only for self-hosted deployments with no relayer configured. Ignored in production.
+
+    PublishAnnouncementResponse:
+      type: object
+      required: [id, success]
+      properties:
+        id: { type: integer, description: Registry id of the announcement. }
+        success: { type: boolean }
+        monad_tx_hash:
+          type: [string, "null"]
+          description: Hash of the relayed on-chain announce() transaction.
+
+    Announcement:
+      type: object
+      description: |
+        Null fields are omitted from responses rather than sent as `null`.
+
+        Freshly created by `createStealthPayment`, an announcement carries only
+        `id`, `ephemeral_key`, `view_tag`, `timestamp` and `stealth_address` — the
+        payment fields below are filled in at publish time. Do not expect an amount
+        or transaction hash to be present before the payment has been published.
+      properties:
+        id: { type: integer }
+        ephemeral_key: { type: string, description: ML-KEM ciphertext (hex, 1088 bytes). }
+        view_tag: { type: integer, minimum: 0, maximum: 255 }
+        timestamp: { type: integer, description: Unix seconds. }
+        source_chain_id: { type: [integer, "null"] }
+        tx_hash: { type: [string, "null"] }
+        payment_tx_hash: { type: [string, "null"] }
+        amount: { type: [string, "null"] }
+        chain: { type: [string, "null"] }
+        stealth_address: { type: [string, "null"] }
+        metadata_blob:
+          type: [string, "null"]
+          description: |
+            On-chain metadata. 93 bytes when encrypted (the normal path), or 77
+            bytes carrying only the view tag when published without a `payment_id`.
+        ephemeral_key_hash: { type: [string, "null"] }
+
+    ListAnnouncementsResponse:
+      type: object
+      required: [announcements, total]
+      properties:
+        announcements:
+          type: array
+          items: { $ref: "#/components/schemas/Announcement" }
+        total: { type: integer }
+
+    RegistryStatsResponse:
+      type: object
+      required: [total_announcements, view_tag_distribution]
+      properties:
+        total_announcements: { type: integer }
+        view_tag_distribution:
+          type: array
+          items:
+            type: object
+            properties:
+              tag: { type: integer, minimum: 0, maximum: 255 }
+              count: { type: integer }
+
+    UploadIpfsRequest:
+      type: object
+      required: [meta_address]
+      properties:
+        meta_address: { type: string, description: Hex meta-address to pin. }
+        name: { type: string, description: Optional label for the pin. }
+
+    UploadIpfsResponse:
+      type: object
+      required: [cid, text_record]
+      properties:
+        cid: { type: string }
+        text_record:
+          type: string
+          description: Value to set as the `specter` ENS text record.
+          examples: ["ipfs://bafkreigueerzwkv73lhvmhrfxfx4zsl36kmarpohgi5s6gftz4hy42plx4"]
